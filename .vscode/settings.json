@@ -1,0 +1,16 @@
+{
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"eslint.options": {
+		"resolvePluginsRelativeTo": ".",
+		"useEslintrc": true,
+		"overrideConfigFile": "./.eslintrc.yml"
+	},
+}
