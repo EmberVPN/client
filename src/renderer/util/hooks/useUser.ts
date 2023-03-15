@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import User from "../class/User";
 
-
 export function useUser() {
 
 	const [ isAuthorized, setIsAuthorized ] = useState<boolean>(false);
