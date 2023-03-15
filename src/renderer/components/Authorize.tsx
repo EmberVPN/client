@@ -123,6 +123,7 @@ export default function Authorize(): JSX.Element {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
+					Authorization: localStorage.getItem("authorization") ?? "",
 				},
 				body: JSON.stringify({ email, password, rememberme: true, noredirect: true })
 			});
@@ -212,7 +213,8 @@ export default function Authorize(): JSX.Element {
 			const resp = await fetch(APIROOT + "/auth/session", {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json"
+					"Content-Type": "application/json",
+					Authorization: localStorage.getItem("authorization") ?? "",
 				},
 				body: JSON.stringify({ email, password, token, rememberme, noredirect: true })
 			});

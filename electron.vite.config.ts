@@ -17,7 +17,8 @@ export default defineConfig({
 		},
 		define: {
 			global: {},
-			APIROOT: JSON.stringify("http://10.16.70.10:80/api")
+			APIROOT: JSON.stringify("https://api.embervpn.org")
+			// APIROOT: JSON.stringify("http://10.16.70.10:80/api"),
 		},
 		plugins: [
 			react()

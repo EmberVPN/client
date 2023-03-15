@@ -26,6 +26,7 @@ export function useUser() {
 
 	// Check if the user is authorized
 	useEffect(function() {
+		electron.ipcRenderer.send("titlebar", "splash");
 		
 		// Check if the user is authorized
 		if (data && data.success) {
