@@ -3,10 +3,11 @@ import { VscChromeClose, VscChromeMaximize, VscChromeMinimize, VscChromeRestore 
 import favicon from "../assets/ember.svg";
 
 interface Props {
-	children: React.ReactNode;
+	children?: React.ReactNode;
+	resizeable?: boolean;
 }
 
-export default function Titlebar({ children, ...props }: Props & HTMLAttributes<HTMLDivElement>): JSX.Element {
+export default function Titlebar({ children, resizeable = true }: Props & HTMLAttributes<HTMLDivElement>): JSX.Element {
 	const [ maximized, setMaximized ] = useState(false);
 	
 	function maximize() {
@@ -26,8 +27,8 @@ export default function Titlebar({ children, ...props }: Props & HTMLAttributes<
 			<div className="flex">
 				<div className="titlebar--button"
 					onClick={ () => electron.ipcRenderer.send("titlebar", "minimize") }><VscChromeMinimize /></div>
-				<div className="titlebar--button"
-					onClick={ maximize }>{maximized ? <VscChromeRestore /> : <VscChromeMaximize />}</div>
+				{ resizeable && <div className="titlebar--button"
+					onClick={ maximize }>{maximized ? <VscChromeRestore /> : <VscChromeMaximize />}</div>}
 				<div className="titlebar--button"
 					onClick={ window.close }><VscChromeClose /></div>
 			</div>

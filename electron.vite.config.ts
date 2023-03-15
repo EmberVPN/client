@@ -1,6 +1,5 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";
-import { resolve } from "path";
 
 export default defineConfig({
 	main: {
@@ -12,16 +11,24 @@ export default defineConfig({
 	renderer: {
 		resolve: {
 			alias: {
-				"@renderer": resolve("src/renderer/src"),
 				"assets": "./src/renderer/assets",
 				"styles": "./src/renderer/styles",
 			}
 		},
 		define: {
-			global: {}
+			global: {},
+			APIROOT: JSON.stringify("/api")
 		},
 		plugins: [
 			react()
-		]
+		],
+		server: {
+			proxy: {
+				"/api": {
+					target: "http://10.16.70.10:80",
+					changeOrigin: true,
+				}
+			}
+		}
 	}
 });

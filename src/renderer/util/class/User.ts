@@ -62,7 +62,7 @@ export default class User<Meta = Auth.Meta> {
 
 		// Upload file
 		async function upload(file: File | Blob): Promise<APIResponse> {
-			return await fetch("http://10.16.70.10:80/api/auth/avatar", {
+			return await fetch("/api/auth/avatar", {
 				method: "PUT",
 				headers: { "Content-Type": file.type },
 				body: file

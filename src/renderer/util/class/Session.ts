@@ -37,7 +37,7 @@ export default class Session implements Auth.Session {
 	}
 
 	public async revoke() {
-		return await fetch("http://10.16.70.10:80/api/auth/session", {
+		return await fetch("/api/auth/session", {
 			method: "DELETE",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ session_id: this.session_id })
