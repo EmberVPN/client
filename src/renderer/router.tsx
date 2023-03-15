@@ -33,8 +33,7 @@ root.render(
 // Export the application
 export function Application() {
 
-	const state = useUser();
-	const { isLoading, user } = state;
+	const { user } = useUser();
 
 	if (user === false) return (
 		<div className="h-screen flex flex-col">
