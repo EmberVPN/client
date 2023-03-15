@@ -1,5 +1,5 @@
 import { electronApp, is, optimizer } from "@electron-toolkit/utils";
-import { app, BrowserWindow, shell } from "electron";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { join } from "path";
 import icon from "../../build/icon.png?asset";
 
@@ -7,14 +7,14 @@ function createWindow(): void {
 
 	// Create the browser window.
 	const mainWindow = new BrowserWindow({
-		width: 900,
-		height: 670,
 		show: false,
-		minHeight: 440,
+		height: 440,
+
+		// resizable: false,
 		title: "Ember Client",
 		icon,
 		titleBarStyle: "hidden",
-		minWidth: 600,
+		width: 600,
 		autoHideMenuBar: true,
 		webPreferences: {
 			preload: join(__dirname, "../preload/index.js"),
@@ -63,6 +63,22 @@ app.whenReady().then(() => {
 		// dock icon is clicked and there are no other windows open.
 		if (BrowserWindow.getAllWindows().length === 0) createWindow();
 	});
+
+	ipcMain.on("titlebar", async(_, key, val) => {
+		switch (key) {
+			case "minimize":
+				BrowserWindow.getFocusedWindow()?.minimize();
+				break;
+			case "maximize":
+				if(val) BrowserWindow.getFocusedWindow()?.maximize();
+				else BrowserWindow.getFocusedWindow()?.unmaximize();
+				break;
+			case "close":
+				BrowserWindow.getFocusedWindow()?.close();
+				break;
+		}
+	});
+	
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

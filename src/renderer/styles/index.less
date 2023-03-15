@@ -4,6 +4,9 @@
 
 body {
 	@apply dark:bg-gray-900;
+}
+
+.window {
 	-webkit-app-region: drag;
 }
 
@@ -23,5 +26,23 @@ img {
 	100% {
 		opacity: 0;
 		transform: scale(1);
+	}
+}
+
+.titlebar--root {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	font-size: 14px;
+	-webkit-app-region: drag;
+	@apply h-8 flex w-full justify-between items-center text-gray-700 dark:text-gray-400 relative;
+	.titlebar--icon {
+		@apply h-5;
+	}
+	.titlebar--button {
+		-webkit-app-region: no-drag;
+		width: 46px;
+		@apply h-8 flex justify-center items-center bg-neutral-500 bg-opacity-0 hover:bg-opacity-10 active:hover:bg-opacity-20 select-none text-base;
+		&:last-child {
+			@apply hover:bg-red-500 hover:bg-opacity-100 hover:active:bg-opacity-70 hover:text-white;
+		}
 	}
 }

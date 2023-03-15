@@ -17,6 +17,11 @@ export default defineConfig({
 				"styles": "./src/renderer/styles",
 			}
 		},
-		plugins: [ react() ]
+		define: {
+			global: {}
+		},
+		plugins: [
+			react()
+		]
 	}
 });
