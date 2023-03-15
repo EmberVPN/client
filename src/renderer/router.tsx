@@ -4,6 +4,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import favicon from "./assets/ember.svg";
 import Authorize from "./components/Authorize";
+import EntryPoint from "./components/EntryPoint";
 import Titlebar from "./components/Titlebar";
 import "./styles/index.less";
 import { useUser } from "./util/hooks/useUser";
@@ -45,10 +46,8 @@ export function Application() {
 	if (user) return (
 		<div className="h-screen flex flex-col">
 			<Titlebar />
-			<div className="grid items-center justify-center grow overflow-auto">
-				Welcome back {user.username}
-				<button className="btn primary"
-					onClick={ signout }>sign out</button>
+			<div className="grow overflow-x-hidden overflow-auto">
+				<EntryPoint />
 			</div>
 		</div>
 	);
