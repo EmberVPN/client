@@ -10,7 +10,11 @@ export function useUser() {
 	const { data, isLoading, error } = useQuery("user", async function() {
 
 		// Fetch the user
-		const response = await fetch("/api/auth/@me");
+		const response = await fetch("/api/auth/@me", { 
+			headers: {
+				Authorization: localStorage.getItem("authorization") ?? "",
+			}
+		});
 
 		// Check if the user is authorized
 		if (!response.ok) return { success: false };

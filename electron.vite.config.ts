@@ -17,7 +17,7 @@ export default defineConfig({
 		},
 		define: {
 			global: {},
-			APIROOT: JSON.stringify("/api")
+			APIROOT: JSON.stringify("http://10.16.70.10:80/api")
 		},
 		plugins: [
 			react()

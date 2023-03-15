@@ -9,7 +9,7 @@ function createWindow(): void {
 	const mainWindow = new BrowserWindow({
 		icon,
 		show: false,
-		resizable: false,
+		// resizable: false,
 		title: "Ember Client",
 		titleBarStyle: "hidden",
 		width: 600,
@@ -80,7 +80,7 @@ app.whenReady().then(() => {
 			break;
 		case "splash":
 			BrowserWindow.getFocusedWindow()?.setSize(600, 440);
-			BrowserWindow.getFocusedWindow()?.setResizable(false);
+			// BrowserWindow.getFocusedWindow()?.setResizable(false);
 			break;
 		case "unsplash":
 			BrowserWindow.getFocusedWindow()?.setSize(800, 600);

@@ -31,16 +31,6 @@ export default function Authorize(): JSX.Element {
 		
 	}
 	
-	function close() {
-		
-		// Clear state
-		setPartial(null);
-		
-		// Scroll to first slide
-		scrollTo(0);
-		
-	}
-	
 	useEffect(() => scrollTo(0), []);
 	
 	function EmailSlide() {
@@ -132,31 +122,29 @@ export default function Authorize(): JSX.Element {
 			const resp = await fetch(APIROOT + "/auth/session", {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json"
+					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ email, password, rememberme: true })
+				body: JSON.stringify({ email, password, rememberme: true, noredirect: true })
 			});
 			
-			const json: APIResponse<Auth.Me> = await resp.json();
+			const json: APIResponse<{ session_id: string }> = await resp.json();
 			
 			// Stop loading
 			setLoading(false);
-
+			
 			// Check for 2 factor
 			if (resp.status === 417) return scrollTo(2);
 			
 			// If failed
 			if (!json.success) return setError(json.readable ?? json.description);
-
+			
 			// Close modal
-			close();
+			localStorage.setItem("authorization", json.session_id);
 
 			// Refetch user
 			setTimeout(refetch, 100);
 			
 		}
-
-		if (!partial) return (<div className="w-full inline-block p-4 align-top" />);
 
 		return (
 			<div className="w-full inline-block p-4 align-top">
@@ -165,7 +153,7 @@ export default function Authorize(): JSX.Element {
 						<img alt={ partial?.username }
 							className="w-12 h-12 rounded-full p-1"
 							onLoad={ () => scrollTo(1) }
-							src={ User.getAvatarURL(partial?.id) } />
+							src={ User.getAvatarURL(partial?.id ?? 0) } />
 						<p className="pr-4 flex flex-col leading-none">
 							<span className="font-medium">{partial?.username}</span>
 							<span className="text-xs">{partial?.email}</span>
@@ -226,10 +214,10 @@ export default function Authorize(): JSX.Element {
 				headers: {
 					"Content-Type": "application/json"
 				},
-				body: JSON.stringify({ email, password, token, rememberme })
+				body: JSON.stringify({ email, password, token, rememberme, noredirect: true })
 			});
-			
-			const json: APIResponse<Auth.Me> = await resp.json();
+
+			const json: APIResponse<{ session_id: string }> = await resp.json();
 			
 			// Stop loading
 			setLoading(false);
@@ -238,7 +226,7 @@ export default function Authorize(): JSX.Element {
 			if (!json.success) return setError(json.readable ?? json.description);
 			
 			// Close modal
-			close();
+			localStorage.setItem("session_id", json.session_id);
 
 			// Refetch user
 			setTimeout(refetch, 100);
