@@ -9,7 +9,6 @@ import Titlebar from "./components/Titlebar";
 import "./styles/index.less";
 import { useUser } from "./util/hooks/useUser";
 import queryClient from "./util/queryClient";
-import { signout } from "./util/signout";
 
 // Create the root element
 const root = createRoot(document.getElementById("root") as HTMLElement);
