@@ -10,7 +10,7 @@ export function useUser() {
 	const { data, isLoading, error } = useQuery("user", async function() {
 
 		// Fetch the user
-		const response = await fetch("/api/auth/@me", { 
+		const response = await fetch(APIROOT + "/auth/@me", { 
 			headers: {
 				Authorization: localStorage.getItem("authorization") ?? "",
 			}

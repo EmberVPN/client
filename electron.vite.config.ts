@@ -21,14 +21,6 @@ export default defineConfig({
 		},
 		plugins: [
 			react()
-		],
-		server: {
-			proxy: {
-				"/api": {
-					target: "http://10.16.70.10:80",
-					changeOrigin: true,
-				}
-			}
-		}
+		]
 	}
 });
