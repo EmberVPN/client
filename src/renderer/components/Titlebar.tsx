@@ -10,11 +10,16 @@ interface Props {
 export default function Titlebar({ children, resizeable = true }: Props & HTMLAttributes<HTMLDivElement>): JSX.Element {
 	const [ maximized, setMaximized ] = useState(false);
 	
-	function maximize() {
-		const state = !maximized;
-		setMaximized(state);
-		electron.ipcRenderer.send("titlebar", "maximize", state);
-	}
+	electron.ipcRenderer.on("titlebar", (_, action: string) => {
+		switch (action) {
+		case "maximize":
+			setMaximized(true);
+			break;
+		case "restore":
+			setMaximized(false);
+			break;
+		}
+	});
 
 	return (
 		<div className="titlebar--root">
@@ -28,7 +33,7 @@ export default function Titlebar({ children, resizeable = true }: Props & HTMLAt
 				<div className="titlebar--button"
 					onClick={ () => electron.ipcRenderer.send("titlebar", "minimize") }><VscChromeMinimize /></div>
 				{ resizeable && <div className="titlebar--button"
-					onClick={ maximize }>{maximized ? <VscChromeRestore /> : <VscChromeMaximize />}</div>}
+					onClick={ () => electron.ipcRenderer.send("titlebar", "restore") }>{maximized ? <VscChromeRestore /> : <VscChromeMaximize />}</div>}
 				<div className="titlebar--button"
 					onClick={ window.close }><VscChromeClose /></div>
 			</div>

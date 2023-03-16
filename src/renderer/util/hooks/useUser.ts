@@ -10,7 +10,7 @@ export function useUser() {
 	const { data, isLoading, error } = useQuery("user", async function() {
 
 		// Fetch the user
-		const response = await fetch(APIROOT + "/auth/@me", { 
+		const response = await fetch(APIROOT + "/auth/@me", {
 			headers: {
 				Authorization: localStorage.getItem("authorization") ?? "",
 			}
@@ -26,11 +26,10 @@ export function useUser() {
 
 	// Check if the user is authorized
 	useEffect(function() {
-		electron.ipcRenderer.send("titlebar", "splash");
 		
 		// Check if the user is authorized
 		if (data && data.success) {
-			electron.ipcRenderer.send("titlebar", "unsplash");
+			electron.ipcRenderer.send("titlebar", "unlock");
 			setIsAuthorized(true);
 			localStorage.setItem("authorization", data.authorization);
 			setUser(new User(data));
@@ -38,7 +37,7 @@ export function useUser() {
 		}
 		
 		if (data && !data.success) {
-			electron.ipcRenderer.send("titlebar", "splash");
+			if (isAuthorized) electron.ipcRenderer.send("titlebar", "lock");
 			setIsAuthorized(false);
 			setUser(false);
 			return;

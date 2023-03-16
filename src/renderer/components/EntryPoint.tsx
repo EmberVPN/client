@@ -14,7 +14,8 @@ export default function EntryPoint(): JSX.Element | null {
 	);
 
 	if (subscription === undefined || !subscription.success || !user) {
-		window.open("//embervpn.org");
+		if (import.meta.env.DEV) return null;
+		window.open("//embervpn.org/plans");
 		window.close();
 		return null;
 	}
@@ -22,6 +23,6 @@ export default function EntryPoint(): JSX.Element | null {
 	const { product } = subscription.items.data[0].plan;
 
 	return (
-		<pre className="p-4 m-4 rounded-lg bg-gray-200 dark:bg-gray-800">{JSON.stringify({ product, user: user.id }, null, 2)}</pre>
+		<pre className="p-4 m-4 rounded-lg bg-gray-200 dark:bg-gray-800 grow">{JSON.stringify({ product, user: user.id }, null, 2)}</pre>
 	);
 }

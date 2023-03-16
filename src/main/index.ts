@@ -9,7 +9,7 @@ function createWindow(): void {
 	const mainWindow = new BrowserWindow({
 		icon,
 		show: false,
-		// resizable: false,
+		resizable: false,
 		title: "Ember Client",
 		titleBarStyle: "hidden",
 		width: 600,
@@ -27,6 +27,9 @@ function createWindow(): void {
 	mainWindow.on("ready-to-show", () => {
 		mainWindow.show();
 	});
+	
+	mainWindow.on("maximize", () => mainWindow.webContents.send("titlebar", "maximize"));
+	mainWindow.on("unmaximize", () => mainWindow.webContents.send("titlebar", "restore"));
 
 	mainWindow.webContents.setWindowOpenHandler(details => {
 		shell.openExternal(details.url);
@@ -67,26 +70,24 @@ app.whenReady().then(() => {
 	});
 
 	ipcMain.on("titlebar", async(_, key, val) => {
-		switch (key) {
-		case "minimize":
-			BrowserWindow.getFocusedWindow()?.minimize();
-			break;
-		case "maximize":
-			if (val) BrowserWindow.getFocusedWindow()?.maximize();
-			else BrowserWindow.getFocusedWindow()?.unmaximize();
-			break;
-		case "close":
-			BrowserWindow.getFocusedWindow()?.close();
-			break;
-		case "splash":
-			BrowserWindow.getFocusedWindow()?.setSize(600, 440);
-			// BrowserWindow.getFocusedWindow()?.setResizable(false);
-			break;
-		case "unsplash":
-			BrowserWindow.getFocusedWindow()?.setSize(800, 600);
-			BrowserWindow.getFocusedWindow()?.setResizable(true);
-			break;
+		
+		const win = BrowserWindow.getFocusedWindow();
+		if (!win) return;
+
+		if (key === "minimize") win.minimize();
+		if (key === "restore") win.isMaximized() ? win.restore() : win.maximize();
+		if (key === "close") win.close();
+			
+		if (key === "lock") {
+			win.setSize(600, 440);
+			win.setResizable(false);
 		}
+		
+		if (key === "unlock") {
+			win.setResizable(true);
+			win.setMinimumSize(600, 440);
+		}
+				
 	});
 	
 });
