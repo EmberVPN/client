@@ -107,13 +107,18 @@ jobs:
           name: mac
           path: dist/*.dmg
 
-  release:
-    name: Release
+  create-release:
+    name: Create Release
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/stable'
     needs: [build-win, build-linux, build-mac]
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
       - name: "Download Artifact (Windows)"
         uses: actions/download-artifact@v3
         with:
@@ -130,22 +135,19 @@ jobs:
           name: mac
           path: dist
 
-      - name: "Upload Artifact (Windows)"
-        uses: actions/upload-artifact@v3
+      - name: "Create Release"
+        uses: softprops/action-gh-release@v1
         with:
-          name: release
-          path: dist/*.exe
-
-      - name: "Upload Artifact (Linux)"
-        uses: actions/upload-artifact@v3
-        with:
-          name: release
-          path: |
+          files: |
+            dist/*.exe
             dist/*.deb
             dist/*.snap
-
-      - name: "Upload Artifact (MacOS)"
-        uses: actions/upload-artifact@v3
-        with:
-          name: release
-          path: dist/*.dmg
+            dist/*.dmg
+          draft: true
+          prerelease: true
+          tag_name: ${{ github.ref }}
+          name: ${{ github.ref }}
+          body: |
+            ## Changelog
+            ${CHANGELOG}
+          token: ${{ secrets.GITHUB_TOKEN }}
