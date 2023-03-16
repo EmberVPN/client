@@ -135,6 +135,10 @@ jobs:
           name: mac
           path: dist
 
+      - name: Read Version
+        uses: dutscher/read-package-json-endpoint-actions@v1.33.7
+        id: version
+
       - name: "Create Release"
         uses: softprops/action-gh-release@v1
         with:
@@ -145,9 +149,6 @@ jobs:
             dist/*.dmg
           draft: true
           prerelease: true
-          tag_name: ${{ github.ref }}
-          name: ${{ github.ref }}
-          body: |
-            ## Changelog
-            ${CHANGELOG}
+          tag_name: v${{ steps.version.outputs.endpoint }}
+          name: v${{ steps.version.outputs.endpoint }}
           token: ${{ secrets.GITHUB_TOKEN }}
