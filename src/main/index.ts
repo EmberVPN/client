@@ -69,7 +69,7 @@ app.whenReady().then(() => {
 		if (BrowserWindow.getAllWindows().length === 0) createWindow();
 	});
 
-	ipcMain.on("titlebar", async(_, key, val) => {
+	ipcMain.on("titlebar", async(_, key) => {
 		
 		const win = BrowserWindow.getFocusedWindow();
 		if (!win) return;
