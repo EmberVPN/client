@@ -2,6 +2,7 @@ import { electronApp, is, optimizer } from "@electron-toolkit/utils";
 import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { join } from "path";
 import icon from "../../build/icon.png?asset";
+import openvpn from "./openvpn";
 
 function createWindow(): void {
 
@@ -89,6 +90,8 @@ app.whenReady().then(() => {
 		}
 				
 	});
+
+	ipcMain.on("openvpn", openvpn);
 	
 });
 

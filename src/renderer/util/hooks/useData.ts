@@ -1,7 +1,8 @@
 import { useQuery } from "react-query";
 
 interface Endpoints {
-	"/ember/subscription": REST.Subscription
+	"/ember/servers": REST.Servers;
+	"/ember/subscription": REST.Subscription;
 }
 
 export default function useData<T extends keyof Endpoints>(route: T): { data: Endpoints[T] | undefined, isLoading: boolean } {

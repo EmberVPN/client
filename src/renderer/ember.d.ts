@@ -210,6 +210,16 @@ declare namespace Ember {
         trial_settings: TrialSettings;
         trial_start?: any;
         success: boolean;
-    }
+	}
+	
+	export interface Server {
+		ip: string;
+		port: string;
+		proto: "tcp" | "udp";
+		name: string;
+		location: string;
+		granted_to: string[];
+		hash: string;
+	}
 
 }

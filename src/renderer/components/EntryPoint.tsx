@@ -1,5 +1,6 @@
 import useData from "../util/hooks/useData";
 import { useUser } from "../util/hooks/useUser";
+import Servers from "./Servers";
 import Spinner from "./Spinner";
 
 export default function EntryPoint(): JSX.Element | null {
@@ -20,9 +21,12 @@ export default function EntryPoint(): JSX.Element | null {
 		return null;
 	}
 
-	const { product } = subscription.items.data[0].plan;
+	// Get the product ID from the subscription
+	// const { product } = subscription.items.data[0].plan;
 
 	return (
-		<pre className="p-4 m-4 rounded-lg bg-gray-200 dark:bg-gray-800 grow">{JSON.stringify({ product, user: user.id }, null, 2)}</pre>
+		<div className="p-4 m-4 rounded-lg bg-gray-200 dark:bg-gray-800 grow flex flex-col gap-4">
+			<Servers />
+		</div>
 	);
 }

@@ -9,6 +9,10 @@ declare namespace REST {
 		currentSubscription: Ember.Subscription | false | null;
 	}
 
+	export interface Servers extends Success {
+		servers: Ember.Server[];
+	}
+
 	export type Subscription = Success & Ember.Subscription;
 
 }
