@@ -18,8 +18,6 @@ export default defineConfig({
 		define: {
 			global: {},
 			APIROOT: JSON.stringify("https://api.embervpn.org")
-			// APIROOT: JSON.stringify("http://10.16.70.10/api")
-			// APIROOT: JSON.stringify(process.env.NODE_ENV === "production" ? "https://api.embervpn.org" : "http://10.16.70.10:80/api")
 		},
 		plugins: [
 			react()

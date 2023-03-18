@@ -16,8 +16,6 @@ export default async function openvpn(_event: Electron.IpcMainEvent, mode: "conn
 		console.log(server)
 		
 		// Download config file
-		// const resp = await fetch(`${process.env.NODE_ENV === "production" ? "https://api.embervpn.org" : "http://10.16.70.10:80/api"}/rsa/download-client-config?server=${server.id}`, {
-		// const resp = await fetch(`http://10.16.70.10:80/api/rsa/download-client-config?server=${server.id}`, {
 		const resp = await fetch(`https://api.embervpn.org/rsa/download-client-config?server=${server.id}`, {
 			method: "POST",
 			headers: {
