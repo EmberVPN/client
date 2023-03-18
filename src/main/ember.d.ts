@@ -220,6 +220,6 @@ declare namespace Ember {
         port: string;
         proto: string;
         hostname: string;
-    }
+	}
 
 }

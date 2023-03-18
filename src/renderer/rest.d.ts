@@ -10,7 +10,7 @@ declare namespace REST {
 	}
 
 	export interface Servers extends Success {
-		servers: Ember.Server[];
+		servers: Record<string, Ember.Server>;
 	}
 
 	export type Subscription = Success & Ember.Subscription;

@@ -10,8 +10,9 @@ export default function Servers(): JSX.Element {
 
 	return (
 		<div className="flex flex-col">
-			{servers.map((server, i) => (<Server key={ i }
-				server={ server } />))}
+			{Object.keys(servers).map((server, key) => <Server hash={ Object.keys(servers)[key] }
+				key={ key }
+				server={ servers[server] } />) }
 		</div>
 	);
 }
