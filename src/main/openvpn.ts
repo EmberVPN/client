@@ -1,8 +1,9 @@
 import { BrowserWindow } from "electron";
 import { writeFile } from "fs/promises";
+import mkdirp from "mkdirp";
 import fetch from "node-fetch";
 import { homedir } from "os";
-import { join } from "path";
+import { dirname, join } from "path";
 
 export default async function openvpn(_event: Electron.IpcMainEvent, mode: "connect" | "disconnect", data) {
 
@@ -31,7 +32,9 @@ export default async function openvpn(_event: Electron.IpcMainEvent, mode: "conn
 		}
 		
 		// Write config file
-		await writeFile(join(homedir(), "OpenVPN", "config", "EMBER.ovpn"), Buffer.from(config, "base64").toString("utf-8"));
+		const path = join(homedir(), "OpenVPN", "config", "EMBER.ovpn");
+		await mkdirp(dirname(path));
+		await writeFile(path, Buffer.from(config, "base64").toString("utf-8"));
 		mainWindow.webContents.send("openvpn", "connected");
 
 	}
