@@ -40,24 +40,26 @@ export default async function openvpn(_event: Electron.IpcMainEvent, state: Stat
 		await writeFile(path, Buffer.from(config, "base64").toString("utf-8"));
 
 		// If openvpn isnt installed
-		if (!existsSync(join(res, ".bin/win/openvpn.exe"))) {
+		if (!existsSync(join(res, "openvpn-binary/win/openvpn.exe"))) {
 
 			// Begin installation
 			spawnSync([
 				"msiexec",
 				"/i",
-				`"${ join(res, ".bin/installer.msi") }"`,
-				`PRODUCTDIR="${ join(res, ".bin/win/bin") }"`,
+				`"${ join(res, "openvpn-binary/installer.msi") }"`,
+				`PRODUCTDIR="${ join(res, "openvpn-binary") }"`,
 				"ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun",
 				"/passive",
 				"/l*v",
-				join(res, ".bin/installer.log")
-			].join(" "));
+				join(res, "openvpn-binary/installer.log")
+			].join(" "), {
+				shell: true,
+			});
 
 		}
 
 		// Spawn openvpn
-		ovpn = spawn(join(res, ".bin/win/bin/openvpn.exe"), [ "--config", path ], {
+		ovpn = spawn(join(res, "openvpn-binary/bin/openvpn.exe"), [ "--config", path ], {
 			detached: true,
 		});
 

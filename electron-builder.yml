@@ -10,10 +10,10 @@ files:
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 extraResources:
-  - 'resources/.bin/*'
+  - 'resources/opevpn-binary/*'
 
 asarUnpack:
-  - .bin/**
+  - opevpn-binary/*
 afterSign: build/notarize.js
 win:
   executableName: ember-client
