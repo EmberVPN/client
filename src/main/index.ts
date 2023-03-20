@@ -2,7 +2,7 @@ import { electronApp, is, optimizer } from "@electron-toolkit/utils";
 import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { join } from "path";
 import icon from "../../build/icon.png?asset";
-import openvpn from "./openvpn";
+import openvpn, { tray } from "./openvpn";
 
 function createWindow(): void {
 
@@ -77,7 +77,13 @@ app.whenReady().then(() => {
 
 		if (key === "minimize") win.minimize();
 		if (key === "restore") win.isMaximized() ? win.restore() : win.maximize();
-		if (key === "close") win.close();
+		if (key === "hide") {
+			if (tray) {
+				win.hide();
+			} else {
+				win.close();
+			}
+		}
 			
 		if (key === "lock") {
 			win.setSize(600, 440);
