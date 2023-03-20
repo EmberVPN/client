@@ -55,6 +55,9 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 
 		// If windows
 		if (process.platform === "win32") {
+
+			// Kill all existing openvpn processes
+			spawnSync("taskkill /f /im openvpn.exe", { shell: true });
 			
 			// Prod binarys
 			const bin = isDev ? resolve("C:\\Program Files\\OpenVPN\\bin\\openvpn.exe") : join(exe, ".bin/bin/openvpn.exe");
@@ -85,6 +88,9 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 			
 		} else if (process.platform === "linux") {
 
+			// Kill all existing openvpn processes
+			spawnSync("killall openvpn", { shell: true });
+
 			// Install openvpn
 			if (!existsSync("/usr/sbin/openvpn") && !isDev) {
 				spawnSync("apt install openvpn -y", { shell: true });
@@ -96,6 +102,9 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 			});
 
 		} else if (process.platform === "darwin") {
+
+			// Kill all existing openvpn processes
+			spawnSync("killall openvpn", { shell: true });
 
 			// Install openvpn
 			if (!existsSync("/usr/local/sbin/openvpn") && !isDev) {
