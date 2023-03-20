@@ -6,6 +6,8 @@ import { join, resolve } from "path";
 
 type State = "connect" | "disconnect";
 
+const res = process.env.NODE_ENV_ELECTRON_VITE === "development" ? resolve(".") : resolve(app.getPath("exe"), "../resources/app.asar.unpacked");
+
 export default async function openvpn(_event: Electron.IpcMainEvent, state: State, data: string) {
 
 	// Get main window
@@ -13,6 +15,8 @@ export default async function openvpn(_event: Electron.IpcMainEvent, state: Stat
 	if (!mainWindow) return;
 
 	if (state === "connect") {
+
+		console.log(process.env);
 
 		// Get server
 		const { server, session_id }: { server: Ember.Server; session_id: string } = JSON.parse(data);
@@ -33,15 +37,17 @@ export default async function openvpn(_event: Electron.IpcMainEvent, state: Stat
 		const path = join(app.getPath("temp"), "EMBER.ovpn");
 		await writeFile(path, Buffer.from(config, "base64").toString("utf-8"));
 
+		// Alert in a dialog box
+
 		// Spawn openvpn
-		spawnSync("cscript.exe", [ resolve(".bin/connect.vbs"), path ]);
+		spawnSync("cscript.exe", [ join(res, ".bin/connect.vbs"), path ]);
 
 		mainWindow.webContents.send("openvpn", "connected", server.hash);
 
 	}
 
 	if (state === "disconnect") {
-		spawnSync("cscript.exe", [ resolve(".bin/disconnect.vbs") ]);
+		spawnSync("cscript.exe", [ join(res, ".bin/disconnect.vbs") ]);
 		mainWindow.webContents.send("openvpn", "disconnected");
 	}
 
