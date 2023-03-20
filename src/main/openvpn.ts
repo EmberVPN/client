@@ -59,8 +59,6 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 			// Prod binarys
 			const bin = isDev ? resolve("C:\\Program Files\\OpenVPN\\bin\\openvpn.exe") : join(exe, ".bin/bin/openvpn.exe");
 
-			console.log(exe);
-
 			// If openvpn isnt installed
 			if (!existsSync(bin) && !isDev) {
 
@@ -84,31 +82,48 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 			ovpn = spawn(bin, [ "--config", path ], {
 				detached: true,
 			});
+			
+		} else if (process.platform === "linux") {
 
-			tray.setContextMenu(Menu.buildFromTemplate([ {
-				label: "Exit",
-				click: () => mainWindow.close()
-			}, {
-				label: "Disconnect",
-				click: () => ovpn?.kill("SIGINT")
-			} ]));
-				
-			tray.displayBalloon({
-				title: "Ember VPN",
-				content: `Connected to ${ server.hostname } (${ server.ip })`,
-				icon: resolve(exe, "./src/renderer/assets/balloon.png")
+			// Install openvpn
+			if (!existsSync("/usr/sbin/openvpn") && !isDev) {
+				spawnSync("apt install openvpn -y", { shell: true });
+			}
+
+			// Spawn openvpn
+			ovpn = spawn("openvpn", [ "--config", path ], {
+				detached: true,
 			});
 
-			mainWindow.webContents.send("openvpn", "connected", server.hash);
-			
-		} else {
-			
+		} else if (process.platform === "darwin") {
+
+			// Install openvpn
+			if (!existsSync("/usr/local/sbin/openvpn") && !isDev) {
+				spawnSync("brew install openvpn", { shell: true });
+			}
+
 			// Spawn openvpn
 			ovpn = spawn("openvpn", [ "--config", path ], {
 				detached: true,
 			});
 
 		}
+
+		tray.setContextMenu(Menu.buildFromTemplate([ {
+			label: "Exit",
+			click: () => mainWindow.close()
+		}, {
+			label: "Disconnect",
+			click: () => ovpn?.kill("SIGINT")
+		} ]));
+				
+		tray.displayBalloon({
+			title: "Ember VPN",
+			content: `Connected to ${ server.hostname } (${ server.ip })`,
+			icon: resolve(exe, "./src/renderer/assets/balloon.png")
+		});
+
+		mainWindow.webContents.send("openvpn", "connected", server.hash);
 
 		// Handle openvpn output
 		ovpn?.stdout.on("data", data => {
@@ -134,7 +149,10 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 
 	if (state === "disconnect") {
 		ovpn?.kill("SIGINT");
-		tray?.destroy();
+		tray?.setContextMenu(Menu.buildFromTemplate([ {
+			label: "Exit",
+			click: () => mainWindow.close()
+		} ]));
 	}
 
 }
