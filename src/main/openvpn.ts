@@ -1,42 +1,48 @@
-import { BrowserWindow } from "electron";
+import { spawnSync } from "child_process";
+import { app, BrowserWindow } from "electron";
 import { writeFile } from "fs/promises";
-import mkdirp from "mkdirp";
 import fetch from "node-fetch";
-import { homedir } from "os";
-import { dirname, join } from "path";
+import { join, resolve } from "path";
 
-export default async function openvpn(_event: Electron.IpcMainEvent, mode: "connect" | "disconnect", data) {
+type State = "connect" | "disconnect";
 
+export default async function openvpn(_event: Electron.IpcMainEvent, state: State, data: string) {
+
+	// Get main window
 	const mainWindow = BrowserWindow.getFocusedWindow();
 	if (!mainWindow) return;
 
-	if (mode === "connect") {
+	if (state === "connect") {
 
-		const server: Ember.Server & { id: string, session_id: string } = JSON.parse(data);
+		// Get server
+		const { server, session_id }: { server: Ember.Server; session_id: string } = JSON.parse(data);
 
-		console.log(server)
-		
-		// Download config file
-		const resp = await fetch(`https://api.embervpn.org/rsa/download-client-config?server=${server.id}`, {
+		const resp = await fetch(`https://api.embervpn.org/rsa/download-client-config?server=${ server.hash }`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				"Authorization": server.session_id
+				"Authorization": session_id
 			}
 		}).then(res => res.json() as Promise<{ success: boolean, config: string }>);
 		const { success, config } = resp;
 
-		if (!success) {
-			console.error(resp);
-			return mainWindow.webContents.send("openvpn", "error", "Failed to download config file");
-		}
-		
-		// Write config file
-		const path = join(homedir(), "OpenVPN", "config", "EMBER.ovpn");
-		await mkdirp(dirname(path));
-		await writeFile(path, Buffer.from(config, "base64").toString("utf-8"));
-		mainWindow.webContents.send("openvpn", "connected");
+		// Check for errors
+		if (!success) return mainWindow.webContents.send("openvpn", "error", server.hash, "Could not initialize connection...");
 
+		// Write config file
+		const path = join(app.getPath("temp"), "EMBER.ovpn");
+		await writeFile(path, Buffer.from(config, "base64").toString("utf-8"));
+
+		// Spawn openvpn
+		spawnSync("cscript.exe", [ resolve(".bin/connect.vbs"), path ]);
+
+		mainWindow.webContents.send("openvpn", "connected", server.hash);
+
+	}
+
+	if (state === "disconnect") {
+		spawnSync("cscript.exe", [ resolve(".bin/disconnect.vbs") ]);
+		mainWindow.webContents.send("openvpn", "disconnected");
 	}
 
 }

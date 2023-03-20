@@ -45,7 +45,7 @@ export function Application() {
 	if (user) return (
 		<div className="h-screen flex flex-col">
 			<Titlebar />
-			<div className="grow overflow-x-hidden overflow-auto flex flex-col">
+			<div className="grow overflow-x-hidden overflow-auto flex flex-col select-none">
 				<EntryPoint />
 			</div>
 		</div>

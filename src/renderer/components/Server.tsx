@@ -1,45 +1,74 @@
-import { useState } from "react";
-import { MdDns } from "react-icons/md";
-import { useUser } from "../util/hooks/useUser";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import Spinner from "./Spinner";
 
-export default function Server({ server, hash }: { server: Ember.Server, hash: string }): JSX.Element {
+export default function Servers({ server }: { server: Ember.Server }): JSX.Element {
 
-	const { user } = useUser();
+	const [ isLoading, setIsLoading ] = useState(false);
+	const [ isConnected, setConnected ] = useState(false);
 
-	const [ loading, setLoading ] = useState(false);
+	useEffect(function() {
+		electron.ipcRenderer.on("openvpn", (_event, state: string, hash, data) => {
 
-	async function connect() {
-		setLoading(true);
-	
-		if (!user) return;
-
-		electron.ipcRenderer.send("openvpn", "connect", JSON.stringify({ server, id: hash, session_id: user.authorization }));
-
-		// Listen for OpenVPN events
-		electron.ipcRenderer.on("openvpn", (_, state: string, data) => {
-			setLoading(false);
-			if (state === "error") {
-				console.error("An error occurred while connecting to the server.", data);
+			setIsLoading(false);
+			
+			switch (state) {
+			case "connected":
+				if (hash !== server.hash) break;
+				setConnected(true);
+				break;
+			case "disconnected":
+				setConnected(false);
+				break;
+			case "error":
+				if (hash !== server.hash) break;
+				toast.error(data);
+				setConnected(false);
+				break;
 			}
+
 		});
-		
+	}, []);
+
+	function connect() {
+		setIsLoading(true);
+		electron.ipcRenderer.send("openvpn", "connect", JSON.stringify({ server, session_id: localStorage.getItem("authorization") }));
+	}
+	
+	function disconnect() {
+		setIsLoading(true);
+		electron.ipcRenderer.send("openvpn", "disconnect");
 	}
 
 	return (
-		<div className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600/50 rounded-lg py-2 px-4 flex items-center gap-4">
-			<MdDns className="text-2xl" />
-			<div className="flex flex-col">
-				<div className="flex items-center gap-4">
-					<span>{ server.hostname }</span>
+		<div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 group">
+			<div className="flex items-center gap-4">
+				<img
+					src={ `https://flagcdn.com/w80/${ server.location.country_code2.toLowerCase() }.png` } />
+				<div className="grow">
+					<div className="flex items-center gap-4">
+						<h1 className="text-xl font-medium font-mono">{server.hostname}</h1>
+						<p className="hidden group-hover:block text-gray-500 dark:text-gray-400 text-xs mt-auto py-1">({server.ip})</p>
+					</div>
+					<p className="text-gray-600 dark:text-gray-300 text-sm">{[ `${ server.location.city } (${ server.location.state_prov })`, server.location.country_name ].join(", ")}</p>
 				</div>
-			
-				<p className="text-xs text-gray-600 dark:text-gray-400 flex gap-2">
-					<span>{ server.ip }</span>
-				</p>
+				{isLoading && !isConnected ? (
+					<div className="gap-4">
+						<Spinner className="w-5 mx-2" />
+					</div>
+				) : !isConnected ? (
+					<div className="gap-4 items-center hidden group-hover:flex">
+						<button className="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+							onClick={ connect }>Connect</button>
+					</div>
+				) : (
+					<div className="gap-4 items-center flex">
+						<button className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+							onClick={ disconnect }>Disonnect</button>
+					</div>
+				)
+				}
 			</div>
-			<div className="ml-auto btn cursor-pointer select-none"
-				onClick={ connect }>{ loading ? <Spinner className="h-5 mx-2" /> : "Connect" }</div>
 		</div>
 	);
 }
