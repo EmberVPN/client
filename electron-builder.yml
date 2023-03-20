@@ -10,18 +10,21 @@ files:
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 extraResources:
-  - 'resources/.bin/**'
+  - 'resources/.bin/*'
 
 asarUnpack:
   - .bin/**
 afterSign: build/notarize.js
 win:
   executableName: ember-client
+  requestedExecutionLevel: "requireAdministrator"
+  target:
+    - nsis
 nsis:
   artifactName: ${name}-${version}-${platform}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
-  createDesktopShortcut: always
+  createDesktopShortcut: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:

@@ -8,7 +8,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 	const [ isConnected, setConnected ] = useState(false);
 
 	useEffect(function() {
-		electron.ipcRenderer.on("openvpn", (_event, state: string, hash, data) => {
+		electron.ipcRenderer.on("openvpn", (_event, state: string, hash: string, data) => {
 
 			setIsLoading(false);
 			
