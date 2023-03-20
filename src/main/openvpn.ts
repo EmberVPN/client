@@ -12,6 +12,9 @@ export let tray: Tray | null = null;
 
 export default async function openvpn(_event: Electron.IpcMainEvent | null, state: State, data?: string) {
 	
+	const isDev = process.env.NODE_ENV_ELECTRON_VITE === "development";
+	const exe = isDev ? resolve(".") : resolve(app.getPath("exe"), "../resources");
+
 	// Get main window
 	const mainWindow = BrowserWindow.getFocusedWindow();
 	if (!mainWindow) return;
@@ -21,7 +24,7 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 		ovpn?.kill("SIGINT");
 
 		if (!tray) {
-			tray = new Tray(resolve("./src/renderer/assets/tray.png"));
+			tray = new Tray(resolve(exe, "./src/renderer/assets/tray.png"));
 		}
 
 		tray.setToolTip("Ember VPN");
@@ -54,9 +57,9 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 		if (process.platform === "win32") {
 			
 			// Prod binarys
-			const isDev = process.env.NODE_ENV_ELECTRON_VITE === "development";
-			const bin = isDev ? resolve("C:\\Program Files\\OpenVPN\\bin\\openvpn.exe") : join(resolve(app.getPath("exe"), "../resources/app.asar.unpacked"), ".bin/bin/openvpn.exe");
-			const exe = resolve(app.getPath("exe"), "../resources/app.asar.unpacked");
+			const bin = isDev ? resolve("C:\\Program Files\\OpenVPN\\bin\\openvpn.exe") : join(exe, ".bin/bin/openvpn.exe");
+
+			console.log(exe);
 
 			// If openvpn isnt installed
 			if (!existsSync(bin) && !isDev) {
