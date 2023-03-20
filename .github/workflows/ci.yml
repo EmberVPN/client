@@ -107,48 +107,48 @@ jobs:
           name: mac
           path: dist/*.dmg
 
-  create-release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/stable'
-    needs: [build-win, build-linux, build-mac]
+#   create-release:
+#     name: Create Release
+#     runs-on: ubuntu-latest
+#     if: github.ref == 'refs/heads/stable'
+#     needs: [build-win, build-linux, build-mac]
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v3
+#         with:
+#           ref: ${{ github.ref }}
 
-      - name: "Download Artifact (Windows)"
-        uses: actions/download-artifact@v3
-        with:
-          name: windows
-          path: dist
-      - name: "Download Artifact (Linux)"
-        uses: actions/download-artifact@v3
-        with:
-          name: linux
-          path: dist
-      - name: "Download Artifact (MacOS)"
-        uses: actions/download-artifact@v3
-        with:
-          name: mac
-          path: dist
+#       - name: "Download Artifact (Windows)"
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: windows
+#           path: dist
+#       - name: "Download Artifact (Linux)"
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: linux
+#           path: dist
+#       - name: "Download Artifact (MacOS)"
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: mac
+#           path: dist
 
-      - name: Read Version
-        uses: dutscher/read-package-json-endpoint-actions@v1.33.7
-        id: version
+#       - name: Read Version
+#         uses: dutscher/read-package-json-endpoint-actions@v1.33.7
+#         id: version
 
-      - name: "Create Release"
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            dist/*.exe
-            dist/*.deb
-            dist/*.snap
-            dist/*.dmg
-          draft: true
-          prerelease: true
-          tag_name: v${{ steps.version.outputs.endpoint }}
-          name: v${{ steps.version.outputs.endpoint }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+#       - name: "Create Release"
+#         uses: softprops/action-gh-release@v1
+#         with:
+#           files: |
+#             dist/*.exe
+#             dist/*.deb
+#             dist/*.snap
+#             dist/*.dmg
+#           draft: true
+#           prerelease: true
+#           tag_name: v${{ steps.version.outputs.endpoint }}
+#           name: v${{ steps.version.outputs.endpoint }}
+#           token: ${{ secrets.GITHUB_TOKEN }}
