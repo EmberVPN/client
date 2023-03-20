@@ -96,7 +96,7 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 			tray.displayBalloon({
 				title: "Ember VPN",
 				content: `Connected to ${ server.hostname } (${ server.ip })`,
-				icon: resolve("./src/renderer/assets/balloon.png")
+				icon: resolve(exe, "./src/renderer/assets/balloon.png")
 			});
 
 			mainWindow.webContents.send("openvpn", "connected", server.hash);
