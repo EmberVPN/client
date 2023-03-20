@@ -18,15 +18,18 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 	
 	if (state === "connect") {
 
-		tray = new Tray(resolve("./src/renderer/assets/tray.png"));
+		ovpn?.kill("SIGINT");
+
+		if (!tray) {
+			tray = new Tray(resolve("./src/renderer/assets/tray.png"));
+		}
+
 		tray.setToolTip("Ember VPN");
+		tray.on("click", mainWindow.show.bind(mainWindow));
 		tray.setContextMenu(Menu.buildFromTemplate([ {
 			label: "Exit",
 			click: () => mainWindow.close()
 		} ]));
-		tray.on("click", mainWindow.show.bind(mainWindow));
-		
-		ovpn?.kill("SIGINT");
 		
 		// Get server
 		const { server, session_id }: { server: Ember.Server; session_id: string } = JSON.parse(data || "{}");
@@ -78,14 +81,6 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 			ovpn = spawn(bin, [ "--config", path ], {
 				detached: true,
 			});
-
-			tray.setContextMenu(Menu.buildFromTemplate([ {
-				label: "Exit",
-				click: () => mainWindow.close()
-			}, {
-				label: "Disconnect",
-				click: () => openvpn(null, "disconnect")
-			} ]));
 			
 		} else {
 			
@@ -98,7 +93,8 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 
 		// Handle openvpn output
 		ovpn?.stdout.on("data", data => {
-			console.log(data.toString());
+
+			// console.log(data.toString());
 		});
 
 		// Handle openvpn errors
@@ -111,16 +107,56 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 		ovpn?.on("exit", code => {
 			mainWindow.webContents.send("openvpn", "disconnected");
 			console.log(`OpenVPN exited with code ${ code }`);
+			tray?.destroy();
+			tray = null;
 		});
 
-		// Send connected event
-		mainWindow.webContents.send("openvpn", "connected", server.hash);
+		let times = 1;
+		(async function check() {
+
+			// Check if openvpn is still running
+			if (ovpn?.exitCode) return;
+
+			if (times > 12) {
+				ovpn?.kill("SIGINT");
+				mainWindow.webContents.send("openvpn", "error", server.hash, "Could not connect to server...");
+				return;
+			}
+
+			// Get current IP
+			const IP = await fetch("https://api.my-ip.io/ip").then(resp => resp.text());
+
+			// Check if IP is the same as the server
+			if (IP === server.ip) {
+
+				tray.setContextMenu(Menu.buildFromTemplate([ {
+					label: "Exit",
+					click: () => mainWindow.close()
+				}, {
+					label: "Disconnect",
+					click: () => ovpn?.kill("SIGINT")
+				} ]));
+				
+				tray.displayBalloon({
+					title: "Ember VPN",
+					content: `Connected to ${ server.hostname } (${ server.ip }))`,
+					icon: resolve("./src/renderer/assets/balloon.png")
+				});
+
+				mainWindow.webContents.send("openvpn", "connected", server.hash);
+				return;
+			}
+
+			// Check again in 1 second
+			setTimeout(check, 1000 * times);
+			times++;
+
+		}());
 
 	}
 
 	if (state === "disconnect") {
 		ovpn?.kill("SIGINT");
-		tray?.destroy();
 	}
 
 }
