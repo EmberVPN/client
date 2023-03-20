@@ -35,7 +35,7 @@ export default function Titlebar({ children, resizeable = true }: Props & HTMLAt
 				{ resizeable && <div className="titlebar--button"
 					onClick={ () => electron.ipcRenderer.send("titlebar", "restore") }>{maximized ? <VscChromeRestore /> : <VscChromeMaximize />}</div>}
 				<div className="titlebar--button"
-					onClick={ window.close }><VscChromeClose /></div>
+					onClick={ () => electron.ipcRenderer.send("titlebar", "hide") }><VscChromeClose /></div>
 			</div>
 		</div>
 	);
