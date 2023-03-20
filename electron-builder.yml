@@ -10,10 +10,8 @@ files:
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 extraResources:
-  - 'resources/.bin/**/*'
-
-asarUnpack:
-  - .bin/**
+  - '.bin/**/*'
+  - 'src/renderer/assets/**/*'
 afterSign: build/notarize.js
 win:
   executableName: ember-client
