@@ -148,7 +148,6 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 		// Handle openvpn exit
 		ovpn?.on("exit", code => {
 			mainWindow.webContents.send("openvpn", "disconnected");
-			console.log(`OpenVPN exited with code ${ code }`);
 		});
 
 		// Send connected event
