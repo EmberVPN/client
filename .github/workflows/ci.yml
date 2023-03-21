@@ -50,40 +50,15 @@ jobs:
         with:
           name: windows
           path: dist/*.exe
-  
-  # build-linux:
-  #   name: Build (Linux)
-  #   runs-on: ubuntu-latest
-  #   if: github.ref == 'refs/heads/stable'
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #       with:
-  #         ref: ${{ github.ref }}
-
-  #     - name: Use Node.js 18
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 18
-  #     - name: Install Dependencies
-  #       run: npm ci
-
-  #     - name: "Build for Linux"
-  #       run: npm run build:linux
-
-  #     - name: "Upload Artifact"
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: linux
-  #         path: |
-  #           dist/*.deb
-  #           dist/*.snap
-  
-  # build-mac:
-    name: Build (MacOS)
-    runs-on: macos-latest
+  # Create github release with artifacts
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/stable'
+    needs: [build-win]
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -91,64 +66,29 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
+      - name: "Download Artifact"
+        uses: actions/download-artifact@v3
         with:
-          node-version: 18
-      - name: Install Dependencies
-        run: npm ci
+          name: windows
 
-      - name: "Build for MacOS"
-        run: npm run build:mac
+      - name: "Create Release"
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: ...
+          draft: true
+          prerelease: true
 
       - name: "Upload Artifact"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-release-asset@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: mac
-          path: dist/*.dmg
-
-#   create-release:
-#     name: Create Release
-#     runs-on: ubuntu-latest
-#     if: github.ref == 'refs/heads/stable'
-#     needs: [build-win, build-linux, build-mac]
-
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v3
-#         with:
-#           ref: ${{ github.ref }}
-
-#       - name: "Download Artifact (Windows)"
-#         uses: actions/download-artifact@v3
-#         with:
-#           name: windows
-#           path: dist
-#       - name: "Download Artifact (Linux)"
-#         uses: actions/download-artifact@v3
-#         with:
-#           name: linux
-#           path: dist
-#       - name: "Download Artifact (MacOS)"
-#         uses: actions/download-artifact@v3
-#         with:
-#           name: mac
-#           path: dist
-
-#       - name: Read Version
-#         uses: dutscher/read-package-json-endpoint-actions@v1.33.7
-#         id: version
-
-#       - name: "Create Release"
-#         uses: softprops/action-gh-release@v1
-#         with:
-#           files: |
-#             dist/*.exe
-#             dist/*.deb
-#             dist/*.snap
-#             dist/*.dmg
-#           draft: true
-#           prerelease: true
-#           tag_name: v${{ steps.version.outputs.endpoint }}
-#           name: v${{ steps.version.outputs.endpoint }}
-#           token: ${{ secrets.GITHUB_TOKEN }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/*.exe
+          asset_name: EmberVPN-Setup.exe
+          asset_content_type: application/octet-stream
