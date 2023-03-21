@@ -51,36 +51,36 @@ jobs:
           name: windows
           path: dist/*.exe
   
-  build-linux:
-    name: Build (Linux)
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/stable'
+  # build-linux:
+  #   name: Build (Linux)
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/stable'
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #       with:
+  #         ref: ${{ github.ref }}
 
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Install Dependencies
-        run: npm ci
+  #     - name: Use Node.js 18
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18
+  #     - name: Install Dependencies
+  #       run: npm ci
 
-      - name: "Build for Linux"
-        run: npm run build:linux
+  #     - name: "Build for Linux"
+  #       run: npm run build:linux
 
-      - name: "Upload Artifact"
-        uses: actions/upload-artifact@v3
-        with:
-          name: linux
-          path: |
-            dist/*.deb
-            dist/*.snap
+  #     - name: "Upload Artifact"
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: linux
+  #         path: |
+  #           dist/*.deb
+  #           dist/*.snap
   
-  build-mac:
+  # build-mac:
     name: Build (MacOS)
     runs-on: macos-latest
     if: github.ref == 'refs/heads/stable'
