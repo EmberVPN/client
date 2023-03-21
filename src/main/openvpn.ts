@@ -1,5 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn, spawnSync } from "child_process";
-import { BrowserWindow, ipcMain, WebContents } from "electron";
+import { BrowserWindow, ipcMain } from "electron";
 import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
 import fetch from "node-fetch";
@@ -11,8 +11,12 @@ export type State = "connect" | "disconnect";
 
 export let proc: ChildProcessWithoutNullStreams | null = null;
 
+let contents: Electron.WebContents | null = null;
+
 // Get mainwindow once it loads
 export default function(win: BrowserWindow) {
+	
+	contents = win.webContents;
 	
 	// Listen for openvpn events
 	ipcMain.on("openvpn", async(_, state: State, data: string) => {
@@ -25,14 +29,14 @@ export default function(win: BrowserWindow) {
 			
 			// Download server config
 			await downloadConfig(server, authorization)
-				.then(() => connect(server, win.webContents))
+				.then(() => connect(server))
 				.catch(e => win.webContents.send("openvpn", "error", server.hash, e));
 
 		}
 
 		// Set disconnected state
 		else if (state === "disconnect") {
-			disconnect(win.webContents);
+			disconnect();
 		}
 
 	});
@@ -108,9 +112,9 @@ export async function downloadConfig(server: Ember.Server, authorization: string
 }
 
 // Connect to openvpn
-export function connect(server: Ember.Server, contents: WebContents) {
+export function connect(server: Ember.Server) {
 
-	contents.send("openvpn", "disconnected");
+	contents?.send("openvpn", "disconnected");
 	
 	// Dispose of old process
 	proc?.kill();
@@ -129,10 +133,10 @@ export function connect(server: Ember.Server, contents: WebContents) {
 	proc.stdout.on("data", chunk => {
 
 		const line = chunk.toString();
-		contents.send("openvpn", "log", server.hash, line);
+		contents?.send("openvpn", "log", server.hash, line);
 		
 		if (line.includes("Initialization Sequence Completed")) {
-			contents.send("openvpn", "connected", server.hash);
+			contents?.send("openvpn", "connected", server.hash);
 			tray.setConnected(`Connected to ${ server.hostname } (${ server.ip })`);
 		}
 
@@ -145,15 +149,15 @@ export function connect(server: Ember.Server, contents: WebContents) {
 		if (code === null) return;
 
 		// Check if process exited with error
-		if (code !== 0) contents.send("openvpn", "error", server.hash, "OpenVPN exited with code " + code);
+		if (code !== 0) contents?.send("openvpn", "error", server.hash, "OpenVPN exited with code " + code);
 
 	});
 		
 }
 
 // Disconnect from openvpn
-export function disconnect(contents: WebContents) {
+export function disconnect() {
 	proc?.kill();
 	tray.disconnect();
-	contents.send("openvpn", "disconnected");
+	contents?.send("openvpn", "disconnected");
 }
