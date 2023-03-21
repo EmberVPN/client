@@ -123,7 +123,13 @@ export default async function openvpn(_event: Electron.IpcMainEvent | null, stat
 			click: () => mainWindow.close()
 		}, {
 			label: "Disconnect",
-			click: () => ovpn?.kill("SIGINT")
+			click: () => {
+				ovpn?.kill("SIGINT");
+				tray?.setContextMenu(Menu.buildFromTemplate([ {
+					label: "Exit",
+					click: () => mainWindow.close()
+				} ]));
+			}
 		} ]));
 				
 		tray.displayBalloon({
