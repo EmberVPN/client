@@ -1,172 +1,159 @@
 import { ChildProcessWithoutNullStreams, spawn, spawnSync } from "child_process";
-import { app, BrowserWindow, Menu, Tray } from "electron";
+import { BrowserWindow, ipcMain, WebContents } from "electron";
 import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
 import fetch from "node-fetch";
-import { join, resolve } from "path";
+import { resolve } from "path";
+import { resources } from ".";
+import * as tray from "./tray";
 
-type State = "connect" | "disconnect";
+export type State = "connect" | "disconnect";
 
-export let ovpn: ChildProcessWithoutNullStreams | null = null;
-export let tray: Tray | null = null;
+export let proc: ChildProcessWithoutNullStreams | null = null;
 
-export default async function openvpn(_event: Electron.IpcMainEvent | null, state: State, data?: string) {
+// Get mainwindow once it loads
+export default function(win: BrowserWindow) {
 	
-	const isDev = process.env.NODE_ENV_ELECTRON_VITE === "development";
-	const exe = isDev ? resolve(".") : resolve(app.getPath("exe"), "../resources");
+	// Listen for openvpn events
+	ipcMain.on("openvpn", async(_, state: State, data: string) => {
 
-	// Get main window
-	const mainWindow = BrowserWindow.getFocusedWindow();
-	if (!mainWindow) return;
-	
-	if (state === "connect") {
-
-		ovpn?.kill("SIGINT");
-
-		if (!tray) {
-			tray = new Tray(resolve(exe, "./src/renderer/assets/tray.png"));
-		}
-
-		tray.setToolTip("Ember VPN");
-		tray.on("click", mainWindow.show.bind(mainWindow));
-		tray.setContextMenu(Menu.buildFromTemplate([ {
-			label: "Exit",
-			click: () => mainWindow.close()
-		} ]));
-		
-		// Get server
-		const { server, session_id }: { server: Ember.Server; session_id: string } = JSON.parse(data || "{}");
-
-		const resp = await fetch(`https://api.embervpn.org/rsa/download-client-config?server=${ server.hash }`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"Authorization": session_id
-			}
-		}).then(res => res.json() as Promise<{ success: boolean, config: string }>);
-		const { success, config } = resp;
-
-		// Check for errors
-		if (!success) return mainWindow.webContents.send("openvpn", "error", server.hash, "Could not initialize connection...");
-		
-		// Write config file
-		const path = join(app.getPath("temp"), "EMBER.ovpn");
-		await writeFile(path, Buffer.from(config, "base64").toString("utf-8"));
-
-		// If windows
-		if (process.platform === "win32") {
-
-			// Kill all existing openvpn processes
-			spawnSync("taskkill /f /im openvpn.exe", { shell: true });
+		// Set connected state
+		if (state === "connect") {
 			
-			// Prod binarys
-			const bin = isDev ? resolve("C:\\Program Files\\OpenVPN\\bin\\openvpn.exe") : join(exe, ".bin/bin/openvpn.exe");
-
-			// If openvpn isnt installed
-			if (!existsSync(bin) && !isDev) {
-
-				// Begin installation
-				spawnSync([
-					"msiexec",
-					"/i",
-					`"${ resolve(exe, ".bin/installer.msi") }"`,
-					`PRODUCTDIR="${ join(exe, ".bin") }"`,
-					"ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun",
-					"/passive",
-					"/l*v",
-					join(exe, ".bin/installer.log")
-				].join(" "), {
-					shell: true,
-				});
-
-			}
-
-			// Spawn openvpn
-			ovpn = spawn(bin, [ "--config", path ], {
-				detached: true,
-			});
+			// Get server & authorization from data
+			const { server, authorization }: { server: Ember.Server; authorization: string } = JSON.parse(data || "{}");
 			
-		} else if (process.platform === "linux") {
-
-			// Kill all existing openvpn processes
-			spawnSync("killall openvpn", { shell: true });
-
-			// Install openvpn
-			if (!existsSync("/usr/sbin/openvpn") && !isDev) {
-				spawnSync("apt install openvpn -y", { shell: true });
-			}
-
-			// Spawn openvpn
-			ovpn = spawn("openvpn", [ "--config", path ], {
-				detached: true,
-			});
-
-		} else if (process.platform === "darwin") {
-
-			// Kill all existing openvpn processes
-			spawnSync("killall openvpn", { shell: true });
-
-			// Install openvpn
-			if (!existsSync("/usr/local/sbin/openvpn") && !isDev) {
-				spawnSync("brew install openvpn", { shell: true });
-			}
-
-			// Spawn openvpn
-			ovpn = spawn("openvpn", [ "--config", path ], {
-				detached: true,
-			});
+			// Download server config
+			await downloadConfig(server, authorization)
+				.then(() => connect(server, win.webContents))
+				.catch(e => win.webContents.send("openvpn", "error", server.hash, e));
 
 		}
 
-		tray.setContextMenu(Menu.buildFromTemplate([ {
-			label: "Exit",
-			click: () => mainWindow.close()
-		}, {
-			label: "Disconnect",
-			click: () => {
-				ovpn?.kill("SIGINT");
-				tray?.setContextMenu(Menu.buildFromTemplate([ {
-					label: "Exit",
-					click: () => mainWindow.close()
-				} ]));
-			}
-		} ]));
+		// Set disconnected state
+		else if (state === "disconnect") {
+			disconnect(win.webContents);
+		}
+
+	});
+
+}
+
+// Get binary path
+export function getBinary() {
+
+	if (process.platform === "win32") {
 				
-		tray.displayBalloon({
-			title: "Ember VPN",
-			content: `Connected to ${ server.hostname } (${ server.ip })`,
-			icon: resolve(exe, "./src/renderer/assets/balloon.png")
-		});
+		// Check if openvpn.exe is on path
+		const openvpn = spawnSync("where openvpn", { shell: true });
+		if (openvpn.status === 0) return "openvpn.exe";
+				
+		// Check default location
+		const defaultLocation = resolve(process.env.ProgramFiles || "C:\\Program Files", "OpenVPN/bin/openvpn.exe");
+		if (existsSync(defaultLocation)) return defaultLocation;
 
-		mainWindow.webContents.send("openvpn", "connected", server.hash);
+		// Check bundled location
+		const bundledLocation = resolve(resources, ".bin/bin/openvpn.exe");
+		if (existsSync(bundledLocation)) return bundledLocation;
 
-		// Handle openvpn output
-		ovpn?.stdout.on("data", data => {
-			console.log(data.toString());
-		});
+		// Install OpenVPN
+		install();
 
-		// Handle openvpn errors
-		ovpn?.stderr.on("error", data => {
-			mainWindow.webContents.send("openvpn", "disconnected");
-			mainWindow.webContents.send("openvpn", "error", server.hash, data.toString());
+		// Return bundled location
+		return bundledLocation;
+
+	}
+
+	throw new Error("Unsupported platform");
+
+}
+
+// Install OpenVPN
+export function install() {
+
+	if (process.platform === "win32") {
+			
+		// Run the bundled installer
+		spawnSync([
+			"msiexec",
+			"/i",
+			`"${ resolve(resources, ".bin/installer.msi") }"`,
+			`PRODUCTDIR="${ resolve(resources, ".bin") }"`,
+			"ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun",
+			"/passive",
+		].join(" "), {
+			shell: true,
 		});
+	
+	}
+
+}
+
+// Download server config
+export async function downloadConfig(server: Ember.Server, authorization: string) {
+	const { success, config } = await fetch(`https://api.embervpn.org/rsa/download-client-config?server=${ server.hash }`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"Authorization": authorization
+		}
+	}).then(res => res.json() as Promise<{ success: boolean, config: string }>);
+			
+	// Check for errors
+	if (!success) throw new Error("Failed to download server config");
+
+	// Write config file
+	const path = resolve(resources, "ember.ovpn");
+	await writeFile(path, Buffer.from(config, "base64").toString("utf-8"));
+}
+
+// Connect to openvpn
+export function connect(server: Ember.Server, contents: WebContents) {
+
+	contents.send("openvpn", "disconnected");
+	
+	// Dispose of old process
+	proc?.kill();
+
+	// Get binary path
+	const binary = getBinary();
+
+	// Spawn openvpn process
+	const path = resolve(resources, "ember.ovpn");
+	proc = spawn(binary, [ "--config", path ], { detached: true });
+
+	// Kill the process on exit
+	process.on("exit", () => proc?.kill());
+
+	// Listen for data
+	proc.stdout.on("data", chunk => {
+
+		const line = chunk.toString();
+		contents.send("openvpn", "log", server.hash, line);
 		
-		// Handle openvpn exit
-		ovpn?.on("exit", () => {
-			mainWindow.webContents.send("openvpn", "disconnected");
-		});
+		if (line.includes("Initialization Sequence Completed")) {
+			contents.send("openvpn", "connected", server.hash);
+			tray.setConnected(`Connected to ${ server.hostname } (${ server.ip })`);
+		}
 
-		// Send connected event
-		mainWindow.webContents.send("openvpn", "connected", server.hash);
+	});
 
-	}
+	// On exit
+	proc.on("exit", code => {
 
-	if (state === "disconnect") {
-		ovpn?.kill("SIGINT");
-		tray?.setContextMenu(Menu.buildFromTemplate([ {
-			label: "Exit",
-			click: () => mainWindow.close()
-		} ]));
-	}
+		// Check if process was killed
+		if (code === null) return;
 
+		// Check if process exited with error
+		if (code !== 0) contents.send("openvpn", "error", server.hash, "OpenVPN exited with code " + code);
+
+	});
+		
+}
+
+// Disconnect from openvpn
+export function disconnect(contents: WebContents) {
+	proc?.kill();
+	tray.disconnect();
+	contents.send("openvpn", "disconnected");
 }

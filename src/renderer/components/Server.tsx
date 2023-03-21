@@ -10,6 +10,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 	useEffect(function() {
 		electron.ipcRenderer.on("openvpn", (_event, state: string, hash: string, data) => {
 
+			console.log(state, hash, data);
 			setIsLoading(false);
 			
 			switch (state) {
@@ -34,7 +35,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 	function connect() {
 		setIsLoading(true);
-		electron.ipcRenderer.send("openvpn", "connect", JSON.stringify({ server, session_id: localStorage.getItem("authorization") }));
+		electron.ipcRenderer.send("openvpn", "connect", JSON.stringify({ server, authorization: localStorage.getItem("authorization") }));
 	}
 	
 	function disconnect() {
