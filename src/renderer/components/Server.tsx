@@ -14,6 +14,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 			
 			switch (state) {
 			case "connected":
+				setIsLoading(false);
 				if (hash !== server.hash) break;
 				setConnected(true);
 				break;
@@ -21,6 +22,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 				setConnected(false);
 				break;
 			case "error":
+				setIsLoading(false);
 				if (hash !== server.hash) break;
 				toast.error(data);
 				setConnected(false);
