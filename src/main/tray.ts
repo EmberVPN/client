@@ -1,6 +1,7 @@
 import { BrowserWindow, Menu, Tray } from "electron";
 import { resolve } from "path";
 import { resources } from ".";
+import * as openvpn from "./openvpn";
 
 export let tray: Tray | null = null;
 
@@ -36,7 +37,7 @@ export function setConnected(content: string) {
 		click: exit
 	}, {
 		label: "Disconnect",
-		click: () => disconnect()
+		click: () => openvpn.disconnect()
 	} ]));
 	
 	tray.displayBalloon({
