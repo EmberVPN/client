@@ -48,13 +48,10 @@ function createWindow(): void {
 		win.loadFile(join(__dirname, "../renderer/index.html"));
 	}
 
-	app.on("second-instance", (event, commandLine, workingDirectory) => {
-
-		// Someone tried to run a second instance, we should focus our window.
-		if (win) {
-			if (win.isMinimized()) win.restore();
-			win.focus();
-		}
+	app.on("second-instance", function(bruh) {
+		if (!win) return;
+		win.show();
+		win.focus();
 	});
     
 	// and load the index.html of the app.
