@@ -93,5 +93,12 @@ app.whenReady().then(function() {
 			app.quit();
 		}
 	});
+
+	// Start on boot
+	if (!is.dev) {
+		app.setLoginItemSettings({
+			openAtLogin: true,
+		});
+	}
 	
 });
