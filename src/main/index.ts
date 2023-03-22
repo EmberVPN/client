@@ -48,7 +48,7 @@ function createWindow(): void {
 		win.loadFile(join(__dirname, "../renderer/index.html"));
 	}
 
-	app.on("second-instance", function(bruh) {
+	app.on("second-instance", function() {
 		if (!win) return;
 		win.show();
 		win.focus();
