@@ -7,7 +7,7 @@ interface Endpoints {
 
 export default function useData<T extends keyof Endpoints>(route: T): { data: Endpoints[T] | undefined, isLoading: boolean } {
 
-	const { isLoading,  data } = useQuery(route, async function() {
+	const { isLoading, data } = useQuery(route, async function() {
 		return await fetch(APIROOT + route, {
 			headers: {
 				Authorization: localStorage.getItem("authorization") ?? "",
@@ -16,6 +16,6 @@ export default function useData<T extends keyof Endpoints>(route: T): { data: En
 			.then(res => res.json());
 	});
 
-	return { isLoading, data};
+	return { isLoading, data };
 
 }
