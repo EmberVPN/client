@@ -24,17 +24,6 @@ jobs:
           npm version patch -m "Bump: %s"
       - run: git push
 
-  build-win:
-    name: Build (Windows)
-    runs-on: windows-latest
-    if: github.ref == 'refs/heads/stable'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
-
       - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
@@ -42,51 +31,80 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: "Build for Windows"
-        run: npm run build:win
+      - name: "Lint"
+        run: run lint
 
-      - name: "Upload Artifact"
-        uses: actions/upload-artifact@v3
-        with:
-          name: windows
-          path: dist/*.exe
+      - run: |
+        git config --global user.name 'CI/CD'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        eslint --fix .
+        git commit -am "Eslint: fix all"
+      - run: git push
 
-  # Create a draft release
-  release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/stable'
-    needs: [ build-win ]
-    permissions:
-      contents: write
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
+  # build-win:
+  #   name: Build (Windows)
+  #   runs-on: windows-latest
+  #   if: github.ref == 'refs/heads/stable'
 
-      - name: "Download Artifact"
-        uses: actions/download-artifact@v3
-        with:
-          name: windows
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #       with:
+  #         ref: ${{ github.ref }}
 
-      - name: "Create Release"
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: true
-          prerelease: false
+  #     - name: Use Node.js 18
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18
+  #     - name: Install Dependencies
+  #       run: npm ci
 
-      - name: "Upload Artifact"
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: '**/*.exe'
-          asset_content_type: application/octet-stream
+  #     - name: "Build for Windows"
+  #       run: npm run build:win
+
+  #     - name: "Upload Artifact"
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: windows
+  #         path: dist/*.exe
+
+  # # Create a draft release
+  # release:
+  #   name: Create Release
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/stable'
+  #   needs: [ build-win ]
+  #   permissions:
+  #     contents: write
+
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #       with:
+  #         ref: ${{ github.ref }}
+
+  #     - name: "Download Artifact"
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: windows
+
+  #     - name: "Create Release"
+  #       id: create_release
+  #       uses: actions/create-release@v1
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         tag_name: ${{ github.ref }}
+  #         release_name: Release ${{ github.ref }}
+  #         draft: true
+  #         prerelease: false
+
+  #     - name: "Upload Artifact"
+  #       uses: actions/upload-release-asset@v1
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         upload_url: ${{ steps.create_release.outputs.upload_url }}
+  #         asset_path: '**/*.exe'
+  #         asset_content_type: application/octet-stream
