@@ -50,8 +50,8 @@ jobs:
         run: run lint
 
       - run: |
-        git config --global user.name 'CI/CD'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        eslint --fix .
-        git commit -am "Eslint: fix all"
+          git config --global user.name 'CI/CD'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          eslint --fix .
+          git commit -am "Eslint: fix all"
       - run: git push
