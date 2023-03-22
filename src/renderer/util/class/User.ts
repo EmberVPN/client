@@ -16,6 +16,7 @@ export default class User<Meta = Auth.Meta> {
 	public mfa_enabled: boolean;
 	public username: string;
 	public email: string;
+
 	// private readonly passwd_md5: string;
 	public readonly passwd_length: number;
 	public readonly passwd_changed_ms: number;
@@ -31,6 +32,7 @@ export default class User<Meta = Auth.Meta> {
 		this.email = data.email;
 		this.created_ms = data.created_ms;
 		this.mfa_enabled = data.mfa_enabled;
+
 		// this.passwd_md5 = data.passwd_md5;
 		this.passwd_length = data.passwd_length;
 		this.passwd_changed_ms = data.passwd_changed_ms;
