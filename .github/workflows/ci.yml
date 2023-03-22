@@ -47,9 +47,7 @@ jobs:
         run: npm ci
 
       - name: "Lint"
-        run: run lint
-
-      - run: |
+        run: |
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           eslint --fix .
