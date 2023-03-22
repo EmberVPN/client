@@ -8,6 +8,8 @@
 	],
 	"compilerOptions": {
 		"composite": true,
+		"noUnusedParameters": false,
+		"noUnusedLocals": false,
 		"types": [
 			"electron-vite/node"
 		]
