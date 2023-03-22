@@ -31,10 +31,9 @@ function createWindow(): void {
 		}
 	});
 
-	// and load the index.html of the app.
-	win.on("ready-to-show", () => {
-		win.show();
-	});
+	// Prevent multiple instances
+	const isUnlocked = app.requestSingleInstanceLock();
+	if (!isUnlocked) return app.quit();
 	
 	// Open links in external browser
 	win.webContents.setWindowOpenHandler(details => {
@@ -48,6 +47,20 @@ function createWindow(): void {
 	} else {
 		win.loadFile(join(__dirname, "../renderer/index.html"));
 	}
+
+	app.on("second-instance", (event, commandLine, workingDirectory) => {
+
+		// Someone tried to run a second instance, we should focus our window.
+		if (win) {
+			if (win.isMinimized()) win.restore();
+			win.focus();
+		}
+	});
+    
+	// and load the index.html of the app.
+	win.on("ready-to-show", () => {
+		win.show();
+	});
 
 	attachTaskbar(win);
 	attachTray(win);
