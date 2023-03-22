@@ -51,12 +51,11 @@ jobs:
           name: windows
           path: dist/*.exe
 
-  # Create github release with artifacts
+  # Create a draft release
   release:
     name: Create Release
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/stable'
-    needs: [build-win]
     permissions:
       contents: write
 
@@ -78,13 +77,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          body: ...
+          release_name: Release ${{ github.ref }}
           draft: true
-          prerelease: true
+          prerelease: false
 
       - name: "Upload Artifact"
-        uses: actions/upload-release-asset@v3
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
