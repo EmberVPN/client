@@ -88,6 +88,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/*.exe
-          asset_name: EmberVPN-Setup.exe
+          asset_path: '**/*.exe'
           asset_content_type: application/octet-stream
