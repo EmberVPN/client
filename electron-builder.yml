@@ -22,7 +22,7 @@ nsis:
   artifactName: ${name}-${version}-${platform}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
-  installerIcon: build/installer.ico
+  installerIcon: build/icon.ico
   createDesktopShortcut: true
   oneClick: false
 mac:
