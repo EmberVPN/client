@@ -33,7 +33,7 @@ function createWindow(): void {
 
 	// Prevent multiple instances
 	const isUnlocked = app.requestSingleInstanceLock();
-	if (!isUnlocked) return app.quit();
+	if (!isUnlocked && !is.dev) return app.quit();
 	
 	// Open links in external browser
 	win.webContents.setWindowOpenHandler(details => {
