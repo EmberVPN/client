@@ -51,5 +51,5 @@ jobs:
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm run lint || true
-          git commit -am "Eslint: fix all"
+          git commit -am "Eslint: fix all" || true
       - run: git push || true
