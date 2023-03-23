@@ -52,4 +52,4 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm run lint || true
           git commit -am "Eslint: fix all"
-      - run: git push
+      - run: git push || true
