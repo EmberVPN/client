@@ -17,7 +17,7 @@ function createWindow(): void {
 		icon,
 		show: false,
 		resizable: false,
-		title: "Ember Client",
+		title: "Ember VPN",
 		titleBarStyle: "hidden",
 		width: 600,
 		height: 440,
