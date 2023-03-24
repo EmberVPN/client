@@ -1,7 +1,8 @@
 import favicon from "../assets/ember.svg";
 import useData from "../util/hooks/useData";
 import { useUser } from "../util/hooks/useUser";
-import Server from "./Server";
+import Map from "./Map";
+
 export default function EntryPoint(): JSX.Element | null {
 
 	const { user } = useUser();
@@ -45,7 +46,10 @@ export default function EntryPoint(): JSX.Element | null {
 	);
 
 	// List all servers
-	return <div className="grow h-full flex flex-col gap-4 m-4">{Object.keys(servers).map((server, i) => <Server key={ i }
-		server={ servers[server] } />) }</div>;
+	return (
+		<div className="grow h-full flex flex-col gap-4 relative overflow-hidden">
+			<Map servers={ Object.values(servers) } />
+		</div>
+	);
 	
 }
