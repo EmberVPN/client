@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Spinner from "./Spinner";
+import { HiMapPin } from "react-icons/hi2";
 
 export default function Servers({ server }: { server: Ember.Server }): JSX.Element {
 
@@ -31,7 +32,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 			}
 
 		});
-	}, []);
+	}, [ ]);
 
 	function connect() {
 		setIsLoading(true);
@@ -44,7 +45,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 	}
 
 	return (
-		<div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 group">
+		<div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 group w-[500px]">
 			<div className="flex items-center gap-4">
 				<div className="grow">
 					<div className="flex items-center gap-2">
