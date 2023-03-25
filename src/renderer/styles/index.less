@@ -30,11 +30,15 @@ img {
 	}
 }
 
+.toolbar {
+	@apply bg-gray-100 dark:bg-gray-800 shadow-md px-8;
+}
+
 .titlebar--root {
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	font-size: 14px;
 	-webkit-app-region: drag;
-	@apply h-8 flex w-full justify-between items-center text-gray-700 dark:text-gray-400 relative select-none;
+	@apply h-8 flex w-full justify-between items-center relative select-none bg-black/20 dark:bg-gray-800/50;
 	.titlebar--icon {
 		@apply h-5;
 	}

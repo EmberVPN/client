@@ -5,7 +5,9 @@ import "react-toastify/dist/ReactToastify.css";
 import favicon from "./assets/ember.svg";
 import Authorize from "./components/Authorize";
 import EntryPoint from "./components/EntryPoint";
+import ThemeToggle from "./components/ThemeToggle";
 import Titlebar from "./components/Titlebar";
+import Toolbar from "./components/Toolbar";
 import "./styles/index.less";
 import { useUser } from "./util/hooks/useUser";
 import queryClient from "./util/queryClient";
@@ -26,6 +28,7 @@ root.render(
 			rtl={ false }
 			theme="colored"
 		/>
+		<ThemeToggle provider />
 		<Application />
 	</QueryClientProvider>
 );
@@ -46,6 +49,7 @@ export function Application() {
 		<div className="h-screen flex flex-col">
 			<Titlebar />
 			<div className="grow overflow-x-hidden overflow-auto flex flex-col select-none">
+				<Toolbar />
 				<EntryPoint />
 			</div>
 		</div>
