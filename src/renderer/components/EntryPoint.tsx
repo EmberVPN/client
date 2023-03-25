@@ -48,7 +48,7 @@ export default function EntryPoint(): JSX.Element | null {
 	// List all servers
 	return (
 		<div className="grow h-full flex flex-col gap-4 relative overflow-hidden">
-			<Map servers={ Object.values(servers) } />
+			<Map />
 		</div>
 	);
 	

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Spinner from "./Spinner";
-import { HiMapPin } from "react-icons/hi2";
 
 export default function Servers({ server }: { server: Ember.Server }): JSX.Element {
 
