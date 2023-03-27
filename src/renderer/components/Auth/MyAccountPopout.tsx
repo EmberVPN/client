@@ -2,10 +2,9 @@ import dayjs from "dayjs";
 import { useEffect } from "react";
 import { MdExitToApp } from "react-icons/md";
 import User from "../../util/class/User";
-import { close } from "./MyAccount";
-
 import { signout } from "../../util/signout";
 import ThemeToggle from "../ThemeToggle";
+import { close } from "./MyAccount";
 
 export default function MyAccountPopup({ user }: { user: User }): JSX.Element {
 
