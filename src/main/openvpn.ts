@@ -32,10 +32,8 @@ export default function(win: BrowserWindow) {
 				.then(() => connect(server))
 				.catch(e => win.webContents.send("openvpn", "error", server.hash, e));
 
-		}
-
 		// Set disconnected state
-		else if (state === "disconnect") {
+		} else if (state === "disconnect") {
 			disconnect();
 		}
 
