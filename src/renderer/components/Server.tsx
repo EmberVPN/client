@@ -13,7 +13,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 	useEffect(function() {
 		electron.ipcRenderer.on("openvpn", (_event, state: string, hash: string, data) => {
-			
+
 			// Clear currentLocation query
 			queryClient.refetchQueries("currentLocation");
 
@@ -107,7 +107,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 					{ !isConnected && <button className="h-12 text-primary-500 hover:bg-primary-500/10 bg-primary-500/5 text-lg font-medium rounded-lg"
 						onClick={ connect }>{isLoading ? <Spinner className="w-5 mx-auto !stroke-primary-500" /> : "Quick Connect"}</button>}
 					{isConnected && <button className="h-12 bg-red-600 hover:bg-red-700 text-white text-lg font-medium rounded-lg"
-						onClick={ disconnect }>{isLoading ? <Spinner className="w-5 mx-auto !stroke-red-600" /> : "Disconnect"}</button>}
+						onClick={ disconnect }>{isLoading ? <Spinner className="w-5 mx-auto !stroke-white" /> : "Disconnect"}</button>}
 
 				</div>
 			</div>
