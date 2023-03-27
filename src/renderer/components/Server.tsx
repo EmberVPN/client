@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { MdLocationPin } from "react-icons/md";
 import { useQuery } from "react-query";
 import { toast } from "react-toastify";
+import queryClient from "../util/queryClient";
 import Spinner from "./Spinner";
 
 export default function Servers({ server }: { server: Ember.Server }): JSX.Element | null {
@@ -12,8 +13,10 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 	useEffect(function() {
 		electron.ipcRenderer.on("openvpn", (_event, state: string, hash: string, data) => {
+			
+			// Clear currentLocation query
+			queryClient.refetchQueries("currentLocation");
 
-			console.log(state, hash, data);
 			setIsLoading(false);
 			
 			switch (state) {
