@@ -56,6 +56,7 @@ import classNames from "classnames";
 import { HTMLAttributes, ReactNode } from "react";
 import { useUser } from "../util/hooks/useUser";
 import MyAccount from "./Auth/MyAccount";
+import IPBadge from "./IPBadge";
 
 export type ToolbarProps = { children?: ReactNode | string, className?: string };
 
@@ -68,6 +69,7 @@ export default function Toolbar({ className, ...props }: ToolbarProps & HTMLAttr
 			
 			<div className="!py-4 flex items-center gap-4 justify-between h-full !overflow-visible flex-wrap !flex-row"
 				{ ...props }>
+				<IPBadge />
 				<div className="flex items-center gap-4 grow" />
 				<div className="flex items-center lg:order-2 ml-auto">
 
