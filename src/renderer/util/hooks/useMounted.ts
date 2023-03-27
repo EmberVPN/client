@@ -8,7 +8,7 @@ export default function useMounted(callback?: () => void): boolean {
 		return function() {
 			setMounted(false);
 		};
-	}, [ ]);
+	}, [ callback ]);
 	return mounted;
 
 }

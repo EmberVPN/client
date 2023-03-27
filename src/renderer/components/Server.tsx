@@ -37,7 +37,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 			}
 
 		});
-	}, [ ]);
+	}, [ server.hash ]);
 
 	function connect() {
 		setIsLoading(true);

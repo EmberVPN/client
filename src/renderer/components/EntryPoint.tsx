@@ -42,7 +42,7 @@ export default function EntryPoint(): JSX.Element | null {
 						onClick={ () => window.open("//embervpn.org/plans") }>See Pricing</a>
 				</div>
 			</div>
-	 	</div>
+		</div>
 	);
 
 	// List all servers

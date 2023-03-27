@@ -1,7 +1,7 @@
 declare namespace Auth {
 	
 	interface Meta {
-		[key: string]: any;
+		[key: string]: unknown;
 	}
 
 	interface Me<Meta = Meta> {
