@@ -67,8 +67,6 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 	const distance = calculateDistance(latitude, longitude, data.latitude, data.longitude);
 
-	console.log(server);
-
 	return (
 		<div className="absolute group hover:z-[1]"
 			style={{
