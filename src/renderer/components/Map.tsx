@@ -1,20 +1,19 @@
 import { useEffect, useRef } from "react";
-import { MdLocationOn } from "react-icons/md";
 import map from "../assets/map.svg";
 import Server from "./Server";
 
 export default function Map({ servers }: { servers: Ember.Server[] }): JSX.Element {
 
-	const SCALE_BOUNDS = .8;
+	const SCALE_BOUNDS = .4;
 	
 	const ref = useRef<HTMLDivElement>(null);
 
 	useEffect(function() {
-
+		
 		// get image
 		const image = ref.current?.querySelector("img") as HTMLImageElement;
 		const items = ref.current?.querySelector(".items") as HTMLDivElement;
-
+		
 		function render(e?: MouseEvent | WheelEvent | UIEvent) {
 			if (!ref.current) return;
 			
@@ -28,7 +27,7 @@ export default function Map({ servers }: { servers: Ember.Server[] }): JSX.Eleme
 			if (e instanceof WheelEvent) {
 				
 				// get a new scale value
-				const scale = 1 + e.deltaY * -0.001;
+				const scale = 1 + e.deltaY * -0.001 / SCALE_BOUNDS;
 
 				// get new width and height
 				const newHeight = height * scale;
@@ -40,7 +39,20 @@ export default function Map({ servers }: { servers: Ember.Server[] }): JSX.Eleme
 				// set new size
 				image.style.height = `${ newHeight }px`;
 				image.style.width = `${ newHeight * aspectRatio }px`;
-				render();
+				
+				console.log();
+
+				// get the difference in size
+				const diffHeight = (height - newHeight) / 2;
+				const clientTop = ref.current.getBoundingClientRect().top;
+				const diffWidth = diffHeight * aspectRatio;
+
+				// get current position
+				const { top, left } = image.getBoundingClientRect();
+				
+				// Set new position
+				image.style.top = `${ top - clientTop + diffHeight }px`;
+				image.style.left = `${ left + diffWidth }px`;
 				
 			} else if (e instanceof MouseEvent) {
 
@@ -48,22 +60,20 @@ export default function Map({ servers }: { servers: Ember.Server[] }): JSX.Eleme
 				if (!e.buttons) return;
 
 				// Get the current image position
-				const top = parseInt(image.style.top) + e.movementY;
-				const left = parseInt(image.style.left) + e.movementX;
+				let top = parseInt(image.style.top) + e.movementY;
+				let left = parseInt(image.style.left) + e.movementX;
 
-				const BOUNDRY_X = ref.current.clientWidth * (1 - SCALE_BOUNDS) / 2;
-				const BOUNDRY_Y = ref.current.clientHeight * (1 - SCALE_BOUNDS) / 2;
+				const BOUNDRY_X = ref.current.clientWidth * (1 - SCALE_BOUNDS);
+				const BOUNDRY_Y = ref.current.clientHeight * (1 - SCALE_BOUNDS);
 
-				if (top > BOUNDRY_Y) return;
-				if (left > BOUNDRY_X) return;
-				if (top < ref.current.clientHeight - height - BOUNDRY_Y) return;
-				if (left < ref.current.clientWidth - width - BOUNDRY_X) return;
+				if (top > BOUNDRY_Y) top = BOUNDRY_Y;
+				if (left > BOUNDRY_X) left = BOUNDRY_X;
+				if (top < ref.current.clientHeight - height - BOUNDRY_Y) top = ref.current.clientHeight - height - BOUNDRY_Y;
+				if (left < ref.current.clientWidth - width - BOUNDRY_X) left = ref.current.clientWidth - width - BOUNDRY_X;
 
 				// Set new position
 				image.style.left = `${ left }px`;
 				image.style.top = `${ top }px`;
-
-				console.log({ top, left });
 
 			} else {
 
@@ -74,8 +84,8 @@ export default function Map({ servers }: { servers: Ember.Server[] }): JSX.Eleme
 				}
 
 				// Center image
-				image.style.top = `${ (ref.current.clientHeight - image.clientHeight) / 2 }px`;
 				image.style.left = `${ (ref.current.clientWidth - image.clientWidth) / 2 }px`;
+				image.style.top = `${ (ref.current.clientHeight - image.clientHeight) / 2 }px`;
 			
 			}
 
@@ -109,20 +119,16 @@ export default function Map({ servers }: { servers: Ember.Server[] }): JSX.Eleme
 			ref={ ref }>
 			
 			<img alt=""
-				className="absolute top-0 left-0 max-w-none opacity-25"
+				className="absolute top-0 left-0 max-w-none opacity-30"
 				src={ map } />
 		
 			<div className="items z-10 absolute">
+
 				{servers.map((server, key) => (
-					<div className="absolute group bg-red-500 mx-6 shadow-2xl hover:z-10"
-						key={ key }
-						style={{
-							top: `${ (90 - parseFloat(server.location.latitude)) / 180 * 100 }%`,
-							left: `${ (120 + parseFloat(server.location.longitude)) / 240 * 100 }%`,
-						}}>
-						<Server server={ server } />
-					</div>
-				)) }
+					<Server key={ key }
+						server={ server } />
+				))}
+
 			</div>
 
 		</div>

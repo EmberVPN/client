@@ -222,6 +222,7 @@ declare namespace Ember {
 		hostname: string
 		hash: string
 		location: Location
+		ping: number
 	}
 
 	export interface Location {
