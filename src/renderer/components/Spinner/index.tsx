@@ -10,7 +10,7 @@ export default function Spinner({ className }: Props): JSX.Element {
 	return (
 		<svg className={ classNames("spinner", className) }
 			viewBox="0 0 50 50">
-			<circle className="path"
+			<circle className={ classNames("path", className) }
 				cx="25"
 				cy="25"
 				fill="none"
