@@ -39,9 +39,7 @@ export default function Map({ servers }: { servers: Ember.Server[] }): JSX.Eleme
 				// set new size
 				image.style.height = `${ newHeight }px`;
 				image.style.width = `${ newHeight * aspectRatio }px`;
-				
-				console.log();
-
+			
 				// get the difference in size
 				const diffHeight = (height - newHeight) / 2;
 				const clientTop = ref.current.getBoundingClientRect().top;
