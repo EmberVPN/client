@@ -16,7 +16,7 @@ export default function InputGroup({ label, error, name, className, ...props }: 
 				{ error ? error : label}
 			</label>}
 			<input
-				className={ classNames("p-2.5 outline-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white hover:border-gray-500 focus:border-primary-500 focus:ring-[3px] focus:ring-primary-500", error && "!border-red-500 !ring-red-500") }
+				className={ classNames("p-2.5 outline-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white hover:border-gray-500 focus:border-primary focus:ring-[3px] focus:ring-primary", error && "!border-red-500 !ring-red-500") }
 				{ ...props }
 				name={ name } />
 		</div>

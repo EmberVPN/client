@@ -78,7 +78,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 			}}>
 			
 			<div className="w-14 aspect-square -translate-x-1/2 rounded-full">
-				<MdLocationPin className="text-primary-500 text-6xl group-hover:scale-150 origin-bottom opacity-60 group-hover:opacity-100 transition-[opacity,transform]" />
+				<MdLocationPin className="text-primary text-6xl group-hover:scale-150 origin-bottom opacity-60 group-hover:opacity-100 transition-[opacity,transform]" />
 			</div>
 
 			<div className="absolute opacity-0 pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100 -translate-x-1/2 transition-[opacity,transform] scale-75 group-hover:scale-100 origin-top w-fit">
@@ -104,8 +104,8 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 						</div>
 					</div>
 
-					{ !isConnected && <button className="h-12 text-primary-500 hover:bg-primary-500/10 bg-primary-500/5 text-lg font-medium rounded-lg"
-						onClick={ connect }>{isLoading ? <Spinner className="w-5 mx-auto !stroke-primary-500" /> : "Quick Connect"}</button>}
+					{ !isConnected && <button className="h-12 text-primary hover:bg-primary/10 bg-primary/5 text-lg font-medium rounded-lg"
+						onClick={ connect }>{isLoading ? <Spinner className="w-5 mx-auto !stroke-primary" /> : "Quick Connect"}</button>}
 					{isConnected && <button className="h-12 bg-red-600 hover:bg-red-700 text-white text-lg font-medium rounded-lg"
 						onClick={ disconnect }>{isLoading ? <Spinner className="w-5 mx-auto !stroke-white" /> : "Disconnect"}</button>}
 

@@ -25,9 +25,9 @@ export default function IPBadge(): JSX.Element | null {
 	const currentConnection = Object.values(servers.servers).find(server => server.ip === iplocation.ip);
 	if (currentConnection) return (
 		<div className="flex items-center gap-4 -my-4">
-			<IoMdCheckmarkCircleOutline className="text-2xl text-emerald-500" />
+			<IoMdCheckmarkCircleOutline className="text-2xl text-success" />
 			<div>
-				<p className="text-emerald-500">Connected</p>
+				<p className="text-success">Connected</p>
 				<p className="text-sm">{ currentConnection.ip }</p>
 			</div>
 			<button className="h-12 bg-red-600 hover:bg-red-700 text-white text-lg font-medium rounded-lg px-4"

@@ -32,6 +32,7 @@ export function useUser() {
 			electron.ipcRenderer.send("titlebar", "unlock");
 			setIsAuthorized(true);
 			localStorage.setItem("authorization", data.authorization);
+			localStorage.setItem("last_user", data.email);
 			setUser(new User(data));
 			return;
 		}

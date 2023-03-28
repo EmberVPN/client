@@ -10,8 +10,9 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
-				"primary": colors.orange,
-				"success": colors.emerald,
+				"primary": { ...colors.orange, DEFAULT: colors.orange[500] },
+				"success": { ...colors.emerald, DEFAULT: colors.emerald[500] },
+				"error": { ...colors.red, DEFAULT: colors.red[500] }
 			}
 		},
 	},
