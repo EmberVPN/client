@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MdLocationPin } from "react-icons/md";
-import { useQuery } from "react-query";
 import { toast } from "react-toastify";
+import useIpLocation from "../util/hooks/useIpLocation";
 import queryClient from "../util/queryClient";
 import Spinner from "./Spinner";
 
@@ -9,7 +9,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 	const [ isLoading, setIsLoading ] = useState(false);
 	const [ isConnected, setConnected ] = useState(false);
-	const { data } = useQuery("currentLocation", () => fetch("https://ipapi.co/json/").then(res => res.json()));
+	const ipLocation = useIpLocation();
 
 	useEffect(function() {
 		electron.ipcRenderer.on("openvpn", (_event, state: string, hash: string, data) => {
@@ -33,15 +33,15 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 	}, [ server.hash ]);
 	
 	useEffect(function() {
-		if (!data) return;
-		if (data.ip === server.ip) {
+		if (!ipLocation) return;
+		if (ipLocation.ip === server.ip) {
 			setConnected(true);
 			setIsLoading(false);
 			electron.ipcRenderer.send("openvpn", "connected", JSON.stringify({ server }));
 		} else {
 			setConnected(false);
 		}
-	}, [ data, server.ip ]);
+	}, [ ipLocation, server ]);
 
 	function connect() {
 		setIsLoading(true);
@@ -70,9 +70,9 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 	const latitude = parseFloat(server.location.latitude);
 	const longitude = parseFloat(server.location.longitude);
 
-	if (!data) return null;
+	if (!ipLocation) return null;
 
-	const distance = calculateDistance(latitude, longitude, data.latitude, data.longitude);
+	const distance = calculateDistance(latitude, longitude, ipLocation.latitude, ipLocation.longitude);
 
 	return (
 		<div className="absolute group hover:z-[1]"
