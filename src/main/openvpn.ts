@@ -21,7 +21,7 @@ export default function(win: BrowserWindow) {
 	// Listen for openvpn events
 	ipcMain.on("openvpn", async(_, state: State, data: string) => {
 
-		// Set connected state
+		// Set connect state
 		if (state === "connect") {
 			
 			// Get server & authorization from data
@@ -35,6 +35,16 @@ export default function(win: BrowserWindow) {
 		// Set disconnected state
 		} else if (state === "disconnect") {
 			disconnect();
+			
+		// Set connected state
+		} else if (state === "connected") {
+
+			// Get server & authorization from data
+			const { server }: { server: Ember.Server; authorization: string } = JSON.parse(data || "{}");
+			
+			// Set tray icon
+			tray.setConnected(`Connected to ${ server.ip }`);
+
 		}
 
 	});
@@ -129,15 +139,8 @@ export function connect(server: Ember.Server) {
 
 	// Listen for data
 	proc.stdout.on("data", chunk => {
-
 		const line = chunk.toString();
 		contents?.send("openvpn", "log", server.hash, line);
-		
-		if (line.includes("Initialization Sequence Completed")) {
-			contents?.send("openvpn", "connected", server.hash);
-			tray.setConnected(`Connected to ${ server.hostname } (${ server.ip })`);
-		}
-
 	});
 
 	// On exit

@@ -16,15 +16,8 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 			// Clear currentLocation query
 			queryClient.refetchQueries("currentLocation");
-
-			setIsLoading(false);
 			
 			switch (state) {
-			case "connected":
-				setIsLoading(false);
-				if (hash !== server.hash) break;
-				setConnected(true);
-				break;
 			case "disconnected":
 				setConnected(false);
 				break;
@@ -38,6 +31,17 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 		});
 	}, [ server.hash ]);
+	
+	useEffect(function() {
+		if (!data) return;
+		if (data.ip === server.ip) {
+			setConnected(true);
+			setIsLoading(false);
+			electron.ipcRenderer.send("openvpn", "connected", JSON.stringify({ server }));
+		} else {
+			setConnected(false);
+		}
+	}, [ data, server.ip ]);
 
 	function connect() {
 		setIsLoading(true);
