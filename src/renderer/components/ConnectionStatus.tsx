@@ -38,16 +38,16 @@ export default function ConnectionStatus(): JSX.Element | null {
 			<div className="group-hover:scale-100 scale-75 opacity-0 group-hover:opacity-100 transition-all absolute px-2 py-0.5 text-sm origin-top-left rounded-lg top-0 pointer-events-none
 shadow-xl border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden -m-4 dark:shadow-black/20 flex flex-col !p-4 gap-3 group-hover:pointer-events-auto min-w-[288px]">
 				<div className="flex items-center gap-4">
-					<Icon />
-					<div className="leading-tight font-roboto font-medium whitespace-nowrap">
-						<h1 className={ classNames("text-lg", isConnected ? "text-success" : "text-error") }>{!isConnected && "Not "}Connected</h1>
-						<ul className="text-sm flex gap-2">
-							<li>{ipLocation.ip}</li>
-							{!isConnected && (<>
-								•<li className="text-gray-500">{ipLocation.org}</li>
-							</>)}
-						</ul>
+					<div>
+						<Icon />
 					</div>
+					<div className="leading-tight font-roboto font-medium whitespace-nowrap w-full">
+						<h1 className={ classNames("text-lg", isConnected ? "text-success" : "text-error") }>{!isConnected && "Not "}Connected</h1>
+						<div className="text-sm flex gap-2 justify-between w-full">
+							<p>{ipLocation.ip}</p>
+						</div>
+					</div>
+					{!isConnected && <p className="text-gray-500 font-roboto font-medium whitespace-nowrap">{ipLocation.org}</p> }
 				</div>
 				<p className="text-xs text-gray-600 dark:text-gray-400">{
 					isConnected ? <>Your internet traffic is encrypted and protected from interception, monitoring, or hacking by third parties such as hackers, government agencies, or internet service providers.</> : <>Your internet traffic is not protected by Ember and is susceptible to interception, monitoring, or hacking by third parties such as hackers, government agencies, or internet service providers like <strong>{ipLocation.org}</strong>.</>
