@@ -7,8 +7,6 @@ on:
 
     name: Build
     runs-on: windows-latest
-    if: github.ref == 'refs/heads/master'
-    needs: [version]
     permissions:
       contents: write
 
