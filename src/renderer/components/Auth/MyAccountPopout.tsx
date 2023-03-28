@@ -20,7 +20,7 @@ export default function MyAccountPopup({ user }: { user: User }): JSX.Element {
 	}, []);
 
 	return (
-		<div className="absolute top-0 right-0 opacity-0 scale-75 group-[.is-open]:opacity-100 group-[.is-open]:scale-100 transition-all origin-top-right rounded-3xl p-4 min-w-full w-[368px] pointer-events-none group-[.is-open]:pointer-events-auto shadow-xl border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden -m-2"
+		<div className="absolute font-roboto top-0 right-0 opacity-0 scale-75 group-[.is-open]:opacity-100 group-[.is-open]:scale-100 transition-all origin-top-right rounded-3xl p-4 min-w-full w-[368px] pointer-events-none group-[.is-open]:pointer-events-auto shadow-xl border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden -m-2 dark:shadow-black/50"
 			onClick={ e => e.stopPropagation() }>
 			<div className="flex gap-4 items-center overflow-hidden">
 				<img alt={ user.username }

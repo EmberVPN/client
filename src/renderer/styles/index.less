@@ -3,8 +3,12 @@
 @tailwind utilities;
 
 body {
-	@apply dark:bg-gray-900 dark:text-gray-300;
+	@apply bg-gray-200 dark:bg-gray-900 dark:text-gray-300;
 	font-family: Lexend;
+}
+
+.font-roboto {
+	font-family: 'Roboto', sans-serif;
 }
 
 .window {
@@ -31,14 +35,15 @@ img {
 }
 
 .toolbar {
-	@apply bg-gray-100 dark:bg-gray-800 shadow-md px-8;
+	@apply bg-white dark:bg-gray-800 shadow-md px-8;
+
 }
 
 .titlebar--root {
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	font-size: 14px;
 	-webkit-app-region: drag;
-	@apply h-8 flex w-full justify-between items-center relative select-none bg-black/20 dark:bg-gray-800/50;
+	@apply h-8 flex w-full justify-between items-center relative select-none bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-200;
 	.titlebar--icon {
 		@apply h-5;
 	}
