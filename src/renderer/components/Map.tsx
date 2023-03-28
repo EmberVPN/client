@@ -110,7 +110,7 @@ export default function Map({ servers }: { servers: Ember.Server[] }): JSX.Eleme
 
 		});
 
-	}, [ ]);
+	}, []);
 
 	return (
 		<div className="relative top-0 left-0 w-full h-full"
