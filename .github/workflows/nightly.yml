@@ -33,8 +33,9 @@ jobs:
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           hub clone -b release ${{ github.repository }} dist
-          npm run build:win
           cd dist
+          git pull
+          npm run build:win
           git add *.exe
           git commit -m "Build: $(cat ../package.json | jq -r .version) (Nightly)"
           git push
