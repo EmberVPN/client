@@ -2,10 +2,10 @@ import classNames from "classnames";
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { refetch } from "../../util/refetch";
+import Button from "../Button";
 import Spinner from "../Spinner";
-import Button from "./Button";
-import Checkbox from "./Checkbox";
-import InputField from "./InputField";
+import Checkbox from "../Checkbox";
+import InputField from "../InputField";
 
 export default function Authorize(): JSX.Element {
 
