@@ -32,7 +32,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 
 	return (
 		<div className="group relative">
-			<div className="w-12 h-12 -m-4 rounded-full flex items-center justify-center hover:bg-gray-500/10 hover:active:bg-gray-500/20 transition-colors">
+			<div className={ classNames("w-12 h-12 -m-4 rounded-full flex items-center justify-center hover:bg-gray-500/10 hover:active:bg-gray-500/20 transition-colors border", isConnected ? "border-success/25" : "border-error/25") }>
 				<Icon />
 			</div>
 			<div className="group-hover:scale-100 scale-75 opacity-0 group-hover:opacity-100 transition-all absolute px-2 py-0.5 text-sm origin-top-left rounded-lg top-0 pointer-events-none
