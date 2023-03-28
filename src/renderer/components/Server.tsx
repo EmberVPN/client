@@ -101,7 +101,9 @@ shadow-xl border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800
 						</div>
 						<div className="text-sm flex justify-between gap-2 w-full">
 							<p className={ classNames(server.ping < 50 ? "text-success" : server.ping < 150 ? "text-amber-500" : "text-error") }>{server.ping}ms</p>
+							<span className="text-gray-400 dark:text-gray-600">•</span>
 							<p>{ Intl.NumberFormat().format(Math.floor(distance)) }km</p>
+							<span className="text-gray-400 dark:text-gray-600">•</span>
 							<p>{server.location.ip}</p>
 						</div>
 					</div>
