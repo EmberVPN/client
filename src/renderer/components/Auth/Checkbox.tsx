@@ -13,7 +13,7 @@ export default function Checkbox({ children, className, ...props }: React.InputH
 				<input className="peer appearance-none border-2 rounded-sm w-5 h-5 border-gray-300 dark:border-gray-600 checked:!border-primary checked:border-[10px] transition-all after:content[''] after:bg-primary-500/10 after:absolute after:w-12 after:h-12 after:left-1/2 after:top-1/2 after:rounded-full after:-translate-x-1/2 after:-translate-y-1/2 after:pointer-events-none after:-z-[1] after:scale-0 focus:after:scale-100 group-active:after:scale-100 duration-100 after:transition-transform"
 					type="checkbox"
 					{ ...props } />
-				<MdCheck className="m-0.5 text-white scale-0 peer-checked:scale-100 absolute transition-transform delay-100" />
+				<MdCheck className="m-0.5 text-white scale-0 peer-checked:scale-125 absolute transition-transform delay-100" />
 			</div>
 			<label className="select-none text-sm"
 				htmlFor={ props.id }>{children}</label>
