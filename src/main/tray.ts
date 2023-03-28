@@ -33,7 +33,7 @@ export function setConnected(content: string) {
 	tray.setToolTip("Ember VPN • Connected");
 	tray.setImage(resolve(resources, "./src/renderer/assets/tray-connected.png"));
 	tray.setContextMenu(Menu.buildFromTemplate([ {
-		label: "Exit",
+		label: "Exit & Disconnect",
 		click: exit
 	}, {
 		label: "Disconnect",
@@ -55,6 +55,20 @@ export function disconnect() {
 
 	tray.setToolTip("Ember VPN");
 	tray.setImage(resolve(resources, "./src/renderer/assets/tray.png"));
+	tray.setContextMenu(Menu.buildFromTemplate([ {
+		label: "Exit",
+		click: exit
+	} ]));
+	
+}
+
+/** Sets the tray to show its connecting to a server */
+export function setConnecting() {
+	
+	if (!tray) return;
+
+	tray.setToolTip("Ember VPN • Connecting...");
+	tray.setImage(resolve(resources, "./src/renderer/assets/tray-connecting.png"));
 	tray.setContextMenu(Menu.buildFromTemplate([ {
 		label: "Exit",
 		click: exit

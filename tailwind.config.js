@@ -12,6 +12,7 @@ module.exports = {
 			colors: {
 				"primary": { ...colors.orange, DEFAULT: colors.orange[500] },
 				"success": { ...colors.emerald, DEFAULT: colors.emerald[500] },
+				"warn": { ...colors.amber, DEFAULT: colors.amber[500] },
 				"error": { ...colors.red, DEFAULT: colors.red[500] }
 			}
 		},

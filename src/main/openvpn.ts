@@ -35,16 +35,6 @@ export default function(win: BrowserWindow) {
 		// Set disconnected state
 		} else if (state === "disconnect") {
 			disconnect();
-			
-		// Set connected state
-		} else if (state === "connected") {
-
-			// Get server & authorization from data
-			const { server }: { server: Ember.Server; authorization: string } = JSON.parse(data || "{}");
-			
-			// Set tray icon
-			tray.setConnected(`Connected to ${ server.ip }`);
-
 		}
 
 	});
@@ -121,11 +111,28 @@ export async function downloadConfig(server: Ember.Server, authorization: string
 
 // Connect to openvpn
 export function connect(server: Ember.Server) {
-
-	contents?.send("openvpn", "disconnected");
 	
+	const iv = setInterval(async function refetch() {
+
+		// Get current IP
+		const { ip } = await fetch("https://ipapi.co/json/").then(res => res.json()) as { ip: string };
+
+		console.log(ip);
+
+		// Set connected
+		if (ip === server.ip) {
+			clearInterval(iv);
+			tray.setConnected(`Connected to ${ server.ip }`);
+			contents?.send("openvpn", "connected");
+		}
+
+	}, 1000);
+
 	// Dispose of old process
 	proc?.kill();
+
+	// Set connecting
+	tray.setConnecting();
 
 	// Get binary path
 	const binary = getBinary();
@@ -146,11 +153,14 @@ export function connect(server: Ember.Server) {
 	// On exit
 	proc.on("exit", code => {
 
+		clearInterval(iv);
+
 		// Check if process was killed
 		if (code === null) return;
 
 		// Check if process exited with error
 		if (code !== 0) contents?.send("openvpn", "error", server.hash, "OpenVPN exited with code " + code);
+		return;
 
 	});
 		
