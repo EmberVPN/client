@@ -86,7 +86,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 			<div className="w-14 aspect-square -translate-x-1/2 rounded-full">
 				<MdLocationPin className="text-primary text-6xl group-hover:scale-150 origin-bottom opacity-60 group-hover:opacity-100 transition-[opacity,transform]" />
 			</div>
-			<div className="group-hover:scale-100 scale-75 opacity-0 group-hover:opacity-100 transition-all absolute px-2 py-0.5 text-sm origin-top-left rounded-lg top-0 pointer-events-none
+			<div className="group-hover:scale-100 scale-75 opacity-0 group-hover:opacity-100 transition-all absolute px-2 py-0.5 text-sm origin-top rounded-lg top-0 pointer-events-none -translate-x-1/2 translate-y-1/2 left-1/2
 shadow-xl border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden -m-4 dark:shadow-black/20 flex flex-col !p-4 gap-3 group-hover:pointer-events-auto min-w-[360px] w-fit">
 				<div className="flex items-center gap-4">
 					<img alt="France"
