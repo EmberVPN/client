@@ -1,7 +1,7 @@
 import { electronApp, is, optimizer } from "@electron-toolkit/utils";
 import { app, BrowserWindow, shell } from "electron";
 import { join, resolve } from "path";
-import icon from "../../build/icon.png?asset";
+import icon from "../renderer/assets/ember.png?asset";
 
 import attachClient from "./openvpn";
 import attachTaskbar from "./taskbar";
