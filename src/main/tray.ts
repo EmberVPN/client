@@ -43,7 +43,7 @@ export function setConnected(content: string) {
 	tray.displayBalloon({
 		content,
 		title: "Ember VPN",
-		icon: resolve(resources, "./src/renderer/assets/balloon.png")
+		icon: resolve(resources, "./src/renderer/assets/ember.png")
 	});
 	
 }
