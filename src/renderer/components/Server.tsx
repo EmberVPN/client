@@ -103,14 +103,6 @@ shadow-xl border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800
 						</Button>
 					)
 				)}
-
-				{/* { !isConnected && <Button className={ classNames("m-0", isLoading && "!bg-opacity-25 !shadow-none pointer-events-none") }
-					color="primary"
-					onClick={ connect }>{isLoading ? <Spinner className="w-6 mx-auto !stroke-primary" /> : "Connect"}</Button>
-				}
-				{ isConnected && <Button className={ classNames("m-0", isLoading && "!bg-opacity-25 !shadow-none pointer-events-none") }
-					color="error"
-					onClick={ disconnect }>{isLoading ? <Spinner className="w-6 mx-auto !stroke-error" /> : "Disconnect"}</Button> */}
 				
 			</div>
 		</div>
