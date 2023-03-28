@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+	overflow: hidden;
+	:focus-visible {
+		outline: none!important;
+	}
+}
+
+
 body {
 	@apply bg-gray-200 dark:bg-gray-900 dark:text-gray-300;
 	font-family: Lexend;
@@ -9,6 +17,10 @@ body {
 
 .font-roboto {
 	font-family: 'Roboto', sans-serif;
+}
+
+.font-manrope {
+	font-family: 'manrope', sans-serif;
 }
 
 .window {
@@ -50,10 +62,21 @@ img {
 	.titlebar--button {
 		-webkit-app-region: no-drag;
 		width: 46px;
+		z-index: 22;
 		@apply h-8 flex justify-center items-center bg-neutral-500 bg-opacity-0 hover:bg-opacity-10 active:hover:bg-opacity-20 select-none text-base;
 		&:last-child {
 			@apply hover:bg-red-500 hover:bg-opacity-100 hover:active:bg-opacity-70 hover:text-white;
 		}
+	}
+	&::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: #0002;
+		z-index: 1;
 	}
 }
 
@@ -73,4 +96,14 @@ img {
 		@apply text-white bg-success-700 hover:bg-success-800 focus:ring-4 focus:ring-success-300 dark:bg-success-600 dark:hover:bg-success-700 dark:focus:ring-success-800 border-none;
 	}
 
+}
+
+.container {
+	@apply max-w-7xl mx-auto w-full px-4 flex flex-col gap-8 py-8 lg:py-12 xl:py-16 lg:gap-12 xl:gap-16;
+}
+
+.input-group {
+	input[value=""] {
+		@apply bg-red-500;
+	}
 }

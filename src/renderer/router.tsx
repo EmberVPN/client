@@ -3,7 +3,7 @@ import { QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import favicon from "./assets/ember.svg";
-import Authorize from "./components/Authorize";
+import Authorize from "./components/Auth/Login";
 import EntryPoint from "./components/EntryPoint";
 import ThemeToggle from "./components/ThemeToggle";
 import Titlebar from "./components/Titlebar";
@@ -46,7 +46,7 @@ export function Application() {
 	);
 	
 	if (user) return (
-		<div className="h-screen flex flex-col">
+		<div className="h-screen flex flex-col overflow-hidden">
 			<Titlebar />
 			<div className="grow overflow-x-hidden overflow-auto flex flex-col select-none">
 				<Toolbar />
@@ -58,7 +58,7 @@ export function Application() {
 	return (
 		<div className="grid h-screen items-center justify-center relative window">
 			<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-				<div className="bg-primary-500 aspect-square w-[400px] rounded-full animate-pulse -z-10"></div>
+				<div className="bg-primary aspect-square w-[400px] rounded-full animate-pulse -z-10"></div>
 			</div>
 			<img className="select-none z-10"
 				src={ favicon } />
