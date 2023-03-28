@@ -20,9 +20,9 @@ function createWindow(): void {
 		title: "Ember VPN",
 		titleBarStyle: "hidden",
 		width: 600,
-		height: 440,
+		height: 400,
 		minWidth: 600,
-		minHeight: 440,
+		minHeight: 400,
 		autoHideMenuBar: true,
 		webPreferences: {
 			preload: join(__dirname, "../preload/index.js"),

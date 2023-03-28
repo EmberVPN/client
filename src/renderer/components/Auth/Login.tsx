@@ -134,7 +134,7 @@ export default function Authorize(): JSX.Element {
 						<Checkbox defaultChecked
 							name="rememberme">Stay signed in</Checkbox>
 						<Button className={ classNames("m0", loading && "!bg-opacity-25 !shadow-none pointer-events-none") }
-							size="md"
+							size="sm"
 							type="submit">{loading ? <Spinner className="w-6 mx-[19px] !stroke-gray-700 dark:!stroke-white" /> : "Sign In"}</Button>
 					</div>
 				</form>
