@@ -9,6 +9,7 @@ import ThemeToggle from "./components/ThemeToggle";
 import Titlebar from "./components/Titlebar";
 import Toolbar from "./components/Toolbar";
 import "./styles/index.less";
+import { ConnectionProvider } from "./util/hooks/useConnection";
 import { useUser } from "./util/hooks/useUser";
 import queryClient from "./util/queryClient";
 
@@ -29,7 +30,9 @@ root.render(
 			theme="colored"
 		/>
 		<ThemeToggle provider />
-		<Application />
+		<ConnectionProvider>
+			<Application />
+		</ConnectionProvider>
 	</QueryClientProvider>
 );
 

@@ -3,9 +3,9 @@ import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { refetch } from "../../util/refetch";
 import Button from "../Button";
-import Spinner from "../Spinner";
 import Checkbox from "../Checkbox";
 import InputField from "../InputField";
+import Spinner from "../Spinner";
 
 export default function Authorize(): JSX.Element {
 
@@ -21,7 +21,7 @@ export default function Authorize(): JSX.Element {
 					viewBox="0 0 500 500"
 					width="100%"
 					xmlns="http://www.w3.org/2000/svg">
-					<path className="fill-amber-500/25">
+					<path className="fill-warn/25">
 						<animate attributeName="d"
 							dur="25s"
 							repeatCount="indefinite"
