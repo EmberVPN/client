@@ -1,9 +1,12 @@
-name: Deploy Nightly
+name: Nightly Deploy
+
 on:
   schedule:
     - cron: "* 0 * * *"
 
-    build:
+jobs:
+  
+  build:
 
     name: Build
     runs-on: windows-latest
