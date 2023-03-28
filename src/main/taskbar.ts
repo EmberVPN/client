@@ -18,13 +18,16 @@ export default function(win: BrowserWindow) {
 		if (key === "hide") win.hide();
 			
 		if (key === "lock") {
-			win.setSize(600, 440);
+			win.setSize(600, 400);
 			win.setResizable(false);
+			win.center();
 		}
 		
 		if (key === "unlock") {
 			win.setResizable(true);
-			win.setMinimumSize(600, 440);
+			win.setMinimumSize(600, 400);
+			win.setSize(800, 600);
+			win.center();
 		}
 				
 	});
