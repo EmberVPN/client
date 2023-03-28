@@ -105,7 +105,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 				}</p>
 				
 				{/* Disconnect button */}
-				{ isConnected && <Button className={ classNames(isLoading && "!bg-opacity-25 !shadow-none pointer-events-none") }
+				{ isConnected && <Button className={ classNames(isLoading && "!bg-opacity-25 !shadow-none pointer-events-none z-[10]") }
 					color="error"
 					onClick={ disconnect }>{isLoading ? <Spinner className="w-6 mx-auto !stroke-error" /> : "Disconnect"}</Button> }
 			</div>
