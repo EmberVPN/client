@@ -90,13 +90,15 @@ shadow-xl border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800
 					(isActive && status === "connected" && ipLocation.ip === server.ip) ? (
 						<Button className="m-0"
 							color="error"
-							onClick={ disconnect }>
+							onClick={ disconnect }
+							raised={ false }>
 							Disconnect
 						</Button>
 					) : (
 						<Button className="m-0"
 							color="success"
-							onClick={ connect }>
+							onClick={ connect }
+							raised={ false }>
 							Connect
 						</Button>
 					)
