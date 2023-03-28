@@ -117,8 +117,6 @@ export function connect(server: Ember.Server) {
 		// Get current IP
 		const { ip } = await fetch("https://ipapi.co/json/").then(res => res.json()) as { ip: string };
 
-		console.log(ip);
-
 		// Set connected
 		if (ip === server.ip) {
 			clearInterval(iv);
