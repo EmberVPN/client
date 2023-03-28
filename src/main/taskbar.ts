@@ -1,5 +1,7 @@
 import { BrowserWindow, ipcMain } from "electron";
 
+let isLocked = true;
+
 // Get mainwindow once it loads
 export default function(win: BrowserWindow) {
 	
@@ -18,16 +20,20 @@ export default function(win: BrowserWindow) {
 		if (key === "hide") win.hide();
 			
 		if (key === "lock") {
+			if (isLocked) return;
 			win.setSize(600, 400);
 			win.setResizable(false);
 			win.center();
+			isLocked = true;
 		}
 		
 		if (key === "unlock") {
+			if (!isLocked) return;
 			win.setResizable(true);
 			win.setMinimumSize(600, 400);
 			win.setSize(800, 600);
 			win.center();
+			isLocked = false;
 		}
 				
 	});
