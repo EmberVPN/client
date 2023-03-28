@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { useState } from "react";
+import { MdMoreVert } from "react-icons/md";
 import User from "../../util/class/User";
 import MyAccountPopout from "./MyAccountPopout";
 
@@ -14,12 +15,10 @@ export default function MyAccount({ user }: { user: User }): JSX.Element {
 
 	return (
 		<div className={ classNames("group relative", _open && "is-open") }>
-			<button className="flex text-sm bg-neutral-500/25 rounded-full md:mr-0 focus:ring-4 focus:ring-primary-400 -my-1 select-none"
+			<div className="w-12 h-12 -m-4 rounded-full flex items-center justify-center hover:bg-gray-500/10 hover:active:bg-gray-500/20 transition-colors"
 				onClick={ open }>
-				<img alt="user photo"
-					className="w-9 h-9 rounded-full"
-					src={ User.getAvatarURL(user.id) } />
-			</button>
+				<MdMoreVert className="text-2xl" />
+			</div>
 			<MyAccountPopout user={ user } />
 		</div>
 	);
