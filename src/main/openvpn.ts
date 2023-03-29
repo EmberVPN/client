@@ -152,6 +152,7 @@ export function connect(server: Ember.Server) {
 	proc.on("exit", code => {
 
 		clearInterval(iv);
+		tray.disconnect();
 
 		// Check if process was killed
 		if (code === null) return;
