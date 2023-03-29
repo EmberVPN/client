@@ -67,7 +67,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 	
 	// If somethings loading, show the spinner
 	if (!ipLocation || !servers || status === "connecting" || status === "disconnecting") return (
-		<div className="w-12 h-12 -m-4 rounded-full flex items-center justify-center hover:bg-gray-500/10 hover:active:bg-gray-500/20 transition-colors border border-warn/25">
+		<div className="w-12 h-12 -m-4 rounded-full flex items-center justify-center hover:bg-gray-500/10 hover:active:bg-gray-500/20 transition-colors border border-warn/25 bg-warn/10">
 			<Spinner className="mx-2 !stroke-warn" />
 		</div>
 	);
