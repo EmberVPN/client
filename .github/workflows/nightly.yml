@@ -32,7 +32,7 @@ jobs:
         run: |
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          hub clone -b releases ${{ github.repository }} dist
+          git clone -b releases https://github.com/EmberVPN/ember-client.git dist
           cd dist
           git pull
           npm run build:win
