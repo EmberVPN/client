@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { useEffect } from "react";
+import { IoMdSettings } from "react-icons/io";
 import { MdExitToApp } from "react-icons/md";
 import User from "../../util/class/User";
 import { signout } from "../../util/signout";
@@ -42,6 +43,12 @@ export default function MyAccountPopup({ user }: { user: User }): JSX.Element {
 					Change theme
 				</ThemeToggle>
 							
+				<div className="flex cursor-pointer px-8 h-14 gap-6 items-center hover:bg-gray-200/30 dark:hover:bg-gray-700/30 select-none text-sm font-medium transition-colors duration-75 hover:active:bg-gray-500/10 dark:hover:active:bg-gray-500/20"
+					onClick={ () => [ close() ] }>
+					<IoMdSettings className="w-6 h-6" />
+					Settings
+				</div>
+				
 				<div className="flex cursor-pointer px-8 h-14 gap-6 items-center hover:bg-gray-200/30 dark:hover:bg-gray-700/30 select-none text-sm font-medium transition-colors duration-75 hover:active:bg-gray-500/10 dark:hover:active:bg-gray-500/20"
 					onClick={ () => [ close(), signout() ] }>
 					<MdExitToApp className="w-6 h-6" />
