@@ -98,6 +98,7 @@ app.whenReady().then(function() {
 	if (!is.dev) {
 		app.setLoginItemSettings({
 			openAtLogin: true,
+			path: app.getPath("exe")
 		});
 	}
 	
