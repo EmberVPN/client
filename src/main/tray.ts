@@ -33,7 +33,7 @@ export function setConnected(content: string) {
 	tray.setToolTip("Ember VPN • Connected");
 	tray.setImage(resolve(resources, "./src/renderer/assets/tray-connected.png"));
 	tray.setContextMenu(Menu.buildFromTemplate([ {
-		label: "Exit & Disconnect",
+		label: "Exit and Disconnect",
 		click: exit
 	}, {
 		label: "Disconnect",
