@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdErrorOutline } from "react-icons/md";
 import { toast } from "react-toastify";
@@ -11,9 +11,6 @@ import Spinner from "./Spinner";
 
 export default function ConnectionStatus(): JSX.Element | null {
 
-	// Initialize local state
-	const [ isLoading, setIsLoading ] = useState(false);
-	
 	// Get the connection status
 	const [ status, setStatus ] = useConnection();
 	
@@ -25,7 +22,6 @@ export default function ConnectionStatus(): JSX.Element | null {
 	
 	// Sync state with main process
 	useEffect(function() {
-		setIsLoading(false);
 		electron.ipcRenderer.on("openvpn", (_event, state: string, _hash: string, data: string) => {
 			switch (state) {
 				
@@ -36,7 +32,6 @@ export default function ConnectionStatus(): JSX.Element | null {
 				
 			case "connected":
 			case "disconnected":
-				setIsLoading(false);
 				setStatus(state);
 				queryClient.refetchQueries("currentLocation");
 				break;
@@ -56,13 +51,6 @@ export default function ConnectionStatus(): JSX.Element | null {
 			setStatus("connected");
 		}
 	}, [ status, ipLocation?.ip, setStatus ]);
-	
-	// Disconnect from the VPN
-	async function disconnect() {
-		setStatus("disconnecting");
-		setIsLoading(true);
-		electron.ipcRenderer.send("openvpn", "disconnect");
-	}
 	
 	// If somethings loading, show the spinner
 	if (!ipLocation || !servers || status === "connecting" || status === "disconnecting") return (

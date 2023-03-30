@@ -1,5 +1,4 @@
 import { HTMLAttributes, ReactNode, useEffect, useState } from "react";
-import { BsBrightnessHigh } from "react-icons/bs";
 import { MdBrightnessHigh, MdOutlineBrightnessAuto, MdOutlineDarkMode } from "react-icons/md";
 
 export type ThemeMode = "DARK" | "LIGHT" | "AUTO";
