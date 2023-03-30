@@ -52,8 +52,10 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 					</div>
 					<div className="text-sm flex justify-between gap-2 w-full">
 						<p className={ classNames(server.ping < 50 ? "text-success" : server.ping < 150 ? "text-warn" : "text-error") }>{server.ping}ms</p>
-						<span className="text-gray-400 dark:text-gray-600">•</span>
-						<p>{ Intl.NumberFormat().format(Math.floor(distance * (ipLocation.country_code === "US" ? 0.621371 : 1))) } {ipLocation.country_code === "US" ? "Mi" : "Km"}</p>
+						{ (!isActive || status !== "connected") && (<>
+							<span className="text-gray-400 dark:text-gray-600">•</span>
+							<p>{Intl.NumberFormat().format(Math.floor(distance * (ipLocation.country_code === "US" ? 0.621371 : 1)))} {ipLocation.country_code === "US" ? "Mi" : "Km"}</p>
+						</>) }
 						<span className="text-gray-400 dark:text-gray-600">•</span>
 						<p>{server.location.ip}</p>
 					</div>
