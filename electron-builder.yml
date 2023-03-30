@@ -14,6 +14,7 @@ extraResources:
   - 'src/renderer/assets/**/*'
 win:
   executableName: ember-client
+  uninstallerName: ember-uninstaller
   requestedExecutionLevel: "requireAdministrator"
   target:
     - nsis
