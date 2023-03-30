@@ -3,6 +3,8 @@
 declare const electron: ElectronAPI;
 declare const APIROOT: string;
 
+declare const VERSION: string;
+
 declare type ErrorMessage = `${ number } ${ string }`;
 
 declare interface APIErrorResponse {

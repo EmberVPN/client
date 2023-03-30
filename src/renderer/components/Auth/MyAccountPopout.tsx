@@ -4,6 +4,7 @@ import { IoMdSettings } from "react-icons/io";
 import { MdExitToApp } from "react-icons/md";
 import User from "../../util/class/User";
 import { signout } from "../../util/signout";
+import { setOpen } from "../Settings";
 import ThemeToggle from "../ThemeToggle";
 import { close } from "./MyAccount";
 
@@ -38,13 +39,9 @@ export default function MyAccountPopup({ user }: { user: User }): JSX.Element {
 			</div>
 			<hr className="dark:border-gray-600/50 my-4 -mx-4" />
 			<ul className="-m-4 divide-y dark:divide-gray-600/50">
-							
-				<ThemeToggle className="flex cursor-pointer px-8 h-14 gap-6 items-center hover:bg-gray-200/30 dark:hover:bg-gray-700/30 select-none text-sm font-medium transition-colors duration-75 hover:active:bg-gray-500/10 dark:hover:active:bg-gray-500/20">
-					Change theme
-				</ThemeToggle>
-							
+								
 				<div className="flex cursor-pointer px-8 h-14 gap-6 items-center hover:bg-gray-200/30 dark:hover:bg-gray-700/30 select-none text-sm font-medium transition-colors duration-75 hover:active:bg-gray-500/10 dark:hover:active:bg-gray-500/20"
-					onClick={ () => [ close() ] }>
+					onClick={ () => [ close(), setOpen() ] }>
 					<IoMdSettings className="w-6 h-6" />
 					Settings
 				</div>
