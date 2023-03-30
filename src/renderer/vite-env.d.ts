@@ -21,3 +21,8 @@ declare interface APIErrorResponse {
 }
 
 declare type APIResponse<T = unknown> = T & { success: true } | APIErrorResponse;
+
+declare const config: {
+	get(key: string): unknown;
+	set(key: string, val: unknown): void;
+};
