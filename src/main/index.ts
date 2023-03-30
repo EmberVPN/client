@@ -114,13 +114,4 @@ app.whenReady().then(function() {
 		}
 	});
 
-	// Start on boot
-	if (!is.dev) {
-		if (!store.get("settings.runatstartup")) return;
-		app.setLoginItemSettings({
-			openAtLogin: true,
-			path: app.getPath("exe")
-		});
-	}
-
 });
