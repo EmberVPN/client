@@ -10,7 +10,7 @@ export default function Settings(): JSX.Element {
 	setOpen = () => setState(true);
 
 	return (
-		<div className={ classNames("bg-white dark:bg-gray-800 top-0 left-0 right-0 bottom-0 absolute z-[40] transition-opacity", state ? "pointer-events-all opacity-1" : "pointer-events-none opacity-0 flex flex-col grow") }>
+		<div className={ classNames("bg-gray-200 dark:bg-gray-900 top-0 left-0 right-0 bottom-0 absolute z-[40] transition-opacity", state ? "pointer-events-all opacity-1" : "pointer-events-none opacity-0 flex flex-col grow") }>
 			<SettingsHeader setState={ setState } />
 			<div className="grow p-4">
 				<div className="container !max-w-xl mx-auto">
