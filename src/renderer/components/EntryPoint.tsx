@@ -1,12 +1,15 @@
 import favicon from "../assets/ember.svg";
+import { calculateDistance } from "../util/calculateDistance";
 import useData from "../util/hooks/useData";
+import useIpLocation from "../util/hooks/useIpLocation";
 import { useUser } from "../util/hooks/useUser";
-import Map from "./Map";
+import Server from "./Server";
 
 export default function EntryPoint(): JSX.Element | null {
 
 	const { user } = useUser();
 	const { data, isLoading } = useData("/ember/servers");
+	const ipLocation = useIpLocation();
 
 	if (!user) return null;
 
@@ -47,8 +50,16 @@ export default function EntryPoint(): JSX.Element | null {
 
 	// List all servers
 	return (
-		<div className="grow h-full flex flex-col gap-4 relative overflow-hidden">
-			<Map servers={ Object.values(servers) } />
+		<div className="grow relative overflow-hidden bg-white/50 dark:bg-gray-800/50 overflow-y-auto flex flex-col">
+			<div className="flex flex-col p-4 gap-4 max-w-md mx-auto my-auto">
+				{Object.values(servers)
+					.sort((a, b) => calculateDistance(ipLocation?.latitude || 0, ipLocation?.longitude || 0, parseFloat(a.location.latitude), parseFloat(a.location.longitude)) - calculateDistance(ipLocation?.latitude || 0, ipLocation?.longitude || 0, parseFloat(b.location.latitude), parseFloat(b.location.longitude)))
+					.map((server, key) => (
+						<Server key={ key }
+							server={ server } />
+					))}
+			</div>
+
 		</div>
 	);
 	
