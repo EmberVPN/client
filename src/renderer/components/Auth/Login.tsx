@@ -133,9 +133,9 @@ export default function Authorize(): JSX.Element {
 					<div className="flex justify-between items-center">
 						<Checkbox defaultChecked
 							name="rememberme">Stay signed in</Checkbox>
-						<Button className={ classNames("m0", loading && "!bg-opacity-25 !shadow-none pointer-events-none") }
+						<Button className={ classNames(loading && "!bg-opacity-0 !shadow-none pointer-events-none") }
 							size="sm"
-							type="submit">{loading ? <Spinner className="w-6 mx-[19px] !stroke-gray-700 dark:!stroke-white" /> : "Sign In"}</Button>
+							type="submit">{loading ? <Spinner className="w-8 mx-3 !stroke-gray-700 dark:!stroke-primary" /> : "Sign In"}</Button>
 					</div>
 				</form>
 				<Vectors />
