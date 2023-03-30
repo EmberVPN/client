@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import { useEffect, useState } from "react";
-import { MdLocationPin } from "react-icons/md";
 import { calculateDistance } from "../util/calculateDistance";
 import useConnection from "../util/hooks/useConnection";
 import useIpLocation from "../util/hooks/useIpLocation";
