@@ -2,7 +2,6 @@ import classNames from "classnames";
 import { useEffect } from "react";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdErrorOutline } from "react-icons/md";
-import { toast } from "react-toastify";
 import useConnection from "../util/hooks/useConnection";
 import useData from "../util/hooks/useData";
 import useIpLocation from "../util/hooks/useIpLocation";
@@ -22,14 +21,12 @@ export default function ConnectionStatus(): JSX.Element | null {
 	
 	// Sync state with main process
 	useEffect(function() {
-		electron.ipcRenderer.on("openvpn", (_event, state: string, hash: string, data: string) => {
+		electron.ipcRenderer.on("openvpn", (_event, state: string) => {
 			switch (state) {
 				
 			case "error":
-				if (active !== hash) break;
 				setStatus("disconnected");
 				setActive(false);
-				toast.error(data);
 				break;
 				
 			case "connected":
@@ -59,7 +56,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 		<div className="h-12 -m-4 rounded-full flex items-center justify-center transition-colors border gap-2 px-5 border-warn/25 bg-warn/10">
 			<Spinner className="w-6 -ml-2 mr-1 !stroke-warn shrink-0" />
 			<div className="font-roboto font-medium whitespace-nowrap w-full flex flex-col justify-center pr-2">
-				<h1 className="text-warn">Loading</h1>
+				<h1 className="text-warn">{ status.includes("ing") ? status[0].toUpperCase() + status.substring(1) : "Loading"}</h1>
 			</div>
 		</div>
 	);
@@ -70,7 +67,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 			{ isConnected ? <IoMdCheckmarkCircleOutline className="text-success text-2xl shrink-0" /> : <MdErrorOutline className="text-error text-2xl shrink-0" /> }
 			<div className="font-roboto font-medium whitespace-nowrap w-full flex flex-col justify-center pr-2">
 				<h1 className={ classNames("-mb-1", isConnected ? "text-success" : "text-error") }>{!isConnected && "Not "}Connected</h1>
-				<p className="text-xs">{ipLocation.ip || "Couldn't determine IP"}</p>
+				<p className="text-xs">{active ? servers.servers[active].ip : ipLocation.ip || "Couldn't determine IP"}</p>
 			</div>
 		</div>
 	);
