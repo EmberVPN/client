@@ -9,7 +9,7 @@ interface ButtonProps {
 
 export default function Button({ children, className, size = "sm", color = "primary", raised = true, ...props }: Partial<ButtonProps> & HTMLAttributes<HTMLButtonElement> & { type?: "button" | "submit" | "reset" }) {
 
-	const base = "m-1 rounded-md font-medium uppercase text-white font-roboto tracking-[0.75px] duration-150 select-none  appearance-none";
+	const base = "rounded-md font-medium uppercase text-white font-roboto tracking-[0.75px] duration-150 select-none  appearance-none";
 	const sizes = {
 		sm: "px-4 h-9 py-1 text-sm",
 		md: "px-6 h-12 py-2 text-base",
