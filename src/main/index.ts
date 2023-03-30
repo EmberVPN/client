@@ -1,13 +1,16 @@
 import { electronApp, is, optimizer } from "@electron-toolkit/utils";
-import { app, BrowserWindow, shell } from "electron";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { join, resolve } from "path";
 import icon from "../renderer/assets/ember.png?asset";
 
+import Store from "electron-store";
 import attachClient from "./openvpn";
 import attachTaskbar from "./taskbar";
 import attachTray from "./tray";
 
 export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "../resources");
+
+const store = new Store();
 
 // Handle creation of window
 function createWindow(): void {
@@ -41,6 +44,15 @@ function createWindow(): void {
 		return { action: "deny" };
 	});
 
+	// Open settings
+	win.webContents.on("before-input-event", (_, input) => {
+
+		if (input.control && input.key === ",") {
+			win.webContents.send("settings", "open");
+		}
+			
+	});
+
 	// HMR for renderer base on electron-vite cli.
 	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
 		win.loadURL(process.env["ELECTRON_RENDERER_URL"]);
@@ -62,6 +74,14 @@ function createWindow(): void {
 	attachTaskbar(win);
 	attachTray(win);
 	attachClient(win);
+
+	// IPC listener
+	ipcMain.on("electron-store-get", async(event, val) => {
+		event.returnValue = store.get(val);
+	});
+	ipcMain.on("electron-store-set", async(event, key, val) => {
+		store.set(key, val);
+	});
 	
 }
 
@@ -96,10 +116,11 @@ app.whenReady().then(function() {
 
 	// Start on boot
 	if (!is.dev) {
+		if (!store.get("settings.runatstartup")) return;
 		app.setLoginItemSettings({
 			openAtLogin: true,
 			path: app.getPath("exe")
 		});
 	}
-	
+
 });

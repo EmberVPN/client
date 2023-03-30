@@ -5,7 +5,6 @@ import { MdExitToApp } from "react-icons/md";
 import User from "../../util/class/User";
 import { signout } from "../../util/signout";
 import { setOpen } from "../Settings";
-import ThemeToggle from "../ThemeToggle";
 import { close } from "./MyAccount";
 
 export default function MyAccountPopup({ user }: { user: User }): JSX.Element {
@@ -44,6 +43,10 @@ export default function MyAccountPopup({ user }: { user: User }): JSX.Element {
 					onClick={ () => [ close(), setOpen() ] }>
 					<IoMdSettings className="w-6 h-6" />
 					Settings
+					<div className="ml-auto flex gap-1 items-center opacity-50">
+						<kbd className="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-200/25 border border-gray-200/25 rounded-lg dark:bg-gray-600/25 dark:text-gray-200 dark:border-gray-500/25">Ctrl</kbd>+
+						<kbd className="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-200/25 border border-gray-200/25 rounded-lg dark:bg-gray-600/25 dark:text-gray-200 dark:border-gray-500/25">,</kbd>
+					</div>
 				</div>
 				
 				<div className="flex cursor-pointer px-8 h-14 gap-6 items-center hover:bg-gray-200/30 dark:hover:bg-gray-700/30 select-none text-sm font-medium transition-colors duration-75 hover:active:bg-gray-500/10 dark:hover:active:bg-gray-500/20"

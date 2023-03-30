@@ -1,5 +1,5 @@
 import { electronAPI } from "@electron-toolkit/preload";
-import { contextBridge } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
 
 // Custom APIs for renderer
 const api = {};
@@ -10,4 +10,12 @@ const api = {};
 if (process.contextIsolated) {
 	contextBridge.exposeInMainWorld("electron", electronAPI);
 	contextBridge.exposeInMainWorld("api", api);
+	contextBridge.exposeInMainWorld("config", {
+		get(key: string) {
+			return ipcRenderer.sendSync("electron-store-get", key);
+		},
+		set(property: string, val: any) {
+			ipcRenderer.send("electron-store-set", property, val);
+		},
+	});
 }
