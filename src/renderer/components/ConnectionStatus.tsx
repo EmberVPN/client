@@ -67,8 +67,10 @@ export default function ConnectionStatus(): JSX.Element | null {
 	
 	// If somethings loading, show the spinner
 	if (!ipLocation || !servers || status === "connecting" || status === "disconnecting") return (
-		<div className="w-12 h-12 -m-4 rounded-full flex items-center justify-center hover:bg-gray-500/10 hover:active:bg-gray-500/20 transition-colors border border-warn/25 bg-warn/10">
-			<Spinner className="mx-2 !stroke-warn" />
+		<div className="group relative">
+			<div className="w-12 h-12 -m-4 rounded-full flex items-center justify-center transition-colors border border-warn/25 bg-warn/10">
+				<Spinner className="mx-2 !stroke-warn" />
+			</div>
 		</div>
 	);
 	
@@ -77,15 +79,15 @@ export default function ConnectionStatus(): JSX.Element | null {
 
 	// Render the connection status
 	return (
-		<div className="group relative">
+		<div className="group relative server">
 
 			{/* Toolbar icon */}
-			<div className={ classNames("w-12 h-12 -m-4 rounded-full flex items-center justify-center hover:bg-gray-500/10 hover:active:bg-gray-500/20 transition-colors border", isConnected ? "border-success/25 bg-success/10" : "border-error/25 bg-error/10") }>
+			<div className={ classNames("w-12 h-12 -m-4 rounded-full flex items-center justify-center transition-colors border", isConnected ? "border-success/25 bg-success/10" : "border-error/25 bg-error/10") }>
 				<Icon />
 			</div>
 
 			{/* Popup */}
-			<div className={ classNames("group-hover:scale-100 scale-75 opacity-0 group-hover:opacity-100 transition-all absolute px-2 py-0.5 text-sm origin-top-left rounded-lg top-0 pointer-events-none shadow-xl border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden -m-4 dark:shadow-black/20 flex flex-col !p-3.5 gap-3 group-hover:pointer-events-auto min-w-[288px] after:content-[''] after:absolute after:top-0 after:left-0 after:bottom-0 after:right-0 after:pointer-events-none", isConnected ? "!border-success/25 after:bg-success/10" : "!border-error/25 after:bg-error/10 rounded-[24px] group-hover:rounded-md") }>
+			<div className={ classNames("group-hover:scale-100 scale-75 opacity-0 group-hover:opacity-100 transition-all absolute px-2 py-0.5 text-sm origin-top-left rounded-[24px] top-0 pointer-events-none shadow-xl border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden -m-4 dark:shadow-black/20 flex flex-col !p-3.5 gap-3 group-hover:pointer-events-auto min-w-[288px] before:content-[''] before:absolute before:-z-[1] before:top-0 before:left-0 before:bottom-0 before:right-0 before:pointer-events-none group-hover:rounded-md", isConnected ? "!border-success/25 before:bg-success/10" : "!border-error/25 before:bg-error/10") }>
 				
 				<div className="flex items-center gap-4">
 					<div>
