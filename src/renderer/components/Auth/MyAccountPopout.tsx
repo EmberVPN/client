@@ -44,8 +44,8 @@ export default function MyAccountPopup({ user }: { user: User }): JSX.Element {
 					<IoMdSettings className="w-6 h-6" />
 					Settings
 					<div className="ml-auto flex gap-1 items-center opacity-50">
-						<kbd className="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-200/25 border border-gray-200/25 rounded-lg dark:bg-gray-600/25 dark:text-gray-200 dark:border-gray-500/25">Ctrl</kbd>+
-						<kbd className="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-200/25 border border-gray-200/25 rounded-lg dark:bg-gray-600/25 dark:text-gray-200 dark:border-gray-500/25">,</kbd>
+						<kbd className="px-2 py-1.5 text-xs font-semibold border rounded-lg border-gray-400/50 bg-gray-400/10 dark:border-gray-600/50 dark:bg-gray-600/10">Ctrl</kbd>+
+						<kbd className="px-2 py-1.5 text-xs font-semibold border rounded-lg border-gray-400/50 bg-gray-400/10 dark:border-gray-600/50 dark:bg-gray-600/10">,</kbd>
 					</div>
 				</div>
 				

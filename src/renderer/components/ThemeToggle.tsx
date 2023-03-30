@@ -44,21 +44,19 @@ export default function ThemeToggle({ provider = false, children, ...props }: { 
 
 	if (provider) return null;
 
-	if (children) return <div onClick={ nextState }
-		{ ...props }>
-		{ state === "AUTO" && <MdOutlineBrightnessAuto className="w-6 h-6" /> }
-		{ state === "LIGHT" && <BsBrightnessHigh className="w-6 h-6" /> }
-		{ state === "DARK" && <MdOutlineDarkMode className="w-6 h-6" /> }
-		{children}
-	</div>;
-
 	return (
-		<div className="btn"
-			onClick={ nextState }>
+		<div onClick={ nextState }
+			{ ...props }>
 			{ state === "AUTO" && <MdOutlineBrightnessAuto className="w-6 h-6" /> }
 			{ state === "LIGHT" && <BsBrightnessHigh className="w-6 h-6" /> }
 			{state === "DARK" && <MdOutlineDarkMode className="w-6 h-6" />}
-			<span>Change theme</span>
+			<div className="flex flex-col font-roboto grow">
+				<p className="text-gray-800 dark:text-gray-300 -mb-0.5">Toggle Theme</p>
+				<p className="text-gray-500 dark:text-gray-400 text-xs font-medium">{
+					state === "AUTO" ? "Automatic" : state === "LIGHT" ? "Light Mode" : "Night Mode"
+				}</p>
+			</div>
+			{children}
 		</div>
 	);
 }
