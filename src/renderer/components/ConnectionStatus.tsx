@@ -7,7 +7,6 @@ import useConnection from "../util/hooks/useConnection";
 import useData from "../util/hooks/useData";
 import useIpLocation from "../util/hooks/useIpLocation";
 import queryClient from "../util/queryClient";
-import Button from "./Button";
 import Spinner from "./Spinner";
 
 export default function ConnectionStatus(): JSX.Element | null {
@@ -68,49 +67,39 @@ export default function ConnectionStatus(): JSX.Element | null {
 	// If somethings loading, show the spinner
 	if (!ipLocation || !servers || status === "connecting" || status === "disconnecting") return (
 		<div className="group relative">
-			<div className="w-12 h-12 -m-4 rounded-full flex items-center justify-center transition-colors border border-warn/25 bg-warn/10">
-				<Spinner className="mx-2 !stroke-warn" />
+			<div className="h-12 -m-4 rounded-full flex items-center justify-center transition-colors border gap-2 px-5 border-warn/25 bg-warn/10">
+				<Spinner className="w-6 -ml-2 mr-1 !stroke-warn shrink-0" />
+				<div className="font-roboto font-medium whitespace-nowrap w-full flex flex-col justify-center pr-2">
+					<h1 className="text-warn">Loading</h1>
+				</div>
 			</div>
 		</div>
 	);
-	
-	// Get the icon
-	const Icon = () => isConnected ? <IoMdCheckmarkCircleOutline className="text-success text-2xl" /> : <MdErrorOutline className="text-error text-2xl" />;
 
 	// Render the connection status
 	return (
-		<div className="group relative server">
+		<div className="group relative">
 
 			{/* Toolbar icon */}
-			<div className={ classNames("w-12 h-12 -m-4 rounded-full flex items-center justify-center transition-colors border", isConnected ? "border-success/25 bg-success/10" : "border-error/25 bg-error/10") }>
-				<Icon />
+			<div className={ classNames("h-12 -m-4 rounded-full flex items-center justify-center transition-colors border gap-2 px-3", isConnected ? "border-success/25 bg-success/10" : "border-error/25 bg-error/10") }>
+				{ isConnected ? <IoMdCheckmarkCircleOutline className="text-success text-2xl shrink-0" /> : <MdErrorOutline className="text-error text-2xl shrink-0" /> }
+				<div className="font-roboto font-medium whitespace-nowrap w-full flex flex-col justify-center pr-2">
+					<h1 className={ classNames("-mb-1", isConnected ? "text-success" : "text-error") }>{!isConnected && "Not "}Connected</h1>
+					<p className="text-xs">{ipLocation.ip}</p>
+				</div>
 			</div>
 
 			{/* Popup */}
-			<div className={ classNames("group-hover:scale-100 scale-75 opacity-0 group-hover:opacity-100 transition-all absolute px-2 py-0.5 text-sm origin-top-left rounded-[24px] top-0 pointer-events-none shadow-xl border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden -m-4 dark:shadow-black/20 flex flex-col !p-3.5 gap-3 group-hover:pointer-events-auto min-w-[288px] before:content-[''] before:absolute before:-z-[1] before:top-0 before:left-0 before:bottom-0 before:right-0 before:pointer-events-none group-hover:rounded-md", isConnected ? "!border-success/25 before:bg-success/10" : "!border-error/25 before:bg-error/10") }>
+			{/* <div className={ classNames("group-hover:scale-100 scale-75 opacity-0 group-hover:opacity-100 transition-all absolute px-2 py-0.5 text-sm origin-top-left rounded-[24px] top-0 pointer-events-none shadow-xl border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden -m-4 dark:shadow-black/20 flex flex-col !p-3.5 gap-3 group-hover:pointer-events-auto min-w-[288px] before:content-[''] before:absolute before:-z-[1] before:top-0 before:left-0 before:bottom-0 before:right-0 before:pointer-events-none", isConnected ? "!border-success/25 before:bg-success/10" : "!border-error/25 before:bg-error/10") }>
 				
-				<div className="flex items-center gap-4">
-					<div>
-						<Icon />
-					</div>
-					<div className="leading-tight font-roboto font-medium whitespace-nowrap w-full">
-						<h1 className={ classNames("text-lg", isConnected ? "text-success" : "text-error") }>{!isConnected && "Not "}Connected</h1>
-						<div className="text-sm flex gap-2 justify-between w-full">
-							<p>{ipLocation.ip}</p>
-						</div>
-					</div>
-					{!isConnected && <p className="text-gray-500 font-roboto font-medium whitespace-nowrap">{ipLocation.org}</p> }
-				</div>
-				
-				<p className="text-xs text-gray-600 dark:text-gray-400">{
+				<p className="text-sm text-gray-900/50 dark:text-gray-100/50">{
 					isConnected ? <>Your internet traffic is encrypted and protected from interception, monitoring, or hacking by third parties such as hackers, government agencies, or internet service providers.</> : <>Your internet traffic is not protected by Ember and is susceptible to interception, monitoring, or hacking by third parties such as hackers, government agencies, or internet service providers like <strong>{ipLocation.org}</strong>.</>
 				}</p>
 				
-				{/* Disconnect button */}
 				{ isConnected && <Button className={ classNames(isLoading && "!bg-opacity-25 !shadow-none pointer-events-none z-[10]") }
 					color="error"
 					onClick={ disconnect }>{isLoading ? <Spinner className="w-6 mx-auto !stroke-error" /> : "Disconnect"}</Button> }
-			</div>
+			</div> */}
 			
 		</div>
 	);
