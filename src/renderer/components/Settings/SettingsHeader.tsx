@@ -1,4 +1,4 @@
-import { MdArrowBack, MdClose } from "react-icons/md";
+import { MdArrowBack } from "react-icons/md";
 import Tooltip from "../Tooltip";
 
 export default function SettingsHeader({ setState }: { setState: (state: boolean) => unknown }) {
@@ -8,7 +8,7 @@ export default function SettingsHeader({ setState }: { setState: (state: boolean
 				<div className="w-12 h-12 -m-4 -my-2 rounded-full flex items-center justify-center hover:bg-gray-500/10 hover:active:bg-gray-500/20 transition-colors group relative"
 					onClick={ () => setState(false) }>
 					<MdArrowBack className="text-2xl" />
-					<Tooltip>Back</Tooltip>
+					<Tooltip anchor="left">Back</Tooltip>
 				</div>
 				<h1 className="text-xl font-roboto mx-4">Settings</h1>
 				<div className="grow" />

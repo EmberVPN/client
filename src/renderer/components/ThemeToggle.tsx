@@ -1,6 +1,6 @@
 import { HTMLAttributes, ReactNode, useEffect, useState } from "react";
 import { BsBrightnessHigh } from "react-icons/bs";
-import { MdOutlineBrightnessAuto, MdOutlineDarkMode } from "react-icons/md";
+import { MdBrightnessHigh, MdOutlineBrightnessAuto, MdOutlineDarkMode } from "react-icons/md";
 
 export type ThemeMode = "DARK" | "LIGHT" | "AUTO";
 
@@ -47,9 +47,9 @@ export default function ThemeToggle({ provider = false, children, ...props }: { 
 	return (
 		<div onClick={ nextState }
 			{ ...props }>
-			{ state === "AUTO" && <MdOutlineBrightnessAuto className="w-6 h-6" /> }
-			{ state === "LIGHT" && <BsBrightnessHigh className="w-6 h-6" /> }
-			{state === "DARK" && <MdOutlineDarkMode className="w-6 h-6" />}
+			{ state === "AUTO" && <MdOutlineBrightnessAuto className="w-6 h-6 opacity-50" /> }
+			{ state === "LIGHT" && <MdBrightnessHigh className="w-6 h-6 opacity-50" /> }
+			{state === "DARK" && <MdOutlineDarkMode className="w-6 h-6 opacity-50" />}
 			<div className="flex flex-col font-roboto grow">
 				<p className="text-gray-800 dark:text-gray-300 -mb-0.5">Toggle Theme</p>
 				<p className="text-gray-500 dark:text-gray-400 text-xs font-medium">{
