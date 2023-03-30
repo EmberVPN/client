@@ -14,14 +14,13 @@ extraResources:
   - 'src/renderer/assets/**/*'
 win:
   executableName: ember-client
-  uninstallerName: ember-uninstaller
   requestedExecutionLevel: "requireAdministrator"
   target:
     - nsis
 nsis:
   artifactName: ${name}-${version}-${platform}-setup.${ext}
   shortcutName: ${productName}
-  uninstallDisplayName: ${productName}
+  uninstallDisplayName: ${productName} Uninstaller
   installerIcon: build/icon.ico
   createDesktopShortcut: true
   oneClick: false
