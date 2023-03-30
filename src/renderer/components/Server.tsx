@@ -67,7 +67,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 					<Spinner className="w-6 mx-auto" />
 				</Button>
 			) : (
-				(isActive && status === "connected" && ipLocation.ip === server.ip) ? (
+				(isActive && status === "connected") ? (
 					<Button className="m-0"
 						color="error"
 						onClick={ disconnect }
