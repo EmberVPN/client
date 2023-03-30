@@ -12,7 +12,7 @@ import Spinner from "./Spinner";
 export default function ConnectionStatus(): JSX.Element | null {
 
 	// Get the connection status
-	const [ status, setStatus ] = useConnection();
+	const { status, active, setStatus, setActive } = useConnection();
 	
 	// Get the current IP location
 	const ipLocation = useIpLocation();
@@ -22,11 +22,13 @@ export default function ConnectionStatus(): JSX.Element | null {
 	
 	// Sync state with main process
 	useEffect(function() {
-		electron.ipcRenderer.on("openvpn", (_event, state: string, _hash: string, data: string) => {
+		electron.ipcRenderer.on("openvpn", (_event, state: string, hash: string, data: string) => {
 			switch (state) {
 				
 			case "error":
+				if (active !== hash) break;
 				setStatus("disconnected");
+				setActive(false);
 				toast.error(data);
 				break;
 				
@@ -39,7 +41,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 			}
 		});
 		() => electron.ipcRenderer.removeAllListeners("openvpn");
-	}, [ ipLocation, setStatus ]);
+	}, [ active, ipLocation, setActive, setStatus ]);
 	
 	// If the VPN is connected 
 	const isConnected = status === "connected";

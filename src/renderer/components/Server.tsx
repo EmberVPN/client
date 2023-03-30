@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import { useEffect, useState } from "react";
 import { calculateDistance } from "../util/calculateDistance";
 import useConnection from "../util/hooks/useConnection";
 import useIpLocation from "../util/hooks/useIpLocation";
@@ -10,34 +9,29 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 	// Get the current IP location
 	const ipLocation = useIpLocation();
-	const [ status, setStatus ] = useConnection();
-	const [ isActive, setActive ] = useState(false);
+	const { status, active, setStatus, setActive } = useConnection();
 
 	// Parse the server location
 	const latitude = parseFloat(server.location.latitude);
 	const longitude = parseFloat(server.location.longitude);
-
-	// If the server is active
-	useEffect(function() {
-		if (status === "disconnected") setActive(false);
-	}, [ status ]);
 
 	// If location is still loading
 	if (!ipLocation) return null;
   
 	// Calculate the distance from the user to the server
 	const distance = calculateDistance(latitude, longitude, ipLocation.latitude, ipLocation.longitude);
+	const isActive = active === server.hash;
 
 	// Connect to the server
 	async function connect() {
-		setActive(true);
+		setActive(server.hash);
 		setStatus("connecting");
 		electron.ipcRenderer.send("openvpn", "connect", JSON.stringify({ server, authorization: localStorage.getItem("authorization") }));
 	}
 
 	// Disconnect from the server
 	async function disconnect() {
-		setActive(true);
+		setActive(false);
 		setStatus("disconnecting");
 		electron.ipcRenderer.send("openvpn", "disconnect");
 	}
