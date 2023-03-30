@@ -85,7 +85,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 				{ isConnected ? <IoMdCheckmarkCircleOutline className="text-success text-2xl shrink-0" /> : <MdErrorOutline className="text-error text-2xl shrink-0" /> }
 				<div className="font-roboto font-medium whitespace-nowrap w-full flex flex-col justify-center pr-2">
 					<h1 className={ classNames("-mb-1", isConnected ? "text-success" : "text-error") }>{!isConnected && "Not "}Connected</h1>
-					<p className="text-xs">{ipLocation.ip}</p>
+					<p className="text-xs">{ipLocation.ip || "Couldn't determine IP"}</p>
 				</div>
 			</div>
 
