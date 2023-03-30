@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import favicon from "./assets/ember.svg";
 import Authorize from "./components/Auth/Login";
 import EntryPoint from "./components/EntryPoint";
+import Settings from "./components/Settings";
 import ThemeToggle from "./components/ThemeToggle";
 import Titlebar from "./components/Titlebar";
 import Toolbar from "./components/Toolbar";
@@ -51,8 +52,9 @@ export function Application() {
 	if (user) return (
 		<div className="h-screen flex flex-col overflow-hidden">
 			<Titlebar />
-			<div className="grow overflow-x-hidden overflow-auto flex flex-col select-none">
+			<div className="grow overflow-x-hidden overflow-auto flex flex-col select-none relative">
 				<Toolbar />
+				<Settings />
 				<EntryPoint />
 			</div>
 		</div>

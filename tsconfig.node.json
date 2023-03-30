@@ -5,9 +5,11 @@
 		"src/main/*",
 		"src/preload/*",
 		"src/ember.d.ts",
+		"package.json",
 	],
 	"compilerOptions": {
 		"composite": true,
+		"resolveJsonModule": true,
 		"noUnusedParameters": false,
 		"noUnusedLocals": false,
 		"types": [

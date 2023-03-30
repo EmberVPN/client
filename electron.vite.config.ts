@@ -1,6 +1,8 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";
 
+import { version } from "./package.json";
+
 export default defineConfig({
 	main: {
 		plugins: [ externalizeDepsPlugin() ]
@@ -17,7 +19,8 @@ export default defineConfig({
 		},
 		define: {
 			global: {},
-			APIROOT: JSON.stringify("https://api.embervpn.org")
+			APIROOT: JSON.stringify("https://api.embervpn.org"),
+			VERSION: JSON.stringify(version)
 		},
 		plugins: [
 			react()
