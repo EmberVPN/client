@@ -8,20 +8,25 @@ type State =| "connected"
 			| "error";
 
 interface Context<T = State> {
-	state: T;
-	setState: React.Dispatch<React.SetStateAction<T>>;
+	status: T;
+	active: false | string;
+	setStatus: React.Dispatch<React.SetStateAction<T>>;
+	setActive: React.Dispatch<React.SetStateAction<false | string>>;
 }
 
 const GlobalStateContext = createContext<Context>({
-	state: "disconnected",
-	setState: () => {},
+	status: "disconnected",
+	active: false,
+	setStatus: () => {},
+	setActive: () => {},
 });
 
 export function ConnectionProvider({ children }: PropsWithChildren) {
-	const [ state, setState ] = useState<State>("disconnected");
-	return <GlobalStateContext.Provider value={{ state, setState }}>{children}</GlobalStateContext.Provider>;
+	const [ status, setStatus ] = useState<State>("disconnected");
+	const [ active, setActive ] = useState<false | string>(false);
+	return <GlobalStateContext.Provider value={{ status, setStatus, active, setActive }}>{children}</GlobalStateContext.Provider>;
 }
 
 export default function useConnection() {
-	return Object.values(useContext(GlobalStateContext)) as [ State, React.Dispatch<React.SetStateAction<State>> ];
+	return useContext(GlobalStateContext);
 }
