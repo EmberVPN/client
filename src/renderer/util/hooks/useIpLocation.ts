@@ -31,7 +31,11 @@ export interface IpLocation {
 }
 
 export default function useIpLocation() {
-	const { data } = useQuery("currentLocation", () => fetch("https://ipapi.co/json/").then(res => res.json()));
+	const { data } = useQuery("currentLocation", () => fetch("https://ipapi.co/json/").then(res => res.json()), {
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		refetchOnReconnect: true,
+	});
 	if (!data) return null;
 	return data as IpLocation;
 }

@@ -44,8 +44,7 @@ export function useUser() {
 			return;
 		}
 		
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ data, error ]);
+	}, [ data, error, isAuthorized ]);
 
 	return { isLoading, isAuthorized, user };
 

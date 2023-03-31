@@ -42,14 +42,6 @@ export default function ConnectionStatus(): JSX.Element | null {
 	
 	// If the VPN is connected 
 	const isConnected = status === "connected";
-
-	// Sync state with the VPN
-	useEffect(function() {
-		if (status === "connected") {
-			queryClient.refetchQueries("currentLocation");
-			setStatus("connected");
-		}
-	}, [ status, ipLocation?.ip, setStatus ]);
 	
 	// If somethings loading, show the spinner
 	if (!ipLocation || !servers || status === "connecting" || status === "disconnecting") return (
