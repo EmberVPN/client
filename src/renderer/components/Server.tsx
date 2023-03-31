@@ -55,8 +55,8 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 						{ (!isActive || status !== "connected") && (<>
 							<span className="text-gray-400 dark:text-gray-600">•</span>
 							<p>{Intl.NumberFormat().format(Math.floor(distance * (ipLocation.country_code === "US" ? 0.621371 : 1)))} {ipLocation.country_code === "US" ? "Mi" : "Km"}</p>
+							<span className="text-gray-400 dark:text-gray-600">•</span>
 						</>) }
-						<span className="text-gray-400 dark:text-gray-600">•</span>
 						<p>{server.location.ip}</p>
 					</div>
 				</div>
@@ -66,7 +66,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 			{ (isActive && (status === "connecting" || status === "disconnecting")) ? (
 				<Button className="m-0 !bg-transparent pointer-events-none"
 					raised={ false }>
-					<Spinner className="w-6 mx-auto" />
+					<Spinner className="w-6 mx-auto !stroke-gray-800 dark:!stroke-gray-200" />
 				</Button>
 			) : (
 				(isActive && status === "connected") ? (
