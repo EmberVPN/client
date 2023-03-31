@@ -50,7 +50,8 @@ export default function EntryPoint(): JSX.Element | null {
 
 	// List all servers
 	return (
-		<div className="grow relative overflow-hidden bg-white/50 dark:bg-gray-800/50 overflow-y-auto flex flex-col">
+		<div className="grow relative overflow-hidden bg-white/50 dark:bg-gray-800/50 overflow-y-auto flex flex-col"
+			id="entrypoint">
 			<div className="flex flex-col p-4 gap-4 max-w-md mx-auto my-auto py-20">
 				{Object.values(servers)
 					.sort((a, b) => calculateDistance(ipLocation?.latitude || 0, ipLocation?.longitude || 0, parseFloat(a.location.latitude), parseFloat(a.location.longitude)) - calculateDistance(ipLocation?.latitude || 0, ipLocation?.longitude || 0, parseFloat(b.location.latitude), parseFloat(b.location.longitude)))
