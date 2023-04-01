@@ -24,6 +24,7 @@ nsis:
   installerIcon: build/icon.ico
   createDesktopShortcut: true
   oneClick: false
+  perMachine: true
 # mac:
 #   entitlementsInherit: build/entitlements.mac.plist
 #   extendInfo:
