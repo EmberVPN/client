@@ -9,6 +9,7 @@ import Settings from "./components/Settings";
 import ThemeToggle from "./components/ThemeToggle";
 import Titlebar from "./components/Titlebar";
 import Toolbar from "./components/Toolbar";
+import Updater from "./components/Updater";
 import "./styles/index.less";
 import { ConnectionProvider } from "./util/hooks/useConnection";
 import { useUser } from "./util/hooks/useUser";
@@ -55,6 +56,7 @@ export function Application() {
 			<div className="grow overflow-x-hidden overflow-auto flex flex-col select-none relative">
 				<Toolbar />
 				<Settings />
+				<Updater />
 				<EntryPoint />
 			</div>
 		</div>

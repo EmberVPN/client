@@ -66,7 +66,7 @@ export default function(win: BrowserWindow) {
 		clearTimeout(id);
 		
 		// Retry if IP is undefined
-		if (!ip) return monitor();
+		if (!ip || ip.includes("error")) return monitor();
 		setTimeout(() => monitor(), 1000);
 
 		// Check if IP has changed
@@ -101,10 +101,13 @@ export default function(win: BrowserWindow) {
 					.catch(() => undefined);
 				
 				clearTimeout(id);
-
+				
 				// Retry if res is undefined
 				if (!res) return monitor();
-				if (!res.success || res.error) return monitor();
+				if (!res.success) return monitor();
+				if (res.hasOwnProperty("error")) return monitor();
+				
+				// console.log(res);
 
 				lastGeo = JSON.stringify({
 					ip,
