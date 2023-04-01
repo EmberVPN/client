@@ -90,6 +90,7 @@ export default function(win: BrowserWindow) {
 					latitude: number;
 					longitude: number;
 					ip: string;
+					error: boolean;
 				}
 
 				// Send request
@@ -103,7 +104,7 @@ export default function(win: BrowserWindow) {
 
 				// Retry if res is undefined
 				if (!res) return monitor();
-				if (!res.success) return monitor();
+				if (!res.success || res.error) return monitor();
 
 				lastGeo = JSON.stringify({
 					ip,
@@ -119,7 +120,7 @@ export default function(win: BrowserWindow) {
 
 		}
 
-		contents?.send("iplocation", lastGeo);
+		if (Object.values(lastGeo).length > 0) contents?.send("iplocation", lastGeo);
 
 	}());
 
