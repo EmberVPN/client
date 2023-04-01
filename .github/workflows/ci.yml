@@ -114,10 +114,10 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
         with:
-          source-files: 'win32/*.exe'
+          source-directory: 'win32'
           destination-github-username: 'EmberVPN'
-          destination-repository-: 'releases'
-          destination-directory: 'win32'
+          destination-repository-name: 'releases'
+          target-directory: 'win32'
           target-branch: 'master'
           user-email: 'github-actions[bot]@users.noreply.github.com'
 
