@@ -7,7 +7,8 @@ export let tray: Tray | null = null;
 
 let exit = () => { };
 
-let defaults: (MenuItem | MenuItemConstructorOptions)[] = [];
+export let defaults: (MenuItem | MenuItemConstructorOptions)[] = [];
+export let settings: (MenuItem | MenuItemConstructorOptions)[] = [];
 
 // Get mainwindow once it loads
 export default function(win: BrowserWindow) {
@@ -16,26 +17,25 @@ export default function(win: BrowserWindow) {
 	if (!tray) tray = new Tray(resolve(resources, "./src/renderer/assets/tray.png"));
 	exit = () => win.close();
 
-	defaults = [
-		{
-			label: "Settings",
-			click: () => {
-				win.show();
-				win.webContents.send("settings", "open");
-			}
-		},
-		{ type: "separator" },
-		{
-			label: "Exit",
-			click: exit
-		},
-	];
+	defaults = [ {
+		label: "Exit",
+		click: exit
+	} ];
+	
+	settings = [ {
+		label: "Settings",
+		click: () => {
+			win.show();
+			win.webContents.send("settings", "open");
+		}
+	},
+	{ type: "separator" } ];
 	
 	// Set disconnected state
 	tray.setToolTip("Ember VPN");
 	tray.setImage(resolve(resources, "./src/renderer/assets/tray.png"));
 	tray.on("click", () => win.show());
-	tray.setContextMenu(Menu.buildFromTemplate([ ...defaults ]));
+	setMenu([ ...settings, ...defaults ]);
 	
 }
 
@@ -70,7 +70,7 @@ export function disconnect() {
 
 	tray.setToolTip("Ember VPN");
 	tray.setImage(resolve(resources, "./src/renderer/assets/tray.png"));
-	tray.setContextMenu(Menu.buildFromTemplate([ ...defaults ]));
+	setMenu([ ...settings, ...defaults ]);
 	
 }
 
@@ -81,6 +81,12 @@ export function setConnecting() {
 
 	tray.setToolTip("Ember VPN • Connecting...");
 	tray.setImage(resolve(resources, "./src/renderer/assets/tray-connecting.png"));
-	tray.setContextMenu(Menu.buildFromTemplate([ ...defaults ]));
+	setMenu([ ...settings, ...defaults ]);
 	
+}
+
+/** @alias setContextMenu */
+export function setMenu(menu: (MenuItem | MenuItemConstructorOptions)[]) {
+	if (!tray) return;
+	tray.setContextMenu(Menu.buildFromTemplate(menu));
 }
