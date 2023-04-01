@@ -1,4 +1,5 @@
 import { BrowserWindow, ipcMain } from "electron";
+import * as tray from "./tray";
 
 let isLocked = true;
 
@@ -25,6 +26,7 @@ export default function(win: BrowserWindow) {
 			win.setResizable(false);
 			win.center();
 			isLocked = true;
+			tray.setMenu(tray.defaults);
 		}
 		
 		if (key === "unlock") {
@@ -34,6 +36,7 @@ export default function(win: BrowserWindow) {
 			win.setSize(800, 600);
 			win.center();
 			isLocked = false;
+			tray.setMenu([ ...tray.settings, ...tray.defaults ]);
 		}
 				
 	});
