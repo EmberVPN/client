@@ -125,9 +125,9 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
         with:
-          source-files: 'win32/*.exe latest.yml'
+          source-files: 'win32/*.exe'
           destination-username: 'CI/CD'
           destination-repository: 'releases'
-          destination-directory: '.'
+          destination-directory: 'win32'
           commit-email: 'github-actions[bot]@users.noreply.github.com'
 
