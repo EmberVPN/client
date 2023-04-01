@@ -123,7 +123,7 @@ jobs:
       - name: Push binarys to releases
         uses: nkoppel/push-files-to-another-repository@1.1.0
         env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
         with:
           source-files: 'win32/*.exe latest.yml'
           destination-username: 'CI/CD'
