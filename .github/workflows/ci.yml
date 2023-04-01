@@ -110,7 +110,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.ref }}
+          ref: master
           repository: EmberVPN/releases
           lfs: false
 
@@ -120,11 +120,14 @@ jobs:
           name: win32
           path: win32/
           
-      - name: Commit
-        run: |
-          git config --unset-all http.https://github.com/.extraheader
-          git config --global user.name 'CI/CD'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .
-          git commit -m "Release: ${{ github.sha }}"
-          git push
+      - name: Push binarys to releases
+        uses: nkoppel/push-files-to-another-repository@1.1.0
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-files: 'win32/*.exe latest.yml'
+          destination-username: 'CI/CD'
+          destination-repository: 'releases'
+          destination-directory: '.'
+          commit-email: 'github-actions[bot]@users.noreply.github.com'
+
