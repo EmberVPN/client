@@ -85,12 +85,13 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build:win
+        run: |
+          mkdir -p releases/win32
+          npm run build:win
 
       # move the built files to the releases repo
       - name: Move Built Files
         run: |
-          mkdir -p releases/win
           mv dist/win32/*.exe releases/win32
 
       - name: Commit Changes
