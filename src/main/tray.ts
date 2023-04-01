@@ -40,7 +40,7 @@ export default function(win: BrowserWindow) {
 }
 
 /** Sets the tray to show its connected to a server */
-export function setConnected(content: string) {
+export function setConnected() {
 
 	if (!tray) return;
 	
@@ -51,12 +51,16 @@ export function setConnected(content: string) {
 		click: () => openvpn.disconnect()
 	}, ...defaults ]));
 	
+}
+
+/** Send native notification balloon */
+export function notify(content: string, title = "Ember VPN", icon = resolve(resources, "./src/renderer/assets/ember.png")) {
+	if (!tray) return;
 	tray.displayBalloon({
 		content,
-		title: "Ember VPN",
-		icon: resolve(resources, "./src/renderer/assets/ember.png")
+		title,
+		icon
 	});
-	
 }
 
 /** Sets the tray to show its disconnected from a server */
