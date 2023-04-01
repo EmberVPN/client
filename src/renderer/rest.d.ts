@@ -15,4 +15,21 @@ declare namespace REST {
 
 	export type Subscription = Success & Ember.Subscription;
 
+	export interface ClientDownloads {
+		success: boolean;
+		latest: {
+			win32: Version;
+		}
+		older: {
+			win32: Version;
+		}
+	}
+
+	export interface Version {
+		name: string;
+		download_url: string;
+		version: string;
+		about?: string;
+	}
+
 }
