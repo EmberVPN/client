@@ -76,6 +76,7 @@ function createWindow(): void {
 	attachTray(win);
 	attachUpdater(win);
 	attachClient(win);
+	attachUpdater();
 
 	// IPC listener
 	ipcMain.on("electron-store-get", async(event, val) => {

@@ -1,12 +1,12 @@
 import { spawn } from "child_process";
-import { BrowserWindow, ipcMain } from "electron";
+import { app, ipcMain } from "electron";
 import { writeFile } from "fs/promises";
 import fetch from "node-fetch";
 import { resolve } from "path";
 import { resources } from ".";
 
 // Get mainwindow once it loads
-export default function(win: BrowserWindow) {
+export default function() {
 	
 	// Listen for openvpn events
 	ipcMain.on("update", async() => {
@@ -26,7 +26,7 @@ export default function(win: BrowserWindow) {
 		
 		// Run updater
 		spawn(updater, { detached: true });
-		win.close();
+		app.quit();
 
 	});
 
