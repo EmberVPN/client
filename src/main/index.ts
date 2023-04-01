@@ -74,7 +74,6 @@ function createWindow(): void {
 
 	attachTaskbar(win);
 	attachTray(win);
-	attachUpdater(win);
 	attachClient(win);
 	attachUpdater();
 
