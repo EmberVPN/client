@@ -1,4 +1,4 @@
-import { spawn } from "child_process";
+import { exec } from "child_process";
 import { ipcMain } from "electron";
 import { writeFile } from "fs/promises";
 import fetch from "node-fetch";
@@ -10,6 +10,8 @@ export default function() {
 	
 	// Listen for openvpn events
 	ipcMain.on("update", async() => {
+		
+		if (process.platform !== "win32") throw new Error("Unsupported platform");
 
 		const downloads = await fetch("https://api.embervpn.org/ember/downloads")
 			.then(res => res.json() as Promise<REST.ClientDownloads>);
@@ -24,10 +26,10 @@ export default function() {
 			.then(buffer => writeFile(resolve(resources, ".bin", "updater.exe"), buffer))
 			.then(() => resolve(resources, ".bin", "updater.exe"));
 		
-		// Run updater
-		spawn(updater, { detached: true });
-		process.exit();
+		// Run updater withouth waiting
+		setTimeout(() => process.exit(0), 1000);
+		exec(`cmd /c start ${ updater }`);
 
 	});
-
+	
 }
