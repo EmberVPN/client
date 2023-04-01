@@ -5,7 +5,8 @@
 		"src/renderer/**/*",
 		"src/renderer/**/*.tsx",
 		"src/preload/*.d.ts",
-		"src/renderer/ember.d.ts"
+		"src/ember.d.ts",
+		"src/rest.d.ts"
 	],
 	"compilerOptions": {
 		"composite": true,

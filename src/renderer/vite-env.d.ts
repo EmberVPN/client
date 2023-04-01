@@ -2,7 +2,7 @@
 
 declare const electron: ElectronAPI;
 declare const APIROOT: string;
-
+declare const DEVELOPMENT: boolean;
 declare const VERSION: string;
 
 declare type ErrorMessage = `${ number } ${ string }`;
@@ -26,3 +26,5 @@ declare const config: {
 	get(key: string): unknown;
 	set(key: string, val: unknown): void;
 };
+
+declare const platform: string;

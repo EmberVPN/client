@@ -18,4 +18,5 @@ if (process.contextIsolated) {
 			ipcRenderer.send("electron-store-set", property, val);
 		},
 	});
+	contextBridge.exposeInMainWorld("platform", process.platform);
 }
