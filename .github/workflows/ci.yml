@@ -61,6 +61,7 @@ jobs:
     name: Build
     runs-on: windows-latest
     if: github.ref == 'refs/heads/master'
+    needs: [ version ]
     permissions:
       contents: write
     
@@ -78,6 +79,8 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+        
+
       - name: Build
         run: npm run build:win
 
@@ -94,6 +97,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     needs: [ build-win ]
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: write
 
