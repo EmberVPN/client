@@ -17,12 +17,8 @@ declare namespace REST {
 
 	export interface ClientDownloads {
 		success: boolean;
-		latest: {
-			win32: Version;
-		}
-		older: {
-			win32: Version;
-		}
+		latest: Record<string, Version>;
+		older: Record<string, Version[]>;
 	}
 
 	export interface Version {
