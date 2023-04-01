@@ -1,6 +1,6 @@
 {
 	"name": "embervpn-client",
-	"version": "1.2.74",
+	"version": "1.2.75",
 	"main": "./out/main/index.js",
 	"homepage": "https://embervpn.org",
 	"description": "Ember VPN Client",
