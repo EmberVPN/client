@@ -40,6 +40,89 @@ export default function(win: BrowserWindow) {
 
 	});
 
+	let lastIp = "";
+	let lastGeo = {};
+	(async function monitor() {
+
+		const controller = new AbortController();
+		const id = setTimeout(() => controller.abort(), 1000);
+
+		const mirror = [
+			"https://ipapi.co/ip/",
+			"https://icanhazip.com/",
+			"https://api.ipify.org/",
+			"https://ip.seeip.org/",
+			"https://ident.me/text"
+		].reduce((a, b) => Math.random() > 0.5 ? a : b);
+
+		// Get IP address
+		const ip = await fetch(mirror, {
+			signal: controller.signal
+		})
+			.then(res => res.text())
+			.then(text => text.trim())
+			.catch(() => undefined);
+		
+		clearTimeout(id);
+		
+		// Retry if IP is undefined
+		if (!ip) return monitor();
+		setTimeout(() => monitor(), 1000);
+
+		// Check if IP has changed
+		if (ip !== lastIp) {
+			lastIp = ip;
+			
+			(async function monitor() {
+
+				const controller = new AbortController();
+				const id = setTimeout(() => controller.abort(), 1000);
+
+				// Get mirror
+				const mirror = [
+					"https://ipwho.is",
+					"https://ipapi.co/json/"
+				].reduce((a, b) => Math.random() > 0.5 ? a : b);
+
+				interface GeoLocation {
+					success: boolean;
+					country_code: string;
+					latitude: number;
+					longitude: number;
+					ip: string;
+				}
+
+				// Send request
+				const res = await fetch(mirror, {
+					signal: controller.signal
+				})
+					.then(res => res.json() as Promise<GeoLocation>)
+					.catch(() => undefined);
+				
+				clearTimeout(id);
+
+				// Retry if res is undefined
+				if (!res) return monitor();
+				if (!res.success) return monitor();
+
+				lastGeo = JSON.stringify({
+					ip,
+					country_code: res.country_code,
+					latitude: res.latitude,
+					longitude: res.longitude
+				});
+				contents?.send("iplocation", lastGeo);
+
+			}());
+
+			return;
+
+		}
+
+		contents?.send("iplocation", lastGeo);
+
+	}());
+
 }
 
 // Get binary path
