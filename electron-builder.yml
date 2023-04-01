@@ -18,7 +18,7 @@ win:
   target:
     - nsis
 nsis:
-  artifactName: ${name}-${version}-${platform}-setup.${ext}
+  artifactName: ${platform}/${name}-${version}-${platform}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName} Uninstaller
   installerIcon: build/icon.ico
