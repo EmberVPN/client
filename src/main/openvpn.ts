@@ -12,6 +12,7 @@ export type State = "connect" | "disconnect";
 export let proc: ChildProcessWithoutNullStreams | null = null;
 
 let contents: Electron.WebContents | null = null;
+let lastServer: Ember.Server;
 
 // Get mainwindow once it loads
 export default function(win: BrowserWindow) {
@@ -111,6 +112,8 @@ export async function downloadConfig(server: Ember.Server, authorization: string
 
 // Connect to openvpn
 export function connect(server: Ember.Server) {
+
+	lastServer = server;
 	
 	const iv = setInterval(async function refetch() {
 
@@ -173,5 +176,6 @@ export function connect(server: Ember.Server) {
 export function disconnect() {
 	proc?.kill();
 	tray.disconnect();
+	tray.notify(`Disconnected from ${ lastServer.hostname } (${ lastServer.ip })`, "Ember VPN • Disconnected", resolve(resources, "./src/renderer/assets/tray.png"));
 	contents?.send("openvpn", "disconnected");
 }
