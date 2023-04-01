@@ -115,9 +115,9 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
         with:
           source-files: 'win32/*.exe'
-          destination-username: 'CI/CD'
-          destination-repository: 'releases'
+          destination-github-username: 'EmberVPN'
+          destination-repository-: 'releases'
           destination-directory: 'win32'
           target-branch: 'master'
-          commit-email: 'github-actions[bot]@users.noreply.github.com'
+          user-email: 'github-actions[bot]@users.noreply.github.com'
 
