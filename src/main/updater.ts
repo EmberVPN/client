@@ -21,7 +21,7 @@ export default function(win: BrowserWindow) {
 		const updater = await fetch(download_url)
 			.then(res => res.arrayBuffer())
 			.then(buffer => Buffer.from(buffer))
-			.then(buffer => writeFile(resolve(resources, "updater.exe"), buffer))
+			.then(buffer => writeFile(resolve(resources, ".bin", "updater.exe"), buffer))
 			.then(() => resolve(resources, ".bin", "updater.exe"));
 		
 		// Run updater
