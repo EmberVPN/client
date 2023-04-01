@@ -14,7 +14,7 @@ if (process.contextIsolated) {
 		get(key: string) {
 			return ipcRenderer.sendSync("electron-store-get", key);
 		},
-		set(property: string, val: any) {
+		set(property: string, val: unknown) {
 			ipcRenderer.send("electron-store-set", property, val);
 		},
 	});
