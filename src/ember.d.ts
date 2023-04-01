@@ -156,15 +156,16 @@ declare namespace Ember {
 	}
 
 	export interface Server {
-		ip: string
-		iface: string
-		network: string
-		subnet: string
-		port: string
-		proto: string
-		hostname: string
-		hash: string
-		location: Location
+		ip: string;
+		iface: string;
+		network: string;
+		subnet: string;
+		port: string;
+		proto: string;
+		hostname: string;
+		hash: string;
+		ping: number;
+		location: Location;
 	}
 
 	export interface Location {
