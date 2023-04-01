@@ -53,3 +53,57 @@ jobs:
           npm run lint || true
           git commit -am "Eslint: fix all" || true
       - run: git push || true
+
+  build:
+
+    name: Build
+    runs-on: windows-latest
+    if: github.ref == 'refs/heads/master'
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout (Source Code)
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Checkout (Releases)
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          repository: EmberVPN/releases
+          path: releases
+          lfs: false
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build:win
+
+      # move the built files to the releases repo
+      - name: Move Built Files
+        run: |
+          mkdir -p releases/win
+          mv dist/win32/*.exe releases/win32
+
+      - name: Commit Changes
+        run: |
+          cd releases
+          git config --global user.name 'CI/CD'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          git commit -m "Build: ${{ github.sha }}"
+
+      - name: Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repository: EmberVPN/releases
+          branch: master
