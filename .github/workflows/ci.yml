@@ -104,14 +104,13 @@ jobs:
         with:
           ref: ${{ github.ref }}
           repository: EmberVPN/releases
-          path: /tmp/releases
           lfs: false
 
       - name: Download
         uses: actions/download-artifact@v2
         with:
           name: win32
-          path: /tmp/releases/win32
+          path: win32/
           
       - name: Commit
         run: |
