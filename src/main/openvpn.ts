@@ -101,10 +101,13 @@ export default function(win: BrowserWindow) {
 					.catch(() => undefined);
 				
 				clearTimeout(id);
-
+				
 				// Retry if res is undefined
 				if (!res) return monitor();
-				if (!res.success || res.hasOwnProperty("error")) return monitor();
+				if (!res.success) return monitor();
+				if (res.hasOwnProperty("error")) return monitor();
+				
+				// console.log(res);
 
 				lastGeo = JSON.stringify({
 					ip,
