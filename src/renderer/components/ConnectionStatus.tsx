@@ -1,44 +1,17 @@
 import classNames from "classnames";
-import { useEffect } from "react";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdErrorOutline } from "react-icons/md";
 import useConnection from "../util/hooks/useConnection";
 import useData from "../util/hooks/useData";
-import useIpLocation from "../util/hooks/useIpLocation";
-import queryClient from "../util/queryClient";
 import Spinner from "./Spinner";
 
 export default function ConnectionStatus(): JSX.Element | null {
 
 	// Get the connection status
-	const { status, active, setStatus, setActive } = useConnection();
-	
-	// Get the current IP location
-	const ipLocation = useIpLocation();
+	const { status, active, ipLocation } = useConnection();
 
 	// Get the list of servers
 	const { data: servers } = useData("/ember/servers");
-	
-	// Sync state with main process
-	useEffect(function() {
-		electron.ipcRenderer.on("openvpn", (_event, state: string) => {
-			switch (state) {
-				
-			case "error":
-				setStatus("disconnected");
-				setActive(false);
-				break;
-				
-			case "connected":
-			case "disconnected":
-				setStatus(state);
-				queryClient.refetchQueries("currentLocation");
-				break;
-				
-			}
-		});
-		() => electron.ipcRenderer.removeAllListeners("openvpn");
-	}, [ active, ipLocation, setActive, setStatus ]);
 	
 	// If the VPN is connected 
 	const isConnected = status === "connected";

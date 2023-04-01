@@ -1,7 +1,7 @@
 import favicon from "../assets/ember.svg";
 import { calculateDistance } from "../util/calculateDistance";
+import useConnection from "../util/hooks/useConnection";
 import useData from "../util/hooks/useData";
-import useIpLocation from "../util/hooks/useIpLocation";
 import { useUser } from "../util/hooks/useUser";
 import Server from "./Server";
 
@@ -9,7 +9,7 @@ export default function EntryPoint(): JSX.Element | null {
 
 	const { user } = useUser();
 	const { data, isLoading } = useData("/ember/servers");
-	const ipLocation = useIpLocation();
+	const { ipLocation } = useConnection();
 
 	if (!user) return null;
 

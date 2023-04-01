@@ -1,15 +1,13 @@
 import classNames from "classnames";
 import { calculateDistance } from "../util/calculateDistance";
 import useConnection from "../util/hooks/useConnection";
-import useIpLocation from "../util/hooks/useIpLocation";
 import Button from "./Button";
 import Spinner from "./Spinner";
 
 export default function Servers({ server }: { server: Ember.Server }): JSX.Element | null {
 
 	// Get the current IP location
-	const ipLocation = useIpLocation();
-	const { status, active, setStatus, setActive } = useConnection();
+	const { status, active, ipLocation, setStatus, setActive } = useConnection();
 
 	// Parse the server location
 	const latitude = parseFloat(server.location.latitude);
