@@ -4,13 +4,11 @@ import { MdSystemUpdateAlt } from "react-icons/md";
 import semver from "semver";
 import useData from "../util/hooks/useData";
 import Button from "./Button";
-import Spinner from "./Spinner";
 
 export default function Updater(): JSX.Element | null {
 
 	const [ state, setState ] = useState(false);
 	const { data: downloads } = useData("/ember/downloads");
-	const [ loading, setLoading ] = useState(false);
 	
 	useEffect(function() {
 		if (!downloads) return;
@@ -20,8 +18,8 @@ export default function Updater(): JSX.Element | null {
 	}, [ downloads, state ]);
 	
 	function update() {
-		setLoading(true);
-		electron.ipcRenderer.send("update");
+		window.open(downloads?.latest[platform]?.download_url, "_blank");
+		window.close();
 	}
 	
 	const latest = downloads?.latest[platform] as REST.Version;
@@ -46,15 +44,13 @@ export default function Updater(): JSX.Element | null {
 
 				<div className="flex justify-end items-center gap-4 md:-m-4">
 					<Button
-						className={ classNames(loading && "opacity-50 pointer-events-none") }
 						color="outlined"
 						onClick={ () => [ setState(false), localStorage.setItem("ignoreUpdate", latest.version) ] }
 						raised={ false }>Skip version</Button>
 					<Button
-						className={ classNames(loading && "!bg-opacity-0 !shadow-none pointer-events-none") }
 						color="success"
 						onClick={ update }
-						raised={ false }>{loading ? <Spinner className="w-8 mx-3 !stroke-success" /> : "Update"}</Button>
+						raised={ false }>Update</Button>
 				</div>
 
 			</div>
