@@ -104,7 +104,7 @@ export default function(win: BrowserWindow) {
 
 				// Retry if res is undefined
 				if (!res) return monitor();
-				if (!res.success || res.error) return monitor();
+				if (!res.success || res.hasOwnProperty("error")) return monitor();
 
 				lastGeo = JSON.stringify({
 					ip,
