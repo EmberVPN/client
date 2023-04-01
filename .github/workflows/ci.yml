@@ -86,7 +86,7 @@ jobs:
 
       - name: Build
         run: |
-          mkdir -p releases/win32
+          mkdir -p dist/releases/win32
           npm run build:win
 
       # move the built files to the releases repo
