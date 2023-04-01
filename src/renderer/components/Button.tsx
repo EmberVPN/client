@@ -3,7 +3,7 @@ import { HTMLAttributes } from "react";
 
 interface ButtonProps {
 	size: "sm" | "md" | "lg";
-	color: "primary" | "error" | "success";
+	color: "primary" | "error" | "success" | "outlined";
 	raised: boolean;
 }
 
@@ -19,7 +19,8 @@ export default function Button({ children, className, size = "sm", color = "prim
 	const colors = {
 		primary: "bg-primary hover:bg-primary-600 focus:bg-primary-600 active:bg-primary-700 !shadow-primary-800/50",
 		error: "bg-error hover:bg-error-600 focus:bg-error-600 active:bg-error-700 !shadow-error-800/50",
-		success: "bg-success hover:bg-success-600 focus:bg-success-600 active:bg-success-700 !shadow-success-800/50"
+		success: "bg-success hover:bg-success-600 focus:bg-success-600 active:bg-success-700 !shadow-success-800/50",
+		outlined: "bg-transparent !text-inherit border border-gray-300/50 dark:border-gray-700/50 hover:bg-gray-50 hover:active:bg-gray-100 dark:hover:bg-gray-700/25 dark:hover:active:bg-gray-700/50"
 	};
 
 	return (

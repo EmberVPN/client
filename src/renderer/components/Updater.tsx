@@ -1,23 +1,51 @@
 import classNames from "classnames";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { MdSystemUpdateAlt } from "react-icons/md";
+import semver from "semver";
+import useData from "../util/hooks/useData";
 import Button from "./Button";
 
-export default function Updater(): JSX.Element {
+export default function Updater(): JSX.Element | null {
 
-	const [ state, setState ] = useState(true);
+	const [ state, setState ] = useState(false);
+	const { data: downloads } = useData("/ember/downloads");
+	
+	useEffect(function() {
+		if (!downloads) return;
+		const latest = downloads?.latest[platform];
+		const shouldUpdate = semver.gt(latest?.version, DEVELOPMENT ? "0.0.0" : VERSION) && localStorage.getItem("ignoreUpdate") !== latest?.version;
+		if (!state && shouldUpdate) setState(true);
+	}, [ downloads, state ]);
+	
+	const latest = downloads?.latest[platform] as REST.Version;
+	if (!latest) return (
+		<div className={ classNames("group absolute w-full h-full flex justify-center items-center z-[40] bg-black/20 transition-opacity", state ? "opacity-1 pointer-events-auto active" : "opacity-0 pointer-events-none") }>
+			<div className="shadow dark:shadow-xl bg-white dark:bg-gray-800  dark:shadow-black/20 w-full h-full md:max-w-[600px] md:max-h-[400px] md:rounded-2xl group-[.active]:scale-100 scale-50 transition-transform" />
+		</div>
+	);
 
 	return (
 		<div className={ classNames("group absolute w-full h-full flex justify-center items-center z-[40] bg-black/20 transition-opacity", state ? "opacity-1 pointer-events-auto active" : "opacity-0 pointer-events-none") }>
-			<div className="text-sm shadow dark:shadow-xl text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden dark:shadow-black/20 flex flex-col p-4 gap-2 w-full h-full md:max-w-[600px] md:max-h-[400px] md:rounded-2xl group-[.active]:scale-100 scale-50 transition-transform">
+			<div className="text-sm shadow dark:shadow-xl text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden dark:shadow-black/20 flex flex-col gap-2 w-full h-full md:max-w-[600px] md:max-h-[400px] md:rounded-2xl group-[.active]:scale-100 scale-50 transition-transform relative p-8">
 
-				<div className="bg-red-500">lol</div>
-				<div className="bg-green-500 grow">lol</div>
+				<div className="grow flex flex-col gap-4">
+					<div className="flex items-center gap-4 text-4xl ">
+						<MdSystemUpdateAlt className="text-success" />
+						<h1 className="font-manrope font-bold select-none">Update available</h1>
+						<div className="font-mono ml-auto text-xl opacity-70 border px-2 rounded-lg dark:border-gray-700">{ latest.version }</div>
+					</div>
+					<p>No additional information is known about this update</p>
+				</div>
 
-				<div className="flex justify-between items-center">
+				<div className="flex justify-end items-center gap-4 md:-m-4">
 					<Button
 						color="outlined"
-						onClick={ () => setState(false) }
-						raised={ false }>Not now</Button>
+						onClick={ () => [ setState(false), localStorage.setItem("ignoreUpdate", latest.version) ] }
+						raised={ false }>Skip version</Button>
+					<Button
+						color="success"
+						onClick={ () => setState(true) }
+						raised={ false }>Update</Button>
 					
 				</div>
 

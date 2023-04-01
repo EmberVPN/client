@@ -20,7 +20,8 @@ export default defineConfig({
 		define: {
 			global: {},
 			APIROOT: JSON.stringify("https://api.embervpn.org"),
-			VERSION: JSON.stringify(version)
+			VERSION: JSON.stringify(version),
+			DEVELOPMENT: JSON.stringify(process.env.NODE_ENV === "development"),
 		},
 		plugins: [
 			react()
