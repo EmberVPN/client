@@ -66,7 +66,7 @@ export default function(win: BrowserWindow) {
 		clearTimeout(id);
 		
 		// Retry if IP is undefined
-		if (!ip) return monitor();
+		if (!ip || ip.includes("error")) return monitor();
 		setTimeout(() => monitor(), 1000);
 
 		// Check if IP has changed
