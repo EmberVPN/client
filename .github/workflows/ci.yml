@@ -118,5 +118,6 @@ jobs:
           destination-username: 'CI/CD'
           destination-repository: 'releases'
           destination-directory: 'win32'
+          target-branch: 'master'
           commit-email: 'github-actions[bot]@users.noreply.github.com'
 
