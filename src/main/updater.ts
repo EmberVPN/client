@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import { app, ipcMain } from "electron";
+import { ipcMain } from "electron";
 import { writeFile } from "fs/promises";
 import fetch from "node-fetch";
 import { resolve } from "path";
@@ -26,7 +26,7 @@ export default function() {
 		
 		// Run updater
 		spawn(updater, { detached: true });
-		app.quit();
+		process.exit();
 
 	});
 
