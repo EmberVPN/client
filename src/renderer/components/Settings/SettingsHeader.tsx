@@ -15,7 +15,7 @@ export default function SettingsHeader({ setState }: { setState: (state: boolean
 	});
 
 	return (
-		<header className="h-[64px] !overflow-visible z-40 sticky top-0 backdrop-blur-3xl transition-all toolbar"
+		<header className="h-[64px] !overflow-visible z-40 sticky top-0 backdrop-blur-3xl transition-shadow toolbar"
 			ref={ ref }>
 			<div className="!py-4 flex items-center gap-4 h-full !overflow-visible flex-wrap !flex-row">
 				<div className="w-12 h-12 -m-4 -my-2 rounded-full flex items-center justify-center hover:bg-gray-500/10 hover:active:bg-gray-500/20 transition-colors group relative"
