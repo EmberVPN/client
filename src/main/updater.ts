@@ -33,10 +33,10 @@ export default function(win: BrowserWindow) {
 				// Launch binary
 				const child = spawn(basename(path), {
 					cwd: dirname(path),
-					detached: true,
-					shell: true
+					detached: true
 				});
 				
+				child.once("spawn", () => app.quit());
 				child.disconnect();
 				child.unref();
 
