@@ -11,7 +11,8 @@ import Titlebar from "./components/Titlebar";
 import Toolbar from "./components/Toolbar";
 import Updater from "./components/Updater";
 import "./styles/index.less";
-import { ConnectionProvider } from "./util/hooks/useConnection";
+import useConnection, { ConnectionProvider } from "./util/hooks/useConnection";
+import useData from "./util/hooks/useData";
 import { useUser } from "./util/hooks/useUser";
 import queryClient from "./util/queryClient";
 
@@ -42,6 +43,8 @@ root.render(
 export function Application() {
 
 	const { user } = useUser();
+	const { data } = useData("/ember/servers");
+	const { ipLocation } = useConnection();
 
 	if (user === false) return (
 		<div className="h-screen flex flex-col">
@@ -50,7 +53,7 @@ export function Application() {
 		</div>
 	);
 	
-	if (user) return (
+	if (user && ipLocation && data) return (
 		<div className="h-screen flex flex-col overflow-hidden">
 			<Titlebar />
 			<div className="grow overflow-x-hidden overflow-auto flex flex-col select-none relative">
@@ -63,7 +66,7 @@ export function Application() {
 	);
 
 	return (
-		<div className="grid h-screen items-center justify-center relative window">
+		<div className="grid h-screen items-center justify-center relative window bg-white dark:bg-gray-800">
 			<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
 				<div className="bg-primary aspect-square w-[400px] rounded-full animate-pulse -z-10"></div>
 			</div>

@@ -4,26 +4,21 @@ import useConnection from "../util/hooks/useConnection";
 import useData from "../util/hooks/useData";
 import { useUser } from "../util/hooks/useUser";
 import Server from "./Server";
+import Spinner from "./Spinner";
 
 export default function EntryPoint(): JSX.Element | null {
 
 	const { user } = useUser();
-	const { data, isLoading } = useData("/ember/servers");
+	const { data } = useData("/ember/servers");
 	const { ipLocation } = useConnection();
 
-	if (!user) return null;
-
-	if (isLoading) {
-		return (
-			<div className="grid h-screen items-center justify-center relative window">
-				<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-					<div className="bg-primary aspect-square w-[400px] rounded-full animate-pulse -z-10"></div>
-				</div>
-				<img className="select-none z-10"
-					src={ favicon } />
+	if (!user || !data || !ipLocation) return (
+		<div className="w-full h-full bg-white dark:bg-gray-800 overflow-hidden">
+			<div className="w-full h-full flex justify-center items-center relative">
+				<Spinner className="w-10 !stroke-gray-800 dark:!stroke-gray-200" />
 			</div>
-		);
-	}
+		</div>
+	);
 
 	if (!data || !data.success) return (
 		<pre>
