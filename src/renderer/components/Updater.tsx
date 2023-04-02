@@ -16,7 +16,7 @@ export default function Updater(): JSX.Element | null {
 	useEffect(function() {
 		if (!downloads) return;
 		const latest = downloads?.latest[platform];
-		const shouldUpdate = semver.gt(latest?.version, DEVELOPMENT ? "0.0.0" : VERSION) && localStorage.getItem("ignoreUpdate") !== latest?.version;
+		const shouldUpdate = semver.gt(latest?.version, VERSION) && localStorage.getItem("ignoreUpdate") !== latest?.version;
 		if (!state && shouldUpdate) setState(true);
 	}, [ downloads, state ]);
 	
