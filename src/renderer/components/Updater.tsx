@@ -45,7 +45,7 @@ export default function Updater(): JSX.Element | null {
 					<div className="flex items-center gap-4 text-4xl ">
 						<MdSystemUpdateAlt className="text-success mr-2" />
 						<h1 className="font-manrope font-bold select-none">Update available</h1>
-						<div className="font-mono ml-auto text-xl opacity-70 border px-2 rounded-lg dark:border-gray-700">v{ latest.version }</div>
+						<code className="text-base ml-auto font-mono border-[1px] px-2 rounded-2xl select-none border-gray-500/10 text-gray-500 bg-gray-500/10">v{VERSION}</code>
 					</div>
 					<p className="font-roboto opacity-75">No additional information is known about this update...</p>
 					<div className="rounded-lg bg-gray-300 dark:bg-gray-700 p-4 flex items-center gap-4 cursor-pointer !bg-opacity-25 hover:!bg-opacity-40 hover:active:!bg-opacity-60"
