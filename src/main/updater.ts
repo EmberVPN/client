@@ -1,10 +1,9 @@
 import { spawn } from "child_process";
-import { BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
 import fetch from "node-fetch";
 import { basename, dirname, resolve } from "path";
-import { resources } from ".";
 
 export type State = "begin";
 
@@ -23,7 +22,7 @@ export default function(win: BrowserWindow) {
 			const version = latest[process.platform];
 
 			// Download binary
-			const path = resolve(resources, `.bin/updater-${ version.name }`);
+			const path = resolve(app.getPath("temp"), version.name);
 			if (!existsSync(path)) await fetch(version.download_url)
 				.then(res => res.arrayBuffer())
 				.then(buf => Buffer.from(buf))
