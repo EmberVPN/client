@@ -1,12 +1,12 @@
 import { electronApp, is, optimizer } from "@electron-toolkit/utils";
 import { app, BrowserWindow, ipcMain, shell } from "electron";
+import Store from "electron-store";
 import { join, resolve } from "path";
 import icon from "../renderer/assets/ember.png?asset";
-
-import Store from "electron-store";
 import attachClient from "./openvpn";
 import attachTaskbar from "./taskbar";
 import attachTray from "./tray";
+import attachUpdater from "./updater";
 
 export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "../resources");
 
@@ -73,6 +73,7 @@ function createWindow(): void {
 
 	attachTaskbar(win);
 	attachTray(win);
+	attachUpdater(win);
 	attachClient(win);
 
 	// IPC listener
