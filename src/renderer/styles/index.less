@@ -71,14 +71,14 @@ img {
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	font-size: 14px;
 	-webkit-app-region: drag;
-	@apply h-8 flex w-full justify-between items-center relative select-none bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-200;
+	@apply h-8 flex w-full justify-between items-center relative select-none text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800;
 	.titlebar--icon {
 		@apply h-5;
 	}
 	.titlebar--button {
 		-webkit-app-region: no-drag;
 		width: 46px;
-		z-index: 22;
+		z-index: 75;
 		@apply h-8 flex justify-center items-center bg-neutral-500 bg-opacity-0 hover:bg-opacity-10 active:hover:bg-opacity-20 select-none text-base;
 		&:last-child {
 			@apply hover:bg-red-500 hover:bg-opacity-100 hover:active:bg-opacity-70 hover:text-white;
