@@ -19,7 +19,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 	// If somethings loading, show the spinner
 	if (!ipLocation || !servers || status === "connecting" || status === "disconnecting") return (
 		<div className="h-12 -m-4 rounded-full flex items-center justify-center transition-colors border gap-2 px-5 border-warn/25 bg-warn/10">
-			<Spinner className="w-6 -ml-2 mr-1 !stroke-warn shrink-0" />
+			<Spinner className="w-6 -ml-2 mr-0.5 !stroke-warn shrink-0" />
 			<div className="font-roboto font-medium whitespace-nowrap w-full flex flex-col justify-center pr-2">
 				<h1 className="text-warn">{ status.includes("ing") ? status[0].toUpperCase() + status.substring(1) : "Loading"}</h1>
 			</div>

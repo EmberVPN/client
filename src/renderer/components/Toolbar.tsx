@@ -23,7 +23,7 @@ export default function Toolbar({ className, ...props }: ToolbarProps & HTMLAttr
 	});
 
 	return (
-		<header className={ classNames("min-h-[64px] !overflow-visible z-40 sticky top-0 backdrop-blur-3xl transition-[box-shadow,transform] toolbar", className) }
+		<header className={ classNames("min-h-[64px] !overflow-visible z-40 sticky top-0 backdrop-blur-3xl transition-shadow toolbar", className) }
 			ref={ ref }>
 			
 			<div className="!py-4 flex items-center gap-4 justify-between h-full !overflow-visible flex-wrap !flex-row"

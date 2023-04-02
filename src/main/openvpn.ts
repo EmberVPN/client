@@ -2,6 +2,7 @@ import { ChildProcessWithoutNullStreams, spawn, spawnSync } from "child_process"
 import { BrowserWindow, ipcMain } from "electron";
 import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
+import isOnline from "is-online";
 import fetch from "node-fetch";
 import { resolve } from "path";
 import { resources } from ".";
@@ -17,6 +18,8 @@ let lastServer: Ember.Server;
 // Get mainwindow once it loads
 export default function(win: BrowserWindow) {
 	
+	let lastIp = "";
+	let lastGeo = {};
 	contents = win.webContents;
 	
 	// Listen for openvpn events
@@ -40,8 +43,6 @@ export default function(win: BrowserWindow) {
 
 	});
 
-	let lastIp = "";
-	let lastGeo = {};
 	(async function monitor() {
 
 		const controller = new AbortController();
@@ -261,8 +262,20 @@ export function connect(server: Ember.Server) {
 
 // Disconnect from openvpn
 export function disconnect() {
+	if (!proc || proc.exitCode !== null) return;
 	proc?.kill();
-	tray.disconnect();
-	tray.notify(`Disconnected from ${ lastServer.hostname } (${ lastServer.ip })`, "Ember VPN • Disconnected", resolve(resources, "./src/renderer/assets/tray.png"));
-	contents?.send("openvpn", "disconnected");
+	
+	// Wait for online
+	setTimeout(async function refetch() {
+
+		// isonline
+		const online = await isOnline();
+		if (!online) return setTimeout(refetch, 100);
+
+		tray.disconnect();
+		tray.notify(`Disconnected from ${ lastServer.hostname } (${ lastServer.ip })`, "Ember VPN • Disconnected", resolve(resources, "./src/renderer/assets/tray.png"));
+		contents?.send("openvpn", "disconnected");
+
+	}, 100);
+
 }
