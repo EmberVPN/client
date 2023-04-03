@@ -4,7 +4,7 @@ import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 
 interface InputFieldProps {
 	label: string;
-	hint?: string;
+	hint: string;
 }
 
 export default function InputField({ label, hint, className, type, ...props }: Partial<InputFieldProps> & React.InputHTMLAttributes<HTMLInputElement>) {
@@ -22,7 +22,7 @@ export default function InputField({ label, hint, className, type, ...props }: P
 	});
 
 	return (
-		<div className={ classNames("relative w-full h-12 group input-group", className) }
+		<div className={ classNames("relative w-full h-12 group", className) }
 			ref={ ref }>
 			<input className={ classNames("peer w-full h-full text-gray-700 dark:text-gray-200 font-roboto font-normal disabled:border-dashed transition-all placeholder-shown:border placeholder-shown:border-gray-500/20 border focus:border-2 text-sm px-3 py-2.5 focus:px-[11px] rounded-lg border-gray-400/40 dark:border-gray-400/25 focus:!border-primary backdrop-blur-2xl !bg-white/10 dark:!bg-gray-800/10 group-[.hascontents]:invalid:!border-error", className) }
 				type={ type === "password" ? (vis ? "text" : "password") : type || "text" }
@@ -33,7 +33,9 @@ export default function InputField({ label, hint, className, type, ...props }: P
 			)}
 			{ type === "password" && (
 				<div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-75 group-hover:opacity-100 cursor-pointer"
-					onClick={ () => setVis(vis => !vis) }>
+					onMouseDown={ () => setVis(true) }
+					onMouseLeave={ () => setVis(false) }
+					onMouseUp={ () => setVis(false) }>
 					{ vis ? <MdVisibility className="text-2xl opacity-70" /> : <MdVisibilityOff className="text-2xl opacity-70" /> }
 				</div>
 			)}
