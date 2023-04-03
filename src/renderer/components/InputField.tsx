@@ -34,7 +34,7 @@ export default function InputField({ label, hint, className, type, ...props }: P
 			{ type === "password" && (
 				<div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-75 group-hover:opacity-100 cursor-pointer"
 					onClick={ () => setVis(vis => !vis) }>
-					{ vis ? <MdVisibilityOff className="text-2xl opacity-70" />	: <MdVisibility className="text-2xl opacity-70" /> }
+					{ vis ? <MdVisibility className="text-2xl opacity-70" /> : <MdVisibilityOff className="text-2xl opacity-70" /> }
 				</div>
 			)}
 			{hint && (
