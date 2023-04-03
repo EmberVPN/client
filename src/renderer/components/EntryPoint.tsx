@@ -33,7 +33,7 @@ export default function EntryPoint(): JSX.Element | null {
 				id="entrypoint">
 				<div className="flex flex-col p-4 gap-4 max-w-md mx-auto my-auto py-20">
 					{Object.values(data.servers)
-						.sort((a, b) => calculateDistance(ipLocation?.latitude || 0, ipLocation?.longitude || 0, parseFloat(a.location.latitude), parseFloat(a.location.longitude)) - calculateDistance(ipLocation?.latitude || 0, ipLocation?.longitude || 0, parseFloat(b.location.latitude), parseFloat(b.location.longitude)))
+						.sort((a, b) => a.ping - b.ping)
 						.map((server, key) => (
 							<Server key={ key }
 								server={ server } />
