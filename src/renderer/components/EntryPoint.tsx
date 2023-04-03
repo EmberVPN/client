@@ -1,6 +1,4 @@
 import { useEffect, useRef } from "react";
-import { calculateDistance } from "../util/calculateDistance";
-import useConnection from "../util/hooks/useConnection";
 import useData from "../util/hooks/useData";
 import Server from "./Server";
 import Toolbar from "./Toolbar";
@@ -8,7 +6,6 @@ import Toolbar from "./Toolbar";
 export default function EntryPoint(): JSX.Element | null {
 
 	const { data } = useData("/ember/servers");
-	const { ipLocation } = useConnection();
 	const ref = useRef<HTMLWebViewElement>(null);
 	
 	// Set authorization
