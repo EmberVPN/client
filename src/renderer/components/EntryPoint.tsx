@@ -28,13 +28,15 @@ export default function EntryPoint(): JSX.Element | null {
 			<Toolbar />
 			<div className="grow relative overflow-hidden bg-white/50 dark:bg-gray-800/50 overflow-y-auto flex flex-col"
 				id="entrypoint">
-				<div className="flex flex-col p-4 gap-4 max-w-md mx-auto my-auto py-20">
+				<div className="flex p-4 gap-4 m-auto py-20 flex-col">
+
 					{Object.values(data.servers)
 						.sort((a, b) => a.ping - b.ping)
 						.map((server, key) => (
 							<Server key={ key }
 								server={ server } />
 						))}
+					
 				</div>
 			</div>
 		</>
