@@ -15,7 +15,7 @@ interface GeoLocation {
 	longitude: number;
 	ip: string;
 }
-			
+
 interface Context<T = State> {
 	status: T;
 	ipLocation: GeoLocation | null;
@@ -23,6 +23,7 @@ interface Context<T = State> {
 	setStatus: React.Dispatch<React.SetStateAction<T>>;
 	setIpLocation: React.Dispatch<React.SetStateAction<GeoLocation | null>>;
 	setActive: React.Dispatch<React.SetStateAction<false | string>>;
+	lastStateChange: number;
 }
 
 const GlobalStateContext = createContext<Context>({
@@ -31,19 +32,22 @@ const GlobalStateContext = createContext<Context>({
 	active: false,
 	setStatus: () => { },
 	setIpLocation: () => { },
-	setActive: () => {},
+	setActive: () => { },
+	lastStateChange: Date.now()
 });
 
 export function ConnectionProvider({ children }: PropsWithChildren) {
 	const [ status, setStatus ] = useState<State>("disconnected");
 	const [ active, setActive ] = useState<false | string>(false);
 	const [ ipLocation, setIpLocation ] = useState<GeoLocation | null>(null);
+	const [ lastStateChange, setLastStateChange ] = useState<number>(Date.now());
 	const { data: servers } = useData("/ember/servers");
 	
 	// Sync state with main process
 	useEffect(function() {
 		
 		electron.ipcRenderer.on("openvpn", (_event, state: string) => {
+			setLastStateChange(Date.now());
 			switch (state) {
 				
 			case "error":
@@ -70,7 +74,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 		};
 	}, [ active, ipLocation, servers?.servers, setActive, setIpLocation, setStatus, status ]);
 
-	return <GlobalStateContext.Provider value={{ status, setStatus, active, setActive, ipLocation, setIpLocation }}>{children}</GlobalStateContext.Provider>;
+	return <GlobalStateContext.Provider value={{ status, setStatus, active, setActive, ipLocation, setIpLocation, lastStateChange }}>{children}</GlobalStateContext.Provider>;
 }
 
 export default function useConnection() {

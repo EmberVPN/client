@@ -1,13 +1,15 @@
 import classNames from "classnames";
+import { MdOutlineTimer } from "react-icons/md";
 import { calculateDistance } from "../util/calculateDistance";
 import useConnection from "../util/hooks/useConnection";
 import Button from "./Button";
 import Spinner from "./Spinner";
+import Timestamp from "./Timestamp";
 
 export default function Servers({ server }: { server: Ember.Server }): JSX.Element | null {
 
 	// Get the current IP location
-	const { status, active, ipLocation, setStatus, setActive } = useConnection();
+	const { status, active, ipLocation, setStatus, setActive, lastStateChange } = useConnection();
 
 	// Parse the server location
 	const latitude = parseFloat(server.location.latitude);
@@ -53,13 +55,19 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 						<p>{ server.location.district || server.location.state_prov || server.location.country_capital }</p>
 					</div>
 					<div className="text-sm flex justify-between gap-2 w-full">
-						{ (!isActive || status !== "connected") && (<>
-							<p className={ classNames(server.ping < 50 ? "text-success" : server.ping < 150 ? "text-warn" : "text-error") }>{server.ping}ms</p>
+						<div className="flex grow gap-2 justify-between mr-2">
+							{(!isActive || status !== "connected") ? (<>
+								<p className={ classNames(server.ping < 50 ? "text-success" : server.ping < 150 ? "text-warn" : "text-error") }>{server.ping}ms</p>
+								<span className="text-gray-400 dark:text-gray-600">•</span>
+								<p>{Intl.NumberFormat().format(Math.floor(distance * (ipLocation.country_code === "US" ? 0.621371 : 1)))} {ipLocation.country_code === "US" ? "Mi" : "Km"}</p>
+							</>
+							) : (<div className="flex items-center gap-1 opacity-70">
+								<MdOutlineTimer className="text-xl -translate-y-[1px]" />
+								<Timestamp timestamp={ lastStateChange } />
+							</div>) }
 							<span className="text-gray-400 dark:text-gray-600">•</span>
-							<p>{Intl.NumberFormat().format(Math.floor(distance * (ipLocation.country_code === "US" ? 0.621371 : 1)))} {ipLocation.country_code === "US" ? "Mi" : "Km"}</p>
-							<span className="text-gray-400 dark:text-gray-600">•</span>
-						</>) }
-						<p className="ml-auto">{server.location.ip}</p>
+							<p className="self-end">{server.location.ip}</p>
+						</div>
 					</div>
 				</div>
 
