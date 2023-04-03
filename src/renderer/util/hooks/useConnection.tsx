@@ -1,4 +1,5 @@
 import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
+import useData from "./useData";
 
 type State =| "connected"
 			| "disconnected"
@@ -37,6 +38,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 	const [ status, setStatus ] = useState<State>("disconnected");
 	const [ active, setActive ] = useState<false | string>(false);
 	const [ ipLocation, setIpLocation ] = useState<GeoLocation | null>(null);
+	const { data: servers } = useData("/ember/servers");
 	
 	// Sync state with main process
 	useEffect(function() {
@@ -50,7 +52,6 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 				break;
 				
 			case "connected":
-			case "disconnected":
 				setStatus(state);
 				break;
 				
@@ -60,13 +61,14 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 		electron.ipcRenderer.on("iplocation", (_event, string) => {
 			const data = JSON.parse(string);
 			if (data.ip !== ipLocation?.ip) setIpLocation(data);
+			if (status === "disconnecting" && Object.values(servers?.servers || {}).filter(server => server.ip === data.ip).length === 0) setStatus("disconnected");
 		});
 
 		return () => {
 			electron.ipcRenderer.removeAllListeners("openvpn");
 			electron.ipcRenderer.removeAllListeners("iplocation");
 		};
-	}, [ active, ipLocation, setActive, setIpLocation, setStatus ]);
+	}, [ active, ipLocation, servers?.servers, setActive, setIpLocation, setStatus, status ]);
 
 	return <GlobalStateContext.Provider value={{ status, setStatus, active, setActive, ipLocation, setIpLocation }}>{children}</GlobalStateContext.Provider>;
 }
