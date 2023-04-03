@@ -22,7 +22,7 @@ export default function EntryPoint(): JSX.Element | null {
 	if (!data?.servers || Object.keys(data?.servers).length === 0) return (
 		<webview className="grow relative overflow-hidden bg-white dark:bg-gray-800 overflow-y-auto flex flex-col items-center justify-center"
 			ref={ ref }
-			src="https://embervpn.org/my-subscription" />
+			src="https://embervpn.org/my-subscription?app" />
 	);
 
 	// List all servers
