@@ -1,41 +1,46 @@
+import { useEffect, useRef } from "react";
 import { calculateDistance } from "../util/calculateDistance";
 import useConnection from "../util/hooks/useConnection";
 import useData from "../util/hooks/useData";
 import Server from "./Server";
+import Toolbar from "./Toolbar";
 
 export default function EntryPoint(): JSX.Element | null {
 
 	const { data } = useData("/ember/servers");
 	const { ipLocation } = useConnection();
+	const ref = useRef<HTMLWebViewElement>(null);
+	
+	// Set authorization
+	useEffect(function() {
+		if (!ref.current) return;
+		const webview = ref.current as HTMLWebViewElement & { executeJavaScript: (code: string) => void };
+		webview.addEventListener("did-start-loading", () => webview.executeJavaScript(`localStorage.setItem("authorization", "${ localStorage.getItem("authorization") }");`));
+	}, []);
 
 	// If no servers
 	if (!data?.servers || Object.keys(data?.servers).length === 0) return (
-		<div className="grow h-full flex flex-col items-center justify-center">
-			<div className="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
-				<div className="mx-auto max-w-screen-sm text-center">
-					<h1 className="mb-4 text-7xl tracking-tight font-extrabold lg:text-9xl text-primary-600 dark:text-primary">Uh Oh!</h1>
-					<p className="mb-4 text-3xl tracking-tight font-bold text-gray-900 md:text-4xl dark:text-white">No servers available.</p>
-					<p className="mb-4 text-lg font-light text-gray-500 dark:text-gray-400">Your subscription dosnt include any servers.</p>
-					<a className="inline-flex text-white bg-primary-600 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-primary-900 my-4 cursor-pointer"
-						onClick={ () => window.open("//embervpn.org/plans") }>See Pricing</a>
-				</div>
-			</div>
-		</div>
+		<webview className="grow relative overflow-hidden bg-white dark:bg-gray-800 overflow-y-auto flex flex-col items-center justify-center"
+			ref={ ref }
+			src="https://embervpn.org/my-subscription" />
 	);
 
 	// List all servers
 	return (
-		<div className="grow relative overflow-hidden bg-white/50 dark:bg-gray-800/50 overflow-y-auto flex flex-col"
-			id="entrypoint">
-			<div className="flex flex-col p-4 gap-4 max-w-md mx-auto my-auto py-20">
-				{Object.values(data.servers)
-					.sort((a, b) => calculateDistance(ipLocation?.latitude || 0, ipLocation?.longitude || 0, parseFloat(a.location.latitude), parseFloat(a.location.longitude)) - calculateDistance(ipLocation?.latitude || 0, ipLocation?.longitude || 0, parseFloat(b.location.latitude), parseFloat(b.location.longitude)))
-					.map((server, key) => (
-						<Server key={ key }
-							server={ server } />
-					))}
+		<>
+			<Toolbar />
+			<div className="grow relative overflow-hidden bg-white/50 dark:bg-gray-800/50 overflow-y-auto flex flex-col"
+				id="entrypoint">
+				<div className="flex flex-col p-4 gap-4 max-w-md mx-auto my-auto py-20">
+					{Object.values(data.servers)
+						.sort((a, b) => calculateDistance(ipLocation?.latitude || 0, ipLocation?.longitude || 0, parseFloat(a.location.latitude), parseFloat(a.location.longitude)) - calculateDistance(ipLocation?.latitude || 0, ipLocation?.longitude || 0, parseFloat(b.location.latitude), parseFloat(b.location.longitude)))
+						.map((server, key) => (
+							<Server key={ key }
+								server={ server } />
+						))}
+				</div>
 			</div>
-		</div>
+		</>
 	);
 	
 }
