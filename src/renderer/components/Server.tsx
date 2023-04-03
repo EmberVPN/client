@@ -36,7 +36,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 	// Render the server
 	return (
-		<div className="text-sm origin-top rounded-lg shadow dark:shadow-xl text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden dark:shadow-black/20 flex flex-col p-4 gap-2">
+		<div className="text-sm origin-top rounded-lg shadow text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden dark:shadow-black/20 flex flex-col p-4 gap-2">
 				
 			<div className="flex items-center gap-4 p-1">
 
