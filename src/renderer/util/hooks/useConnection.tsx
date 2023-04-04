@@ -62,10 +62,14 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 			}
 		});
 
+		// Observe IP address changes
 		electron.ipcRenderer.on("iplocation", (_event, string) => {
 			const data = JSON.parse(string);
 			if (data.ip !== ipLocation?.ip) setIpLocation(data);
-			if (status === "disconnecting" && Object.values(servers?.servers || {}).filter(server => server.ip === data.ip).length === 0) setStatus("disconnected");
+			if (status === "disconnecting" && Object.values(servers?.servers || {}).filter(server => server.ip === data.ip).length === 0) {
+				setStatus("disconnected");
+				setActive(false);
+			}
 		});
 
 		return () => {

@@ -21,7 +21,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 	// Calculate the distance from the user to the server
 	const distance = calculateDistance(latitude, longitude, ipLocation.latitude, ipLocation.longitude);
 	const isActive = active === server.hash;
-	const isLoading = (status === "connecting" || status === "disconnecting") && isActive;
+	const isLoading = isActive && status.endsWith("ing");
 
 	// Connect to the server
 	async function connect() {
@@ -32,14 +32,17 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 	// Disconnect from the server
 	async function disconnect() {
-		setActive(false);
 		setStatus("disconnecting");
 		electron.ipcRenderer.send("openvpn", "disconnect");
 	}
 
 	// Render the server
 	return (
-		<div className={ classNames("text-sm rounded-lg shadow text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden dark:shadow-black/20 flex flex-col p-4 gap-2 transition-[height,margin,transform] duration-100", !isLoading ? "h-[134px]" : "h-[88px] my-[23px]", (isLoading || (isActive && status === "connected")) && "scale-110 shadow-lg", (isActive && status === "connected") && "my-2") }>
+		<div className={ classNames(
+			"text-sm rounded-lg shadow text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden dark:shadow-black/20 flex flex-col p-4 gap-2 transition-[height,margin,transform] duration-100",
+			isLoading ? "h-[88px] my-[23px] scale-110 shadow-lg" : "h-[134px]",
+			isActive && status === "connected" && "scale-110 shadow-lg my-2"
+		) }>
 				
 			<div className="flex items-center gap-4 p-1">
 
