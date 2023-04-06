@@ -1,13 +1,14 @@
 import React, { HTMLAttributes, useState } from "react";
 import { VscChromeClose, VscChromeMaximize, VscChromeMinimize, VscChromeRestore } from "react-icons/vsc";
 import favicon from "../assets/ember.svg";
+import classNames from "classnames";
 
 interface Props {
 	children?: React.ReactNode;
 	resizeable?: boolean;
 }
 
-export default function Titlebar({ children, resizeable = true }: Props & HTMLAttributes<HTMLDivElement>): JSX.Element {
+export default function Titlebar({ children, resizeable = true, className, ...props }: Props & HTMLAttributes<HTMLDivElement>): JSX.Element {
 	const [ maximized, setMaximized ] = useState(false);
 	
 	electron.ipcRenderer.on("titlebar", (_, action: string) => {
@@ -22,7 +23,8 @@ export default function Titlebar({ children, resizeable = true }: Props & HTMLAt
 	});
 
 	return (
-		<div className="titlebar--root">
+		<div className={ classNames("titlebar--root", className) }
+			{ ...props }>
 			<div className="flex items-center px-3 gap-2 z-10">
 				<img alt=""
 					className="titlebar--icon"

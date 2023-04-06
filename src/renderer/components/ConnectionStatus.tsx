@@ -18,7 +18,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 	
 	// If somethings loading, show the spinner
 	if (!ipLocation || !servers || status === "connecting" || status === "disconnecting") return (
-		<div className="h-12 -m-4 rounded-full flex items-center justify-center transition-colors border gap-2 px-5 border-warn/25 bg-warn/10">
+		<div className="h-12 rounded-full flex items-center justify-center transition-colors border gap-2 px-5 border-warn/25 bg-warn/10">
 			<Spinner className="w-6 -ml-2 mr-0.5 !stroke-warn shrink-0" />
 			<div className="font-roboto font-medium whitespace-nowrap w-full flex flex-col justify-center pr-2">
 				<h1 className="text-warn">{ status.includes("ing") ? status[0].toUpperCase() + status.substring(1) : "Loading"}</h1>
@@ -28,7 +28,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 
 	// Render the connection status
 	return (
-		<div className={ classNames("h-12 -m-4 rounded-full flex items-center justify-center transition-colors border gap-2 px-3", isConnected ? "border-success/25 bg-success/10" : "border-error/25 bg-error/10") }>
+		<div className={ classNames("h-12 rounded-full flex items-center justify-center transition-colors border gap-2 px-3", isConnected ? "border-success/25 bg-success/10" : "border-error/25 bg-error/10") }>
 			{ isConnected ? <IoMdCheckmarkCircleOutline className="text-success text-2xl shrink-0" /> : <MdErrorOutline className="text-error text-2xl shrink-0" /> }
 			<div className="font-roboto font-medium whitespace-nowrap w-full flex flex-col justify-center pr-2">
 				<h1 className={ classNames("-mb-1", isConnected ? "text-success" : "text-error") }>{!isConnected && "Not "}Connected</h1>
