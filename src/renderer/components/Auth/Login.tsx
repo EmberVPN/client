@@ -2,10 +2,10 @@ import classNames from "classnames";
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { refetch } from "../../util/refetch";
-import InputField from "../ui-elements/InputField";
 import Button from "../ui-elements/Button";
-import Spinner from "../ui-elements/Spinner/";
 import Checkbox from "../ui-elements/Checkbox";
+import InputField from "../ui-elements/InputField";
+import Spinner from "../ui-elements/Spinner/";
 
 export default function Authorize(): JSX.Element {
 
@@ -101,7 +101,7 @@ export default function Authorize(): JSX.Element {
 					ref={ ref }>
 					<div className="grow flex flex-col justify-between">
 						<h1 className="text-4xl font-manrope font-bold select-none">Sign In</h1>
-						<p className="-mt-6 text-sm text-gray-600 dark:text-gray-400 select-none font-roboto font-medium">with your <a className="text-primary hover:underline underline-offset-2"
+						<p className="-mt-6 text-sm text-gray-600 dark:text-gray-400 select-none  font-medium">with your <a className="text-primary hover:underline underline-offset-2"
 							href="https://embervpn.org">Ember VPN</a> account</p>
 						<InputField
 							defaultValue={ localStorage.getItem("last_user") || "" }

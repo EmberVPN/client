@@ -7,14 +7,11 @@
 
 html {
 	overflow: hidden;
-	:focus-visible {
-		outline: none!important;
-	}
 }
-
 
 body {
 	@apply bg-gray-200 dark:bg-gray-900 dark:text-gray-300;
+	font-family: 'Roboto', sans-serif;
 }
 
 ::-webkit-scrollbar {
@@ -35,20 +32,16 @@ body {
 	@apply bg-gray-500;
 }
 
-.font-roboto {
-	font-family: 'Roboto', sans-serif;
-}
-
-.font-manrope {
-	font-family: 'manrope', sans-serif;
-}
-
 .window {
 	-webkit-app-region: drag;
 }
 
 img {
   	-webkit-user-drag: none;
+}
+
+.font-manrope {
+	font-family: 'Manrope', sans-serif;
 }
 
 .animate-ember {
