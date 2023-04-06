@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
-import useData from "../util/hooks/useData";
-import { useUser } from "../util/hooks/useUser";
-import MyAccount from "./Auth/MyAccount";
-import ConnectionStatus from "./ConnectionStatus";
-import Server from "./Server";
+import MyAccount from "./components/Auth/MyAccount";
+import ConnectionStatus from "./components/ConnectionStatus";
+import Server from "./components/Server";
 import Spinner from "./ui-elements/Spinner";
 import Toolbar from "./ui-elements/Toolbar";
+import useData from "./util/hooks/useData";
+import { useUser } from "./util/hooks/useUser";
 
 export default function EntryPoint(): JSX.Element | null {
 
@@ -28,7 +28,7 @@ export default function EntryPoint(): JSX.Element | null {
 		<>
 			<Toolbar htmlFor="entrypoint">
 				<ConnectionStatus />
-				<div className="flex items-center">
+				<div className="flex items-center ml-auto">
 					{ !user && <Spinner className="w-9 mx-3" /> }
 					{ user && <MyAccount user={ user } /> }
 				</div>

@@ -2,11 +2,11 @@ import classNames from "classnames";
 import { useEffect, useState } from "react";
 import { MdArrowForward, MdSystemUpdateAlt } from "react-icons/md";
 import semver from "semver";
+import Button from "../ui-elements/Button";
+import Spinner from "../ui-elements/Spinner";
 import useConnection from "../util/hooks/useConnection";
 import useData from "../util/hooks/useData";
 import { close } from "./Auth/MyAccount";
-import Button from "./ui-elements/Button";
-import Spinner from "./ui-elements/Spinner";
 
 export default function Updater(): JSX.Element | null {
 
