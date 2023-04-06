@@ -1,10 +1,10 @@
 import classNames from "classnames";
 import { useState } from "react";
 import { MdArrowBack } from "react-icons/md";
+import Icon from "../ui-elements/Icon";
+import Toolbar from "../ui-elements/Toolbar";
+import Tooltip from "../ui-elements/Tooltip";
 import ThemeToggle from "./ThemeToggle";
-import Icon from "./ui-elements/Icon";
-import Toolbar from "./ui-elements/Toolbar";
-import Tooltip from "./ui-elements/Tooltip";
 
 export let setOpen: () => unknown;
 
@@ -37,9 +37,8 @@ export default function Settings(): JSX.Element {
 					onClick={ () => setState(false) }>
 					<Tooltip anchor="left">Back</Tooltip>
 				</Icon>
-				<h1 className="text-xl ">Settings</h1>
-				<div className="grow" />
-				<code className="font-mono border-[1px] px-2 rounded-2xl select-none border-gray-500/10 text-gray-500 bg-gray-500/10 mx-4">v{VERSION}</code>
+				<h2 className="text-xl">Settings</h2>
+				<code className="font-mono border-[1px] px-2 rounded-2xl select-none border-gray-500/10 text-gray-500 bg-gray-500/10 mx-4 ml-auto">v{VERSION}</code>
 			</Toolbar>
 			
 			<div className="grow p-4 max-h-[calc(100%_-_64px)] overflow-x-hidden overflow-y-auto bg-white/50 dark:bg-gray-800/50 h-full"
