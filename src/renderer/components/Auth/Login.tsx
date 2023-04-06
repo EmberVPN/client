@@ -2,10 +2,10 @@ import classNames from "classnames";
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { refetch } from "../../util/refetch";
-import Button from "../Button";
-import Checkbox from "../Checkbox";
-import InputField from "../InputField";
-import Spinner from "../Spinner";
+import InputField from "../ui-elements/InputField";
+import Button from "../ui-elements/Button";
+import Spinner from "../ui-elements/Spinner/";
+import Checkbox from "../ui-elements/Checkbox";
 
 export default function Authorize(): JSX.Element {
 
@@ -93,7 +93,7 @@ export default function Authorize(): JSX.Element {
 	}
 
 	return (
-		<div className="w-full h-full p-4 flex flex-col bg-white dark:bg-gray-800 relative z-[0]"
+		<div className="w-full h-full p-4 flex flex-col bg-gray-100 dark:bg-gray-900 relative z-[0]"
 			id="login-cover">
 			<div className="grow flex flex-col">
 				<form className="container grow"
@@ -134,7 +134,6 @@ export default function Authorize(): JSX.Element {
 						<Checkbox defaultChecked
 							name="rememberme">Stay signed in</Checkbox>
 						<Button className={ classNames(loading && "!bg-opacity-0 !shadow-none pointer-events-none") }
-							size="sm"
 							type="submit">{loading ? <Spinner className="w-8 mx-3 !stroke-gray-700 dark:!stroke-primary" /> : "Sign In"}</Button>
 					</div>
 				</form>

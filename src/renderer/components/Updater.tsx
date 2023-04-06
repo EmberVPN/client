@@ -5,8 +5,8 @@ import semver from "semver";
 import useConnection from "../util/hooks/useConnection";
 import useData from "../util/hooks/useData";
 import { close } from "./Auth/MyAccount";
-import Button from "./Button";
-import Spinner from "./Spinner";
+import Button from "./ui-elements/Button";
+import Spinner from "./ui-elements/Spinner";
 
 export default function Updater(): JSX.Element | null {
 
@@ -68,13 +68,11 @@ export default function Updater(): JSX.Element | null {
 
 				<div className="flex justify-end items-center gap-4 md:-m-4 !mt-2">
 					<Button
-						color="outlined"
 						onClick={ () => [ setState(false), localStorage.setItem("ignoreUpdate", latest.version) ] }
-						raised={ false }>Skip version</Button>
+						variant="outlined">Skip version</Button>
 					<Button
 						color="success"
-						onClick={ download }
-						raised={ false }>Download & Install</Button>
+						onClick={ download }>Download & Install</Button>
 				</div>
 
 			</div>

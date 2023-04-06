@@ -3,6 +3,7 @@
 	"include": [
 		"src/renderer/env.d.ts",
 		"src/renderer/**/*",
+		"src/renderer/components/ui-elements",
 		"src/renderer/**/*.tsx",
 		"src/preload/*.d.ts",
 		"src/ember.d.ts",

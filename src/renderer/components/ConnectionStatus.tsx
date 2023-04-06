@@ -3,7 +3,7 @@ import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdErrorOutline } from "react-icons/md";
 import useConnection from "../util/hooks/useConnection";
 import useData from "../util/hooks/useData";
-import Spinner from "./Spinner";
+import Spinner from "./ui-elements/Spinner";
 
 export default function ConnectionStatus(): JSX.Element | null {
 
