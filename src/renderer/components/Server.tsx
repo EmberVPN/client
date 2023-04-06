@@ -2,9 +2,9 @@ import classNames from "classnames";
 import { MdOutlineTimer } from "react-icons/md";
 import { calculateDistance } from "../util/calculateDistance";
 import useConnection from "../util/hooks/useConnection";
-import Button from "./Button";
-import Spinner from "./Spinner";
 import Timestamp from "./Timestamp";
+import Button from "./ui-elements/Button";
+import Spinner from "./ui-elements/Spinner";
 
 export default function Servers({ server }: { server: Ember.Server }): JSX.Element | null {
 
@@ -76,23 +76,17 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 			</div>
 
-			{isLoading ? (
-				<Button className="!bg-transparent"
-					raised={ false }>
-				</Button>
-			) : (
+			{ isLoading ? <Button className="!bg-transparent pointer-events-none" /> : (
 				(isActive && status === "connected") ? (
 					<Button className="m-0"
 						color="error"
-						onClick={ disconnect }
-						raised={ false }>
+						onClick={ disconnect }>
 							Disconnect
 					</Button>
 				) : (
 					<Button className="m-0"
 						color="success"
-						onClick={ connect }
-						raised={ false }>
+						onClick={ connect }>
 							Connect
 					</Button>
 				)

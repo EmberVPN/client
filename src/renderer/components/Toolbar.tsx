@@ -4,7 +4,7 @@ import useAnimation from "../util/hooks/useAnimation";
 import { useUser } from "../util/hooks/useUser";
 import MyAccount from "./Auth/MyAccount";
 import ConnectionStatus from "./ConnectionStatus";
-import Spinner from "./Spinner";
+import Spinner from "./ui-elements/Spinner";
 
 export type ToolbarProps = { children?: ReactNode | string, className?: string };
 
