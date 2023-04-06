@@ -131,7 +131,8 @@ export default function Authorize(): JSX.Element {
 						</div>
 					</div>
 					<div className="flex justify-between items-center">
-						<Checkbox defaultChecked
+						<Checkbox className="w-auto"
+							defaultChecked
 							name="rememberme">Stay signed in</Checkbox>
 						<Button className={ classNames(loading && "!bg-opacity-0 !shadow-none pointer-events-none") }
 							type="submit">{loading ? <Spinner className="w-8 mx-3 !stroke-gray-700 dark:!stroke-primary" /> : "Sign In"}</Button>

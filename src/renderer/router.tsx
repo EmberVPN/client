@@ -47,7 +47,8 @@ export function Application() {
 
 	if (user === false) return (
 		<div className="h-screen flex flex-col">
-			<Titlebar resizeable={ false }>Sign In</Titlebar>
+			<Titlebar className="!bg-gray-100 dark:!bg-transparent"
+				resizeable={ false }>Sign In</Titlebar>
 			<Authorize />
 		</div>
 	);
