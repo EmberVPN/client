@@ -1,11 +1,16 @@
 import { useEffect, useRef } from "react";
 import useData from "../util/hooks/useData";
+import { useUser } from "../util/hooks/useUser";
+import MyAccount from "./Auth/MyAccount";
+import ConnectionStatus from "./ConnectionStatus";
 import Server from "./Server";
-import Toolbar from "./Toolbar";
+import Spinner from "./ui-elements/Spinner";
+import Toolbar from "./ui-elements/Toolbar";
 
 export default function EntryPoint(): JSX.Element | null {
 
 	const { data } = useData("/ember/servers");
+	const { user } = useUser();
 	const ref = useRef<HTMLWebViewElement>(null);
 	
 	// Set authorization
@@ -16,27 +21,27 @@ export default function EntryPoint(): JSX.Element | null {
 	}, []);
 
 	// If no servers
-	if (!data?.servers || Object.keys(data?.servers).length === 0) return (
-		<webview className="grow relative overflow-hidden bg-white dark:bg-gray-800 overflow-y-auto flex flex-col items-center justify-center"
-			ref={ ref }
-			src="https://embervpn.org/my-subscription?app" />
-	);
+	if (!data?.servers || Object.keys(data?.servers).length === 0) return <p>no plans</p>;
 
 	// List all servers
 	return (
 		<>
-			<Toolbar />
+			<Toolbar htmlFor="entrypoint">
+				<ConnectionStatus />
+				<div className="flex items-center">
+					{ !user && <Spinner className="w-9 mx-3" /> }
+					{ user && <MyAccount user={ user } /> }
+				</div>
+			</Toolbar>
 			<div className="grow relative overflow-hidden bg-white/50 dark:bg-gray-800/50 overflow-y-auto flex flex-col"
 				id="entrypoint">
 				<div className="flex p-4 gap-4 m-auto py-20 flex-col">
-
 					{Object.values(data.servers)
 						.sort((a, b) => a.ping - b.ping)
 						.map((server, key) => (
 							<Server key={ key }
 								server={ server } />
 						))}
-					
 				</div>
 			</div>
 		</>

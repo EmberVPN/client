@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { MdArrowBack } from "react-icons/md";
 import useAnimation from "../../util/hooks/useAnimation";
-import Tooltip from "../Tooltip";
+import Tooltip from "../ui-elements/Tooltip";
 
 export default function SettingsHeader({ setState }: { setState: (state: boolean) => unknown }) {
 

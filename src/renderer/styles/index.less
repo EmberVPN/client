@@ -1,6 +1,9 @@
+@import "../components/ui-elements/util/index.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 html {
 	overflow: hidden;
@@ -63,10 +66,6 @@ img {
 	}
 }
 
-.toolbar {
-	@apply bg-white dark:bg-gray-800 px-8 border-gray-200 dark:border-gray-700;
-}
-
 .titlebar--root {
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	font-size: 14px;
@@ -90,4 +89,16 @@ img {
 	@apply max-w-7xl mx-auto w-full px-4 flex flex-col gap-8 py-4 lg:gap-12 xl:gap-16;
 }
 
-.animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; } @keyframes pulse { 0%, 100% { transform: scale(.6); } 50% { transform: scale(.5); }}
+.animate-pulse {
+	animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+	0%, 100% {
+		transform: scale(.6);
+	}
+
+	50% {
+		transform: scale(.5);
+	}
+}

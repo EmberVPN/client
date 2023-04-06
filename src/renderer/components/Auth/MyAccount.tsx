@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { useState } from "react";
 import { MdMoreVert } from "react-icons/md";
 import User from "../../util/class/User";
-import Tooltip from "../Tooltip";
+import Tooltip from "../ui-elements/Tooltip";
 import MyAccountPopout from "./MyAccountPopout";
 
 export let open = () => { };
