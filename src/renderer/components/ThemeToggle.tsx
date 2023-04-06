@@ -49,7 +49,7 @@ export default function ThemeToggle({ provider = false, children, ...props }: { 
 			{ state === "AUTO" && <MdOutlineBrightnessAuto className="w-6 h-6 opacity-50" /> }
 			{ state === "LIGHT" && <MdBrightnessHigh className="w-6 h-6 opacity-50" /> }
 			{state === "DARK" && <MdOutlineDarkMode className="w-6 h-6 opacity-50" />}
-			<div className="flex flex-col font-roboto grow">
+			<div className="flex flex-col  grow">
 				<p className="text-gray-800 dark:text-gray-300 -mb-0.5">Toggle Theme</p>
 				<p className="text-gray-500 dark:text-gray-400 text-xs font-medium">{
 					state === "AUTO" ? "Automatic" : state === "LIGHT" ? "Light Mode" : "Night Mode"

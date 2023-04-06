@@ -52,7 +52,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 				</div>
 					
 				{/* Server details */}
-				<div className="leading-tight font-roboto font-medium whitespace-nowrap w-full">
+				<div className="leading-tight  font-medium whitespace-nowrap w-full">
 
 					{/* Server location */}
 					<div className="flex w-full justify-between items-center text-gray-700 dark:text-gray-300 text-lg">

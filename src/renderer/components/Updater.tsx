@@ -46,7 +46,7 @@ export default function Updater(): JSX.Element | null {
 	return (
 		<div className={ classNames("group fixed top-0 w-full h-full flex justify-center items-center z-40 bg-black/20 transition-opacity", state ? "opacity-1 pointer-events-auto active" : "opacity-0 pointer-events-none") }
 			onClick={ close }>
-			<div className="text-sm shadow-2xl text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden dark:shadow-black/20 flex flex-col gap-2 w-full h-full md:max-w-[640px] md:max-h-[400px] md:rounded-lg group-[.active]:scale-100 scale-50 transition-transform relative p-8 font-roboto">
+			<div className="text-sm shadow-2xl text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden dark:shadow-black/20 flex flex-col gap-2 w-full h-full md:max-w-[640px] md:max-h-[400px] md:rounded-lg group-[.active]:scale-100 scale-50 transition-transform relative p-8 ">
 
 				<div className={ classNames("bg-inherit absolute w-full top-0 left-0 h-full flex items-center justify-center z-[1] transition-opacity", isLoading ? "opacity-1 pointer-events-auto" : "opacity-0 pointer-events-none") }>
 					<Spinner className="w-12 !stroke-gray-800 dark:!stroke-gray-200" />
