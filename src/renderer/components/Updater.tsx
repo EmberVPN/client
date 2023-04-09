@@ -20,7 +20,7 @@ export default function Updater(): JSX.Element | null {
 	useEffect(function() {
 		if (!downloads) return;
 		const latest = downloads?.latest[platform];
-		const shouldUpdate = semver.gt(latest?.version, VERSION) && localStorage.getItem("ignoreUpdate") !== latest?.version && status === "disconnected" || true;
+		const shouldUpdate = semver.gt(latest?.version, VERSION) && localStorage.getItem("ignoreUpdate") !== latest?.version && status === "disconnected";
 		if (!state && shouldUpdate) {
 			setState(true);
 			electron.ipcRenderer.send("updater", "hasupdate", JSON.stringify(latest));
