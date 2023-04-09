@@ -32,6 +32,7 @@ export default function(win: BrowserWindow) {
 			
 			// Download server config
 			await downloadConfig(server, authorization)
+				.then(e => win.webContents.send("openvpn", "connecting", server.hash, e))
 				.then(() => connect(server))
 				.catch(e => win.webContents.send("openvpn", "error", server.hash, e));
 

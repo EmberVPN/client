@@ -14,14 +14,15 @@ export default function ConnectionStatus(): JSX.Element | null {
 	const { data: servers } = useData("/ember/servers");
 	
 	// If the VPN is connected 
-	const isConnected = status === "connected";
+	const isConnected = status === "connected" || status === "will-connect";
 	
 	// If somethings loading, show the spinner
-	if (!ipLocation || !servers || status === "connecting" || status === "disconnecting") return (
+	if (!ipLocation || !servers || status === "connecting" || status === "disconnecting" || status === "will-connect") return (
 		<div className="h-12 rounded-full flex items-center justify-center transition-colors border gap-2 px-5 border-warn/25 bg-warn/10">
 			<Spinner className="w-6 -ml-2 mr-0.5 !stroke-warn shrink-0" />
 			<div className=" font-medium whitespace-nowrap w-full flex flex-col justify-center pr-2">
-				<h1 className="text-warn">{ status.includes("ing") ? status[0].toUpperCase() + status.substring(1) : "Loading"}</h1>
+				<h1 className={ classNames("text-warn", (status === "will-connect" || status === "connecting") && "-mb-1") }>{status === "will-connect" ? "Pending" : status.includes("ing") ? status[0].toUpperCase() + status.substring(1) : "Loading"}</h1>
+				{ (status === "will-connect" || status === "connecting") && <p className="text-xs">{status === "will-connect" ? "Generating keypair" : "Obtaining IP"}</p>}
 			</div>
 		</div>
 	);
