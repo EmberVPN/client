@@ -69,8 +69,8 @@ export default function(win: BrowserWindow) {
 		if (!ip || ip.includes("error")) return monitor();
 		setTimeout(() => monitor(), 1000);
 
-		// Check if IP has changed
-		if (ip !== lastIp) {
+		// Check if IP has changed and it didnt pick up an ipv6 address
+		if (ip !== lastIp && ip.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)) {
 			lastIp = ip;
 			
 			(async function monitor() {
