@@ -47,7 +47,7 @@ export default function Updater(): JSX.Element | null {
 
 	// Render the updater dialog
 	return (
-		<div className={ classNames("group fixed top-0 w-full h-full flex justify-center items-center z-40 bg-black/20 transition-opacity", state ? "opacity-1 pointer-events-auto active" : "opacity-0 pointer-events-none") }
+		<div className={ classNames("group fixed top-0 w-full h-full flex justify-center items-center z-[60] bg-black/20 transition-opacity", state ? "opacity-1 pointer-events-auto active" : "opacity-0 pointer-events-none") }
 			onClick={ close }>
 			<div className="text-sm shadow-2xl text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden dark:shadow-black/20 flex flex-col gap-2 w-full h-full md:max-w-[640px] md:max-h-[400px] md:rounded-lg group-[.active]:scale-100 scale-50 transition-transform relative p-8 ">
 

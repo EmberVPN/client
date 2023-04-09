@@ -23,7 +23,7 @@ export default function Titlebar({ children, resizeable = true, className, ...pr
 	});
 
 	return (
-		<div className={ classNames("titlebar--root", className) }
+		<div className={ classNames("titlebar--root z-[70]", className) }
 			{ ...props }>
 			<div className="flex items-center px-3 gap-2 z-10">
 				<img alt=""
