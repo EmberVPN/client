@@ -23,12 +23,13 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 	const distance = calculateDistance(latitude, longitude, ipLocation.latitude, ipLocation.longitude);
 	const isActive = active === server.hash;
 	const isLoading = isActive && (status.endsWith("ing") || status === "will-connect");
+	const authorization = localStorage.getItem("authorization");
 
 	// Connect to the server
 	async function connect() {
 		setActive(server.hash);
 		setStatus("will-connect");
-		electron.ipcRenderer.send("openvpn", "connect", JSON.stringify({ server, authorization: localStorage.getItem("authorization") }));
+		electron.ipcRenderer.send("openvpn", "connect", JSON.stringify({ server, authorization }));
 	}
 
 	// Disconnect from the server
