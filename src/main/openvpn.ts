@@ -236,6 +236,12 @@ export function connect(server: Ember.Server) {
 	// Listen for data
 	proc.stdout.on("data", chunk => {
 		const line = chunk.toString();
+		console.log("[openvpn]", line);
+		if (line.includes("error code 1")) {
+			contents?.send("openvpn", "error", server.hash, line);
+			proc?.kill();
+			return;
+		}
 		contents?.send("openvpn", "log", server.hash, line);
 	});
 
