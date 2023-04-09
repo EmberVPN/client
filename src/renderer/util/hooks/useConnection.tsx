@@ -48,15 +48,15 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 	useEffect(function() {
 		
 		electron.ipcRenderer.on("openvpn", (_event, state: string) => {
-			setLastStateChange(Date.now());
 			switch (state) {
 				
 			case "error":
 				setStatus("disconnected");
 				setActive(false);
 				break;
-				
+					
 			case "connected":
+				setLastStateChange(Date.now());
 			case "connecting":
 				setStatus(state);
 				break;
