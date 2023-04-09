@@ -16,7 +16,10 @@
 		"paths": {
 			"@renderer/*": [
 				"src/renderer/src/*"
-			]
+			],
+			"@ui-elements/*": [
+				"src/renderer/ui-elements/*"
+			],
 		}
 	}
 }

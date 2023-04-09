@@ -1,8 +1,8 @@
+import Button from "@ui-elements/Button";
+import Card from "@ui-elements/Card";
+import Spinner from "@ui-elements/Spinner";
 import classNames from "classnames";
 import { MdOutlineTimer } from "react-icons/md";
-import Button from "../ui-elements/Button";
-import Card from "../ui-elements/Card";
-import Spinner from "../ui-elements/Spinner";
 import { calculateDistance } from "../util/calculateDistance";
 import useConnection from "../util/hooks/useConnection";
 import Timestamp from "./Timestamp";

@@ -1,8 +1,8 @@
+import Icon from "@ui-elements/Icon";
+import Tooltip from "@ui-elements/Tooltip";
 import classNames from "classnames";
 import { useState } from "react";
 import { MdMoreVert } from "react-icons/md";
-import Icon from "../../ui-elements/Icon";
-import Tooltip from "../../ui-elements/Tooltip";
 import User from "../../util/class/User";
 import MyAccountPopout from "./MyAccountPopout";
 
