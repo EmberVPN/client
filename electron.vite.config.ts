@@ -1,5 +1,6 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 import { version } from "./package.json";
 
@@ -14,7 +15,7 @@ export default defineConfig({
 		resolve: {
 			alias: {
 				"assets": "./src/renderer/assets",
-				"styles": "./src/renderer/styles",
+				"styles": "./src/renderer/styles"
 			}
 		},
 		define: {
@@ -24,7 +25,8 @@ export default defineConfig({
 			DEVELOPMENT: JSON.stringify(process.env.NODE_ENV === "development"),
 		},
 		plugins: [
-			react()
+			react(),
+			tsconfigPaths()
 		]
 	}
 });

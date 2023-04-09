@@ -28,7 +28,6 @@
 		"mkdirp": "^2.1.5"
 	},
 	"devDependencies": {
-		"semver": "^7.3.8",
 		"@electron-toolkit/tsconfig": "^1.0.1",
 		"@electron/notarize": "^1.2.3",
 		"@exponent/electron-cookies": "^2.0.0",
@@ -38,10 +37,10 @@
 		"@types/semver": "^7.3.13",
 		"@typescript-eslint/eslint-plugin": "^5.54.1",
 		"@typescript-eslint/parser": "^5.54.1",
-		"dayjs": "^1.11.7",
 		"@vitejs/plugin-react": "^3.1.0",
 		"autoprefixer": "^10.4.14",
 		"classnames": "^2.3.2",
+		"dayjs": "^1.11.7",
 		"electron": "^24.0.0",
 		"electron-builder": "^23.6.0",
 		"electron-fetch": "^1.9.1",
@@ -61,9 +60,11 @@
 		"react-query": "^3.39.3",
 		"react-router-dom": "^6.9.0",
 		"react-toastify": "^9.1.1",
+		"semver": "^7.3.8",
 		"tailwindcss": "^3.2.7",
 		"typescript": "^5.0.3",
 		"vite": "^4.1.4",
-		"vite-plugin-require-transform": "^1.0.9"
+		"vite-plugin-require-transform": "^1.0.9",
+		"vite-tsconfig-paths": "^4.0.8"
 	}
 }

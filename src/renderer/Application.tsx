@@ -1,9 +1,9 @@
+import Spinner from "@ui-elements/Spinner";
+import Toolbar from "@ui-elements/Toolbar";
 import { useEffect, useRef } from "react";
 import MyAccount from "./components/Auth/MyAccount";
 import ConnectionStatus from "./components/ConnectionStatus";
 import Server from "./components/Server";
-import Spinner from "./ui-elements/Spinner";
-import Toolbar from "./ui-elements/Toolbar";
 import useData from "./util/hooks/useData";
 import { useUser } from "./util/hooks/useUser";
 

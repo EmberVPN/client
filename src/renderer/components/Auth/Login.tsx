@@ -1,10 +1,10 @@
+import Button from "@ui-elements/Button";
+import Checkbox from "@ui-elements/Checkbox";
+import InputField from "@ui-elements/InputField";
+import Spinner from "@ui-elements/Spinner/";
 import classNames from "classnames";
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
-import Button from "../../ui-elements/Button";
-import Checkbox from "../../ui-elements/Checkbox";
-import InputField from "../../ui-elements/InputField";
-import Spinner from "../../ui-elements/Spinner/";
 import { refetch } from "../../util/refetch";
 
 export default function Authorize(): JSX.Element {

@@ -1,9 +1,9 @@
+import Icon from "@ui-elements/Icon";
+import Toolbar from "@ui-elements/Toolbar";
+import Tooltip from "@ui-elements/Tooltip";
 import classNames from "classnames";
 import { useState } from "react";
 import { MdArrowBack } from "react-icons/md";
-import Icon from "../ui-elements/Icon";
-import Toolbar from "../ui-elements/Toolbar";
-import Tooltip from "../ui-elements/Tooltip";
 import ThemeToggle from "./ThemeToggle";
 
 export let setOpen: () => unknown;
