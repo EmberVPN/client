@@ -63,7 +63,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 					{/* Server stats and IP */}
 					<div className="text-sm flex justify-between gap-2 w-full">
-						<div className="flex grow gap-2 justify-between mr-2">
+						<div className="flex grow gap-2 justify-between">
 
 							{(!isActive || status !== "connected") ? (
 
