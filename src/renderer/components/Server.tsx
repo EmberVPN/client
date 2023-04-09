@@ -92,7 +92,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 			</div>
 
 			{/* Connect/disconnect action */}
-			{ isLoading ? <Button className="!bg-transparent pointer-events-none" /> : (
+			{ isLoading ? <Button className="opacity-0 pointer-events-none" /> : (
 				(isActive && status === "connected") ? (
 
 					// Disconnect button
