@@ -4,14 +4,15 @@ import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
 import fetch from "node-fetch";
 import { basename, dirname, resolve } from "path";
+import { notify } from "./tray";
 
-export type State = "begin";
+export type State = "begin" | "hasupdate";
 
 // Get mainwindow once it loads
 export default function(win: BrowserWindow) {
 	
 	// Listen for openvpn events
-	ipcMain.on("updater", async(_, state: State) => {
+	ipcMain.on("updater", async(_, state: State, data: string) => {
 
 		// Set connect state
 		if (state === "begin") {
@@ -44,6 +45,12 @@ export default function(win: BrowserWindow) {
 				win.webContents.send("updater", "error", e);
 			}
 			
+		}
+
+		if (state === "hasupdate") {
+			const update = JSON.parse(data);
+			console.log(update);
+			notify(`Ember VPN v${ update.version } is now available.`, "Update Available");
 		}
 
 	});
