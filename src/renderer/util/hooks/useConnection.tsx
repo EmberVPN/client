@@ -6,7 +6,8 @@ type State =| "connected"
 			| "connecting"
 			| "reconnecting"
 			| "disconnecting"
-			| "error";
+			| "error"
+			| "will-connect";
 
 interface GeoLocation {
 	success: boolean;
@@ -56,6 +57,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 				break;
 				
 			case "connected":
+			case "connecting":
 				setStatus(state);
 				break;
 				

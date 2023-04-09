@@ -22,12 +22,12 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 	// Calculate the distance from the user to the server
 	const distance = calculateDistance(latitude, longitude, ipLocation.latitude, ipLocation.longitude);
 	const isActive = active === server.hash;
-	const isLoading = isActive && status.endsWith("ing");
+	const isLoading = isActive && (status.endsWith("ing") || status === "will-connect");
 
 	// Connect to the server
 	async function connect() {
 		setActive(server.hash);
-		setStatus("connecting");
+		setStatus("will-connect");
 		electron.ipcRenderer.send("openvpn", "connect", JSON.stringify({ server, authorization: localStorage.getItem("authorization") }));
 	}
 
@@ -92,17 +92,17 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 			</div>
 
 			{/* Connect/disconnect action */}
-			{ isLoading ? <Button className="opacity-0 pointer-events-none" /> : (
+			{ isLoading ? <Button className="opacity-0 !bg-transparent pointer-events-none" /> : (
 				(isActive && status === "connected") ? (
 
 					// Disconnect button
-					<Button className={ classNames("m-0 shadow-none", status.endsWith("ing") && "opacity-50 pointer-events-none") }
+					<Button className={ classNames("shadow-none", status.endsWith("ing") && "opacity-50 pointer-events-none") }
 						color="error"
 						onClick={ disconnect }>Disconnect</Button>
 				) : (
 
 					// Connect button
-					<Button className={ classNames("m-0 shadow-none", status.endsWith("ing") && "opacity-50 pointer-events-none") }
+					<Button className={ classNames("shadow-none", status.endsWith("ing") && "opacity-50 pointer-events-none") }
 						color="success"
 						onClick={ connect }>Connect</Button>
 				))}
