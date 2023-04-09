@@ -49,7 +49,6 @@ export default function(win: BrowserWindow) {
 
 		if (state === "hasupdate") {
 			const update = JSON.parse(data);
-			console.log(update);
 			notify(`Ember VPN v${ update.version } is now available.`, "Update Available");
 		}
 
