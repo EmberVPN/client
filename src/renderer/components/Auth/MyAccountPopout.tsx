@@ -2,7 +2,7 @@ import DrawerItem from "@ui-elements/Drawer/DrawerItem";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 import { IoMdSettings } from "react-icons/io";
-import { MdExitToApp } from "react-icons/md";
+import { MdExitToApp, MdManageAccounts } from "react-icons/md";
 import User from "../../util/class/User";
 import { signout } from "../../util/signout";
 import { setOpen } from "../Settings";
@@ -26,7 +26,7 @@ export default function MyAccountPopup({ user }: { user: User }): JSX.Element {
 			onClick={ e => e.stopPropagation() }>
 			<div className="flex gap-4 items-center overflow-hidden">
 				<img alt={ user.username }
-					className="w-16 h-16 rounded-full my-auto"
+					className="w-16 h-16 rounded-full bg-gray-500/20 my-auto"
 					src={ User.getAvatarURL(user.id) } />
 				<div className="pr-4 flex text-sm flex-col grow overflow-hidden text-left">
 					<span className="truncate font-medium text-lg text-gray-800 flex gap-4 dark:text-gray-200 items-center">
@@ -43,6 +43,12 @@ export default function MyAccountPopup({ user }: { user: User }): JSX.Element {
 					onClick={ () => [ close(), setOpen() ] }
 					size="dense">
 					Settings
+				</DrawerItem>
+				
+				<DrawerItem icon={ MdManageAccounts }
+					onClick={ () => [ close(), window.open("https://embervpn.org/my/account") ] }
+					size="dense">
+					My account
 				</DrawerItem>
 				
 				<DrawerItem icon={ MdExitToApp }

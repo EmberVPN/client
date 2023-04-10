@@ -33,7 +33,8 @@ export default function Settings(): JSX.Element {
 	return (
 		<div className={ classNames("top-0 left-0 right-0 bottom-0 absolute z-[60] transition-opacity overflow-hidden bg-gray-200 dark:bg-gray-900  duration-75", state ? "pointer-events-all opacity-1" : "pointer-events-none opacity-0 flex flex-col grow") }>
 			<Toolbar htmlFor="settings">
-				<Icon icon={ MdArrowBack }
+				<Icon className="group/tooltip"
+					icon={ MdArrowBack }
 					onClick={ () => setState(false) }>
 					<Tooltip anchor="left">Back</Tooltip>
 				</Icon>

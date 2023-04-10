@@ -17,7 +17,8 @@ export default function MyAccount({ user }: { user: User }): JSX.Element {
 
 	return (
 		<div className={ classNames("group relative", _open && "is-open") }>
-			<Icon icon={ MdMoreVert }
+			<Icon className="group/tooltip"
+				icon={ MdMoreVert }
 				onClick={ open }>
 				<Tooltip anchor="right">More</Tooltip>
 			</Icon>
