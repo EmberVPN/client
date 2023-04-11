@@ -20,6 +20,7 @@ export default function Updater(): JSX.Element | null {
 	useEffect(function() {
 		if (!downloads) return;
 		const latest = downloads?.latest[platform];
+		if (!latest) return;
 		const shouldUpdate = semver.gt(latest?.version, VERSION) && localStorage.getItem("ignoreUpdate") !== latest?.version && status === "disconnected";
 		if (!state && shouldUpdate) {
 			setState(true);
