@@ -155,6 +155,24 @@ export function getBinary() {
 
 	}
 
+	if (process.platform === "linux") {
+		
+		// Check if openvpn is on path
+		const openvpn = spawnSync("which openvpn", { shell: true });
+		if (openvpn.status === 0) return "openvpn";
+
+		// Check default location
+		const defaultLocation = resolve("/usr/sbin/openvpn");
+		if (existsSync(defaultLocation)) return defaultLocation;
+
+		// Install OpenVPN
+		install();
+
+		// Return openvpn
+		return "openvpn";
+
+	}
+
 	throw new Error("Unsupported platform");
 
 }
@@ -176,6 +194,13 @@ export function install() {
 			shell: true,
 		});
 	
+	}
+
+	if (process.platform === "linux") {
+
+		// Install openvpn
+		spawnSync("apt-get install openvpn", { shell: true });
+
 	}
 
 }
@@ -229,13 +254,17 @@ export function connect(server: Ember.Server) {
 
 	// Spawn openvpn process
 	const path = resolve(resources, "ember.ovpn");
-	proc = spawn(binary, [ "--config", path ], { detached: true });
+	if (process.platform === "win32") {
+		proc = spawn(binary, [ "--config", path ], { detached: true });
+	} else {
+		proc = spawn("sudo", [ binary, "--config", path ], { detached: true });
+	}
 
 	// Kill the process on exit
 	process.on("exit", () => proc?.kill());
 
 	// Listen for data
-	proc.stdout.on("data", chunk => {
+	proc?.stdout.on("data", chunk => {
 		const line = chunk.toString();
 		console.log("[openvpn]", line);
 		if (line.includes("error code 1")) {
@@ -247,7 +276,7 @@ export function connect(server: Ember.Server) {
 	});
 
 	// On exit
-	proc.on("exit", code => {
+	proc?.on("exit", code => {
 
 		clearInterval(iv);
 		tray.disconnect();
