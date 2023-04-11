@@ -79,7 +79,7 @@ export function setConnecting() {
 	if (!tray) return;
 
 	tray.setToolTip("Ember VPN • Connecting...");
-	tray.setImage(resolve(resources, "./src/renderer/assets/tray-connecting.png"));
+	tray.setImage(resolve(resources, "./src/renderer/assets/tray-pending.png"));
 	setMenu([ ...settings, ...defaults ]);
 	
 }
