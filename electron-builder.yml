@@ -22,6 +22,9 @@ nsis:
   shortcutName: ${productName}
   createDesktopShortcut: true
   oneClick: false
+linux:
+  maintainer: embervpn.org
+  category: Utility
 # mac:
 #   entitlementsInherit: build/entitlements.mac.plist
 #   extendInfo:
