@@ -1,7 +1,7 @@
+import classNames from "classnames";
 import React, { HTMLAttributes, useState } from "react";
 import { VscChromeClose, VscChromeMaximize, VscChromeMinimize, VscChromeRestore } from "react-icons/vsc";
-import favicon from "../assets/ember.svg";
-import classNames from "classnames";
+import favicon from "../assets/icon.svg";
 
 interface Props {
 	children?: React.ReactNode;
