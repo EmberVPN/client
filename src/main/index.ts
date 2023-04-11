@@ -1,8 +1,8 @@
 import { electronApp, is, optimizer } from "@electron-toolkit/utils";
-import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { BrowserWindow, app, ipcMain, shell } from "electron";
 import Store from "electron-store";
 import { join, resolve } from "path";
-import icon from "../renderer/assets/ember.png?asset";
+import icon from "../renderer/assets/icon.png?asset";
 import attachClient from "./openvpn";
 import attachTaskbar from "./taskbar";
 import attachTray from "./tray";

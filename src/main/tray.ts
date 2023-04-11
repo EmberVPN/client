@@ -54,7 +54,7 @@ export function setConnected() {
 }
 
 /** Send native notification balloon */
-export function notify(content: string, title = "Ember VPN", icon = resolve(resources, "./src/renderer/assets/ember.png")) {
+export function notify(content: string, title = "Ember VPN", icon = resolve(resources, "./src/renderer/assets/icon.png")) {
 	if (!tray) return;
 	tray.displayBalloon({
 		content,

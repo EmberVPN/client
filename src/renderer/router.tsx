@@ -3,7 +3,7 @@ import { QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import EntryPoint from "./Application";
-import favicon from "./assets/ember.svg";
+import favicon from "./assets/icon.svg";
 import Authorize from "./components/Auth/Login";
 import Settings from "./components/Settings";
 import ThemeToggle from "./components/ThemeToggle";

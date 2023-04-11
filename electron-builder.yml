@@ -20,7 +20,6 @@ win:
 nsis:
   artifactName: ${name}-${version}-${platform}-setup.${ext}
   shortcutName: ${productName}
-  installerIcon: build/icon.ico
   createDesktopShortcut: true
   oneClick: false
 # mac:
