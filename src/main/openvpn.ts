@@ -173,6 +173,24 @@ export function getBinary() {
 
 	}
 
+	if (process.platform === "darwin") {
+
+		// Check if openvpn is on path
+		const openvpn = spawnSync("which openvpn", { shell: true });
+		if (openvpn.status === 0) return "openvpn";
+
+		// Check default location
+		const defaultLocation = resolve("/usr/local/sbin/openvpn");
+		if (existsSync(defaultLocation)) return defaultLocation;
+
+		// Install OpenVPN
+		install();
+
+		// Return openvpn
+		return "openvpn";
+
+	}
+
 	throw new Error("Unsupported platform");
 
 }
