@@ -203,6 +203,13 @@ export function install() {
 
 	}
 
+	if (process.platform === "darwin") {
+
+		// Install openvpn
+		spawnSync("brew install openvpn", { shell: true });
+
+	}
+
 }
 
 // Download server config
