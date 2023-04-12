@@ -80,11 +80,23 @@ jobs:
       - name: Build
         run: npm run build:win
 
-      - name: Upload
-        uses: actions/upload-artifact@v3
+      - name: Move
+        run: |
+          cd dist
+          mkdir win32
+          mv *.exe win32
+
+      - name: Push binarys to releases
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
         with:
-          name: win32
-          path: dist/*.exe
+          source-directory: 'dist/win32'
+          destination-github-username: 'EmberVPN'
+          destination-repository-name: 'releases'
+          target-directory: 'win32'
+          target-branch: 'master'
+          user-email: 'github-actions[bot]@users.noreply.github.com'
   
   build-linux:
     name: Build (linux)
@@ -113,13 +125,23 @@ jobs:
       - name: Build
         run: npm run build:linux
 
-      - name: Upload
-        uses: actions/upload-artifact@v3
+      - name: Move
+        run: |
+          cd dist
+          mkdir linux
+          mv *.AppImage linux
+
+      - name: Push binarys to releases
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
         with:
-          name: linux
-          path: |
-            dist/*.AppImage
-            dist/*.snap
+          source-directory: 'dist/linux'
+          destination-github-username: 'EmberVPN'
+          destination-repository-name: 'releases'
+          target-directory: 'linux'
+          target-branch: 'master'
+          user-email: 'github-actions[bot]@users.noreply.github.com'
   
   build-macos:
     name: Build (macos)
@@ -148,83 +170,20 @@ jobs:
       - name: Build
         run: npm run build:mac
 
-      - name: Upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: darwin
-          path: dist/*.dmg
-
-
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    needs: [ build-win, build-linux, build-macos ]
-    permissions:
-      contents: write
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: master
-          repository: EmberVPN/releases
-          lfs: false
-
-      - name: Download
-        uses: actions/download-artifact@v3
-        with:
-          name: win32
-          path: win32/
+      - name: Move
+        run: |
+          cd dist
+          mkdir darwin
+          mv *.dmg darwin
 
       - name: Push binarys to releases
         uses: cpina/github-action-push-to-another-repository@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
         with:
-          source-directory: 'win32'
-          destination-github-username: 'EmberVPN'
-          destination-repository-name: 'releases'
-          target-directory: 'win32'
-          target-branch: 'master'
-          user-email: 'github-actions[bot]@users.noreply.github.com'
-      
-      - name: Download
-        uses: actions/download-artifact@v3
-        with:
-          name: linux
-          path: linux/
-
-      - name: Push binarys to releases
-        uses: cpina/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
-        with:
-          source-directory: 'linux'
-          destination-github-username: 'EmberVPN'
-          destination-repository-name: 'releases'
-          target-directory: 'linux'
-          target-branch: 'master'
-          user-email: 'github-actions[bot]@users.noreply.github.com'
-      
-      - name: Download
-        uses: actions/download-artifact@v3
-        with:
-          name: darwin
-          path: darwin/
-
-      - name: Push binarys to releases
-        uses: cpina/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
-        with:
-          source-directory: 'darwin'
+          source-directory: 'dist/darwin'
           destination-github-username: 'EmberVPN'
           destination-repository-name: 'releases'
           target-directory: 'darwin'
           target-branch: 'master'
           user-email: 'github-actions[bot]@users.noreply.github.com'
-          
-      
-
