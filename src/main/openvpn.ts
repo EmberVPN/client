@@ -199,7 +199,7 @@ export function install() {
 	if (process.platform === "linux") {
 
 		// Install openvpn
-		spawnSync("apt-get install openvpn", { shell: true });
+		spawnSync("sudo apt-get install openvpn", { shell: true });
 
 	}
 
