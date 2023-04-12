@@ -14,11 +14,12 @@ export let proc: ChildProcessWithoutNullStreams | null = null;
 let contents: Electron.WebContents | null = null;
 let lastServer: Ember.Server;
 
+let lastIp = "";
+let lastGeo = {};
+
 // Get mainwindow once it loads
 export default function(win: BrowserWindow) {
 	
-	let lastIp = "";
-	let lastGeo = {};
 	contents = win.webContents;
 	
 	// Listen for openvpn events
@@ -80,7 +81,7 @@ export default function(win: BrowserWindow) {
 
 				// Get mirror
 				const mirror = [
-					"https://ipwho.is"
+					"https://ipwho.is",
 				].reduce((a, b) => Math.random() > 0.5 ? a : b);
 
 				interface GeoLocation {
@@ -153,24 +154,6 @@ export function getBinary() {
 
 	}
 
-	if (process.platform === "linux") {
-		
-		// Check if openvpn is on path
-		const openvpn = spawnSync("which openvpn", { shell: true });
-		if (openvpn.status === 0) return "openvpn";
-
-		// Check default location
-		const defaultLocation = resolve("/usr/sbin/openvpn");
-		if (existsSync(defaultLocation)) return defaultLocation;
-
-		// Install OpenVPN
-		install();
-
-		// Return openvpn
-		return "openvpn";
-
-	}
-
 	if (process.platform === "darwin") {
 
 		// Check if openvpn is on path
@@ -189,7 +172,19 @@ export function getBinary() {
 
 	}
 
-	throw new Error("Unsupported platform");
+	// Check if openvpn is on path
+	const openvpn = spawnSync("which openvpn", { shell: true });
+	if (openvpn.status === 0) return "openvpn";
+
+	// Check default location
+	const defaultLocation = resolve("/usr/sbin/openvpn");
+	if (existsSync(defaultLocation)) return defaultLocation;
+
+	// Install OpenVPN
+	install();
+
+	// Return openvpn
+	return "openvpn";
 
 }
 
@@ -212,19 +207,15 @@ export function install() {
 	
 	}
 
-	if (process.platform === "linux") {
-
-		// Install openvpn
-		spawnSync("sudo apt-get install openvpn", { shell: true });
-
-	}
-
 	if (process.platform === "darwin") {
 
 		// Install openvpn
 		spawnSync("brew install openvpn", { shell: true });
 
 	}
+
+	// Install openvpn
+	spawnSync("sudo apt-get install openvpn", { shell: true });
 
 }
 
@@ -252,12 +243,9 @@ export function connect(server: Ember.Server) {
 	lastServer = server;
 	
 	const iv = setInterval(async function refetch() {
-
-		// Get current IP
-		const { ip } = await fetch("https://ipapi.co/json/").then(res => res.json()) as { ip: string };
-
+		
 		// Set connected
-		if (ip === server.ip) {
+		if (lastIp === server.ip) {
 			clearInterval(iv);
 			tray.setConnected();
 			tray.notify(`Connected to ${ server.hostname } (${ server.ip })`, "Ember VPN • Connected", resolve(resources, "./src/renderer/assets/tray-connected.png"));
