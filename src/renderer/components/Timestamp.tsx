@@ -20,6 +20,6 @@ export default function Timestamp({ timestamp, ...props }: Omit<Props & HTMLAttr
 	}, [ timestamp ]);
 
 	return (
-		<span { ...props }>{dayjs.duration(elapsed).format(elapsed > 1000 * 60 * 60 * 24 ? "D[d] HH:mm:ss" : elapsed > 1000 * 60 * 60 ? "D[d] HH:mm:ss" : "mm:ss")}</span>
+		<span { ...props }>{dayjs.duration(elapsed).format(elapsed > 1000 * 60 * 60 * 24 ? "D[d] HH:mm:ss" : elapsed > 1000 * 60 * 60 ? "HH:mm:ss" : "mm:ss")}</span>
 	);
 }
