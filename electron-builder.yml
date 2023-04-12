@@ -28,6 +28,5 @@ linux:
   artifactName: ${name}-${version}-${platform}.${ext}
   target:
     - snap
-mac:
-  dmg:
-    artifactName: ${name}-${version}-${platform}.${ext}
+dmg:
+  artifactName: ${name}-${version}-${platform}.${ext}
