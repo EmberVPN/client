@@ -117,7 +117,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: linux
-          path: dist/*.{AppImage,snap}
+          path:
+            - dist/*.AppImage
+            - dist/*.snap
 
 
   release:
