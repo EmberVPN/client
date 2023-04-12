@@ -25,25 +25,9 @@ nsis:
 linux:
   maintainer: embervpn.org
   category: Utility
-# mac:
-#   entitlementsInherit: build/entitlements.mac.plist
-#   extendInfo:
-#     - NSCameraUsageDescription: Application requests access to the device's camera.
-#     - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-#     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-#     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
-# dmg:
-#   artifactName: ${name}-${version}-${platform}.${ext}
-# linux:
-#   target:
-#     - AppImage
-#     - snap
-#     - deb
-#   maintainer: embervpn.org
-#   category: Utility
-# appImage:
-#   artifactName: ${name}-${version}-${platform}.${ext}
-# npmRebuild: false
-# publish:
-#   provider: generic
-#   url: https://example.com/auto-updates
+  artifactName: ${name}-${version}-${platform}.${ext}
+  target:
+    - snap
+mac:
+  dmg:
+    artifactName: ${name}-${version}-${platform}.${ext}
