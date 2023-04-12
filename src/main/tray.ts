@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Tray } from "electron";
+import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Notification, Tray } from "electron";
 import { resolve } from "path";
 import { resources } from ".";
 import * as openvpn from "./openvpn";
@@ -54,13 +54,12 @@ export function setConnected() {
 }
 
 /** Send native notification balloon */
-export function notify(content: string, title = "Ember VPN", icon = resolve(resources, "./src/renderer/assets/icon.png")) {
-	if (!tray) return;
-	tray.displayBalloon({
-		content,
+export function notify(body: string, title = "Ember VPN", icon = resolve(resources, "./src/renderer/assets/icon.png")) {
+	new Notification({
+		body,
 		title,
 		icon
-	});
+	}).show();
 }
 
 /** Sets the tray to show its disconnected from a server */
@@ -80,7 +79,7 @@ export function setConnecting() {
 	if (!tray) return;
 
 	tray.setToolTip("Ember VPN • Connecting...");
-	tray.setImage(resolve(resources, "./src/renderer/assets/tray-connecting.png"));
+	tray.setImage(resolve(resources, "./src/renderer/assets/tray-pending.png"));
 	setMenu([ ...settings, ...defaults ]);
 	
 }
