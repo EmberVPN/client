@@ -27,6 +27,6 @@ linux:
   category: Utility
   artifactName: ${name}-${version}-${platform}.${ext}
   target:
-    - AppImage
+    - deb
 dmg:
   artifactName: ${name}-${version}-${platform}.${ext}
