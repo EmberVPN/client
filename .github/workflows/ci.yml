@@ -84,7 +84,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: win32
-          path: dist/*.exe
+          path: |
+            dist/*.exe
   
   build-linux:
     name: Build (linux)
@@ -121,13 +122,46 @@ jobs:
             dist/*.AppImage
             dist/*.snap
             dist/*.deb
+  
+  build-macos:
+    name: Build (macos)
+    runs-on: macos-latest
+    if: github.ref == 'refs/heads/master'
+    needs: [ version ]
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          submodules: recursive
 
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+        
+      - name: Build
+        run: npm run build:macos
+
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: darwin
+          path: |
+            dist/*.dmg
 
   release:
     name: Release
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: [ build-win, build-linux ]
+    needs: [ build-win, build-linux, build-macos ]
     permissions:
       contents: write
     env:
@@ -173,6 +207,24 @@ jobs:
           destination-github-username: 'EmberVPN'
           destination-repository-name: 'releases'
           target-directory: 'linux'
+          target-branch: 'master'
+          user-email: 'github-actions[bot]@users.noreply.github.com'
+     
+      - name: Download
+        uses: actions/download-artifact@v3
+        with:
+          name: darwin
+          path: darwin/
+
+      - name: Push binarys to releases
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
+        with:
+          source-directory: 'darwin'
+          destination-github-username: 'EmberVPN'
+          destination-repository-name: 'releases'
+          target-directory: 'darwin'
           target-branch: 'master'
           user-email: 'github-actions[bot]@users.noreply.github.com'
           
