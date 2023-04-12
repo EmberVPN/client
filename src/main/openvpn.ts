@@ -49,7 +49,6 @@ export default function(win: BrowserWindow) {
 		const id = setTimeout(() => controller.abort(), 1000);
 
 		const mirror = [
-			"https://ipapi.co/ip/",
 			"https://icanhazip.com/",
 			"https://api.ipify.org/",
 			"https://ip.seeip.org/",
@@ -81,8 +80,7 @@ export default function(win: BrowserWindow) {
 
 				// Get mirror
 				const mirror = [
-					"https://ipwho.is",
-					"https://ipapi.co/json/"
+					"https://ipwho.is"
 				].reduce((a, b) => Math.random() > 0.5 ? a : b);
 
 				interface GeoLocation {
