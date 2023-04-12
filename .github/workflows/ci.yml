@@ -124,7 +124,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: [ build-win ]
+    needs: [ build-win, build-linux ]
     permissions:
       contents: write
     env:
