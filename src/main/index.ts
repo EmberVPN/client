@@ -22,6 +22,7 @@ function createWindow(): void {
 		resizable: false,
 		title: "Ember VPN",
 		titleBarStyle: "hidden",
+		frame: process.platform === "win32",
 		width: 600,
 		height: 400,
 		minWidth: 600,
