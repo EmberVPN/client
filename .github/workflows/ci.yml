@@ -157,11 +157,11 @@ jobs:
           path: |
             dist/*.dmg
 
-  release:
-    name: Release
+  release-win:
+    name: Release (win32)
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: [ build-win, build-linux, build-macos ]
+    needs: [ build-win ]
     permissions:
       contents: write
     env:
@@ -191,7 +191,25 @@ jobs:
           target-directory: 'win32'
           target-branch: 'master'
           user-email: 'github-actions[bot]@users.noreply.github.com'
-      
+
+
+  release-linux:
+    name: Release (linux)
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    needs: [ build-linux ]
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: master
+          repository: EmberVPN/releases
+          lfs: false
+
       - name: Download
         uses: actions/download-artifact@v3
         with:
@@ -209,7 +227,24 @@ jobs:
           target-directory: 'linux'
           target-branch: 'master'
           user-email: 'github-actions[bot]@users.noreply.github.com'
-     
+
+  release-macos:
+    name: Release (macos)
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    needs: [ build-macos ]
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: master
+          repository: EmberVPN/releases
+          lfs: false
+
       - name: Download
         uses: actions/download-artifact@v3
         with:
@@ -227,6 +262,3 @@ jobs:
           target-directory: 'darwin'
           target-branch: 'master'
           user-email: 'github-actions[bot]@users.noreply.github.com'
-          
-      
-
