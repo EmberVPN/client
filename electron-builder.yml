@@ -14,9 +14,11 @@ extraResources:
   - 'src/renderer/assets/**/*'
 win:
   executableName: ember-client
+  artifactName: ${name}-${version}-${platform}-setup.${ext}
   requestedExecutionLevel: "requireAdministrator"
   target:
     - nsis
+    - msi
 nsis:
   artifactName: ${name}-${version}-${platform}-setup.${ext}
   shortcutName: ${productName}

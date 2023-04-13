@@ -86,6 +86,7 @@ jobs:
           name: win32
           path: |
             dist/*.exe
+            dist/*.msi
   
   build-linux:
     name: Build (linux)
@@ -122,6 +123,8 @@ jobs:
             dist/*.AppImage
             dist/*.snap
             dist/*.deb
+            dist/*.tar.gz
+            dist/*.zip
   
   build-macos:
     name: Build (macos)
@@ -191,7 +194,6 @@ jobs:
           target-directory: 'win32'
           target-branch: 'master'
           user-email: 'github-actions[bot]@users.noreply.github.com'
-
 
   release-linux:
     name: Release (linux)
