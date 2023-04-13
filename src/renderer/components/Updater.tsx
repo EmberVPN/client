@@ -14,7 +14,7 @@ export default function Updater(): JSX.Element | null {
 	const { status } = useConnection();
 	const [ state, setState ] = useState(false);
 	const { data: downloads } = useData("/ember/downloads");
-	const [ isLoading, setIsLoading ] = useState(false);
+	const [ isLoading, _setIsLoading ] = useState(false);
 	
 	// Check for updates
 	useEffect(function() {
