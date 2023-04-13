@@ -41,9 +41,7 @@ export default function Updater(): JSX.Element | null {
 
 	// Tell the main process to download the update
 	function download() {
-		setIsLoading(true);
-		electron.ipcRenderer.send("updater", "begin");
-		electron.ipcRenderer.once("updater", () => setIsLoading(false));
+		window.open("https://embervpn.org/downloads/", "_blank");
 	}
 
 	// Render the updater dialog
@@ -72,6 +70,7 @@ export default function Updater(): JSX.Element | null {
 
 				<div className="flex justify-end items-center gap-4 md:-m-4 !mt-2">
 					<Button
+						className="grayscale dark:opacity-50"
 						onClick={ () => [ setState(false), localStorage.setItem("ignoreUpdate", latest.version) ] }
 						variant="outlined">Skip version</Button>
 					<Button
