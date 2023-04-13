@@ -26,7 +26,12 @@ linux:
   maintainer: embervpn.org
   category: Utility
   artifactName: ${name}-${version}-${platform}.${ext}
+  icon: build/icon.png
   target:
     - deb
+    - snap
+    - AppImage
+    - tar.gz
+    - zip
 dmg:
   artifactName: ${name}-${version}-${platform}.${ext}
