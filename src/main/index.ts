@@ -6,7 +6,6 @@ import icon from "../renderer/assets/icon.png?asset";
 import attachClient from "./openvpn";
 import attachTaskbar from "./taskbar";
 import attachTray from "./tray";
-import attachUpdater from "./updater";
 
 export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "../resources");
 
@@ -75,7 +74,6 @@ function createWindow(): void {
 
 	attachTaskbar(win);
 	attachTray(win);
-	attachUpdater(win);
 	attachClient(win);
 
 	// IPC listener
