@@ -8,7 +8,6 @@ import Authorize from "./components/Auth/Login";
 import Settings from "./components/Settings";
 import ThemeToggle from "./components/ThemeToggle";
 import Titlebar from "./components/Titlebar";
-import Updater from "./components/Updater";
 import "./styles/index.less";
 import useConnection, { ConnectionProvider } from "./util/hooks/useConnection";
 import useData from "./util/hooks/useData";
@@ -58,7 +57,6 @@ export function Application() {
 			<Titlebar />
 			<div className="grow overflow-x-hidden overflow-auto flex flex-col select-none relative">
 				<Settings />
-				<Updater />
 				<EntryPoint />
 			</div>
 		</div>
