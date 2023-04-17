@@ -16,11 +16,6 @@
 		"noUnusedLocals": false,
 		"types": [
 			"electron-vite/node"
-		],
-		"paths": {
-			"@assets/*": [
-				"assets/*"
-			],
-		}
+		]
 	}
 }
