@@ -7,7 +7,8 @@
 		"src/renderer/**/*.tsx",
 		"src/preload/*.d.ts",
 		"src/ember.d.ts",
-		"src/rest.d.ts"
+		"src/rest.d.ts",
+		"assets"
 	],
 	"compilerOptions": {
 		"composite": true,
@@ -19,6 +20,9 @@
 			],
 			"@ui-elements/*": [
 				"src/renderer/ui-elements/*"
+			],
+			"@assets/*": [
+				"assets/*"
 			],
 		}
 	}

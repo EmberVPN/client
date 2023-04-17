@@ -2,7 +2,6 @@ import { electronApp, is, optimizer } from "@electron-toolkit/utils";
 import { BrowserWindow, app, ipcMain, shell } from "electron";
 import Store from "electron-store";
 import { join, resolve } from "path";
-import icon from "../renderer/assets/icon.png?asset";
 import attachClient from "./openvpn";
 import attachTaskbar from "./taskbar";
 import attachTray from "./tray";
@@ -16,7 +15,7 @@ function createWindow(): void {
 
 	// Create the browser window.
 	const win = new BrowserWindow({
-		icon,
+		icon: resolve(resources, "./assets/icon.png"),
 		show: false,
 		resizable: false,
 		title: "Ember VPN",

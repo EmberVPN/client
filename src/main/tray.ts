@@ -14,7 +14,7 @@ export let settings: (MenuItem | MenuItemConstructorOptions)[] = [];
 export default function(win: BrowserWindow) {
 	
 	// Initialize the tray
-	if (!tray) tray = new Tray(resolve(resources, "./src/renderer/assets/tray.png"));
+	if (!tray) tray = new Tray(resolve(resources, "./assets/tray.png"));
 	exit = () => win.close();
 
 	defaults = [ {
@@ -33,7 +33,7 @@ export default function(win: BrowserWindow) {
 	
 	// Set disconnected state
 	tray.setToolTip("Ember VPN");
-	tray.setImage(resolve(resources, "./src/renderer/assets/tray.png"));
+	tray.setImage(resolve(resources, "./assets/tray.png"));
 	tray.on("click", () => win.show());
 	setMenu([ ...settings, ...defaults ]);
 	
@@ -45,7 +45,7 @@ export function setConnected() {
 	if (!tray) return;
 	
 	tray.setToolTip("Ember VPN • Connected");
-	tray.setImage(resolve(resources, "./src/renderer/assets/tray-connected.png"));
+	tray.setImage(resolve(resources, "./assets/tray-connected.png"));
 	tray.setContextMenu(Menu.buildFromTemplate([ {
 		label: "Disconnect",
 		click: () => openvpn.disconnect()
@@ -54,7 +54,7 @@ export function setConnected() {
 }
 
 /** Send native notification balloon */
-export function notify(body: string, title = "Ember VPN", icon = resolve(resources, "./src/renderer/assets/icon.png")) {
+export function notify(body: string, title = "Ember VPN", icon = resolve(resources, "./assets/icon.png")) {
 	new Notification({
 		body,
 		title,
@@ -68,7 +68,7 @@ export function disconnect() {
 	if (!tray) return;
 
 	tray.setToolTip("Ember VPN");
-	tray.setImage(resolve(resources, "./src/renderer/assets/tray.png"));
+	tray.setImage(resolve(resources, "./assets/tray.png"));
 	setMenu([ ...settings, ...defaults ]);
 	
 }
@@ -79,7 +79,7 @@ export function setConnecting() {
 	if (!tray) return;
 
 	tray.setToolTip("Ember VPN • Connecting...");
-	tray.setImage(resolve(resources, "./src/renderer/assets/tray-pending.png"));
+	tray.setImage(resolve(resources, "./assets/tray-pending.png"));
 	setMenu([ ...settings, ...defaults ]);
 	
 }
