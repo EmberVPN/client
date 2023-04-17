@@ -1,0 +1,30 @@
+Ember VPN License Agreement
+
+PLEASE READ THIS LICENSE AGREEMENT CAREFULLY BEFORE USING EMBER VPN SOFTWARE. BY INSTALLING, COPYING, OR OTHERWISE USING THE SOFTWARE, YOU AGREE TO BE BOUND BY THE TERMS AND CONDITIONS OF THIS AGREEMENT. IF YOU DO NOT AGREE TO THE TERMS AND CONDITIONS OF THIS AGREEMENT, DO NOT INSTALL, COPY OR USE THE SOFTWARE.
+
+License Grant:
+Ember VPN grants you a non-exclusive, non-transferable, revocable license to use the Ember VPN software solely for your personal or internal business purposes, subject to the terms and conditions of this Agreement.
+
+Restrictions:
+You may not, and you agree not to, reverse engineer, decompile, disassemble, modify, create derivative works of, or otherwise attempt to derive the source code of the Ember VPN software or any part thereof, except to the extent that such activity is expressly permitted by applicable law. You may not distribute, sell, sublicense, rent, lease, or otherwise transfer the Ember VPN software to any third party.
+
+Ownership:
+The Ember VPN software is protected by copyright and other intellectual property laws. Ember VPN retains all right, title, and interest in and to the software, including all copyrights, trademarks, trade secrets, and other intellectual property rights therein.
+
+Updates and Upgrades:
+Ember VPN may, from time to time, release updates or upgrades to the software. Such updates or upgrades may be provided to you at Ember VPN's discretion and may be subject to additional terms and conditions. You agree that updates or upgrades to the software may be necessary for continued use of the software and that you will promptly install such updates or upgrades when made available by Ember VPN.
+
+Warranty Disclaimer:
+THE EMBER VPN SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, EMBER VPN DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. EMBER VPN DOES NOT WARRANT THAT THE SOFTWARE WILL BE ERROR-FREE OR UNINTERRUPTED, THAT DEFECTS WILL BE CORRECTED, OR THAT THE SOFTWARE IS FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS.
+
+Limitation of Liability:
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL EMBER VPN BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF THE EMBER VPN SOFTWARE, EVEN IF EMBER VPN HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+Termination:
+This Agreement is effective until terminated by you or Ember VPN. You may terminate this Agreement by discontinuing the use of the Ember VPN software and uninstalling it from your device. Ember VPN may terminate this Agreement at any time without notice if you fail to comply with any of the terms and conditions of this Agreement. Upon termination, you shall cease all use of the Ember VPN software and destroy all copies of the software in your possession or control.
+
+Governing Law and Jurisdiction:
+This Agreement shall be governed by and construed in accordance with the laws of the jurisdiction in which Ember VPN is based, without giving effect to its conflict of law principles. Any dispute arising out of or in connection with this Agreement shall be submitted to the exclusive jurisdiction of the courts in the jurisdiction in which Ember VPN is based.
+
+Entire Agreement:
+This Agreement constitutes the entire agreement between you and Ember VPN
