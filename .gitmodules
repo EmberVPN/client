@@ -1,3 +1,6 @@
 [submodule "src/renderer/ui-elements"]
 	path = src/renderer/ui-elements
 	url = https://github.com/JoshMerlino/ui-elements.git
+[submodule "assets"]
+	path = assets
+	url = https://github.com/EmberVPN/resources.git
