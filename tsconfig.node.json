@@ -7,6 +7,7 @@
 		"src/ember.d.ts",
 		"src/rest.d.ts",
 		"package.json",
+		"assets"
 	],
 	"compilerOptions": {
 		"composite": true,
@@ -15,6 +16,11 @@
 		"noUnusedLocals": false,
 		"types": [
 			"electron-vite/node"
-		]
+		],
+		"paths": {
+			"@assets/*": [
+				"assets/*"
+			],
+		}
 	}
 }

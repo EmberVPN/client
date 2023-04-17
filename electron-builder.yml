@@ -1,7 +1,7 @@
 appId: org.embervpn.app
 productName: Ember VPN
 directories:
-  buildResources: build
+  buildResources: assets
 files:
   - '!**/.vscode/*'
   - '!src/*'
@@ -11,7 +11,7 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 extraResources:
   - '.bin/**/*'
-  - 'src/renderer/assets/**/*'
+  - 'assets/**/*'
 win:
   executableName: ember-client
   artifactName: ${name}-${version}-${platform}-setup.${ext}
@@ -28,7 +28,7 @@ linux:
   maintainer: embervpn.org
   category: Utility
   artifactName: ${name}-${version}-${platform}.${ext}
-  icon: build/icon.png
+  icon: assets/icon.png
   target:
     - deb
     - snap
