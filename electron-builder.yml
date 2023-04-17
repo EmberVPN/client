@@ -24,6 +24,7 @@ nsis:
   shortcutName: ${productName}
   createDesktopShortcut: true
   oneClick: false
+  license: license.txt
 linux:
   maintainer: embervpn.org
   category: Utility
