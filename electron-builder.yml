@@ -24,6 +24,8 @@ nsis:
   shortcutName: ${productName}
   createDesktopShortcut: true
   oneClick: false
+  installerSidebar: assets/sidebar.bmp
+  uninstallerSidebar: assets/sidebar.bmp
   license: license.txt
 linux:
   maintainer: embervpn.org
