@@ -53,7 +53,7 @@ jobs:
           git commit -am "Eslint: fix all" || true
           git push || true
 
-  build-win:
+  build-win32:
     name: Build (win32)
     runs-on: windows-latest
     if: github.ref == 'refs/heads/master'
@@ -160,11 +160,11 @@ jobs:
           path: |
             dist/*.dmg
 
-  release-win:
-    name: Release (win32)
+  release:
+    name: Release (all)
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: [ build-win ]
+    needs: [ build-win32, build-macos, build-linux ]
     permissions:
       contents: write
     env:
@@ -177,13 +177,25 @@ jobs:
           repository: EmberVPN/releases
           lfs: false
 
-      - name: Download
+      - name: Download (win32)
         uses: actions/download-artifact@v3
         with:
           name: win32
           path: win32/
 
-      - name: Push binarys to releases
+      - name: Download (linux)
+        uses: actions/download-artifact@v3
+        with:
+          name: linux
+          path: linux/
+
+      - name: Download (macos)
+        uses: actions/download-artifact@v3
+        with:
+          name: darwin
+          path: darwin/
+
+      - name: Push binarys to releases (win32)
         uses: cpina/github-action-push-to-another-repository@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
@@ -192,6 +204,29 @@ jobs:
           destination-github-username: 'EmberVPN'
           destination-repository-name: 'releases'
           target-directory: 'win32'
+          target-branch: 'master'
+          user-email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Push binarys to releases (linux)
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
+        with:
+          source-directory: 'linux'
+          destination-github-username: 'EmberVPN'
+          destination-repository-name: 'releases'
+          target-directory: 'linux'
+          target-branch: 'master'
+          user-email: 'github-actions[bot]@users.noreply.github.com'
+      - name: Push binarys to releases (macos)
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
+        with:
+          source-directory: 'darwin'
+          destination-github-username: 'EmberVPN'
+          destination-repository-name: 'releases'
+          target-directory: 'darwin'
           target-branch: 'master'
           user-email: 'github-actions[bot]@users.noreply.github.com'
 
@@ -212,23 +247,9 @@ jobs:
           repository: EmberVPN/releases
           lfs: false
 
-      - name: Download
-        uses: actions/download-artifact@v3
-        with:
-          name: linux
-          path: linux/
+      
 
-      - name: Push binarys to releases
-        uses: cpina/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
-        with:
-          source-directory: 'linux'
-          destination-github-username: 'EmberVPN'
-          destination-repository-name: 'releases'
-          target-directory: 'linux'
-          target-branch: 'master'
-          user-email: 'github-actions[bot]@users.noreply.github.com'
+      
 
   release-macos:
     name: Release (macos)
@@ -247,20 +268,6 @@ jobs:
           repository: EmberVPN/releases
           lfs: false
 
-      - name: Download
-        uses: actions/download-artifact@v3
-        with:
-          name: darwin
-          path: darwin/
+      
 
-      - name: Push binarys to releases
-        uses: cpina/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
-        with:
-          source-directory: 'darwin'
-          destination-github-username: 'EmberVPN'
-          destination-repository-name: 'releases'
-          target-directory: 'darwin'
-          target-branch: 'master'
-          user-email: 'github-actions[bot]@users.noreply.github.com'
+      
