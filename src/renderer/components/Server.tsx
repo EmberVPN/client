@@ -97,13 +97,13 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 				(isActive && status === "connected") ? (
 
 					// Disconnect button
-					<Button className={ classNames("shadow-none", status.endsWith("ing") && "opacity-50 pointer-events-none") }
+					<Button className={ classNames(status.endsWith("ing") && "opacity-50 pointer-events-none") }
 						color="error"
 						onClick={ disconnect }>Disconnect</Button>
 				) : (
 
 					// Connect button
-					<Button className={ classNames("shadow-none", status.endsWith("ing") && "opacity-50 pointer-events-none") }
+					<Button className={ classNames(status.endsWith("ing") && "opacity-50 pointer-events-none") }
 						color="success"
 						onClick={ connect }>Connect</Button>
 				))}
