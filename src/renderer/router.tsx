@@ -63,7 +63,7 @@ export function Application() {
 	);
 
 	return (
-		<div className="grid h-screen items-center justify-center relative window bg-white dark:bg-gray-800">
+		<div className="w-full h-screen flex items-center justify-center">
 			<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
 				<div className="bg-primary aspect-square w-[400px] rounded-full animate-ember -z-10"></div>
 			</div>
