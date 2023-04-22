@@ -62,54 +62,5 @@ export default class User<Meta = Auth.Meta> {
 		return User.getAvatarURL(this.id);
 	}
 
-	public async uploadAvatar(binary?: string) {
-
-		// Upload file
-		async function upload(file: File | Blob): Promise<APIResponse> {
-			return await fetch("/api/auth/avatar", {
-				method: "PUT",
-				headers: { "Content-Type": file.type },
-				body: file
-			}).then(resp => resp.json());
-		}
-
-		// If binary, upload it
-		if (binary) {
-			const blob = await fetch(binary)
-				.then(resp => resp.blob());
-			
-			// Upload file
-			await upload(blob);
-			return;
-		}
-
-		// Create hidden file input
-		const input = document.createElement("input");
-		input.type = "file";
-		input.accept = "image/*";
-		input.style.display = "none";
-		document.body.appendChild(input);
-
-		// Open file input
-		input.click();
-
-		// Handle file input
-		input.onchange = async() => {
-			
-			// Make sure theres something there
-			if (!input.files) return input.remove();
-
-			// Read each file as a blob
-			const file = input.files[0];
-
-			upload(file);
-
-			// Remove input
-			input.remove();
-			
-		};
-		
-	}
-
 }
 
