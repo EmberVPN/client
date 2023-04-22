@@ -58,6 +58,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 			case "connected":
 				setLastStateChange(Date.now());
 			case "connecting":
+			case "disconnecting":
 				setStatus(state);
 				break;
 				
