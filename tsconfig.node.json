@@ -4,8 +4,7 @@
 		"electron.vite.config.*",
 		"src/main/*",
 		"src/preload/*",
-		"src/ember.d.ts",
-		"src/rest.d.ts",
+		"types/*",
 		"package.json",
 		"assets"
 	],

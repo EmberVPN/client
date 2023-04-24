@@ -10,7 +10,7 @@ export function useUser() {
 	const { data, isLoading, error } = useQuery("user", async function() {
 
 		// Fetch the user
-		const response = await fetch(APIROOT + "/auth/@me", {
+		const response = await fetch(APIROOT + "/v2/auth/@me", {
 			headers: {
 				Authorization: localStorage.getItem("authorization") ?? "",
 			}
@@ -20,7 +20,7 @@ export function useUser() {
 		if (!response.ok) return { success: false };
 
 		// Parse the user
-		return await response.json();
+		return await response.json() as REST.APIResponse<{ user: Auth.User }>;
 
 	}, { staleTime: 5000 });
 
@@ -28,12 +28,11 @@ export function useUser() {
 	useEffect(function() {
 		
 		// Check if the user is authorized
-		if (data && data.success) {
+		if (data && data.success && "user" in data) {
 			electron.ipcRenderer.send("titlebar", "unlock");
 			setIsAuthorized(true);
-			localStorage.setItem("authorization", data.authorization);
-			localStorage.setItem("last_user", data.email);
-			setUser(new User(data));
+			localStorage.setItem("last_user", data.user.email);
+			setUser(new User(data.user));
 			return;
 		}
 		
