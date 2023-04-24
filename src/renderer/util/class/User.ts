@@ -1,13 +1,13 @@
 import Session from "./Session";
 
-export default class User<Meta = Auth.Meta> {
+export default class User implements Auth.User {
 
 	/**
 	 * Get the avatar URL for a user given their ID
 	 * @param id The user ID
 	 */
 	static getAvatarURL(id: number): string {
-		return APIROOT + `/auth/avatar/${ id }`;
+		return `${ APIROOT }/auth/avatar/${ id }`;
 	}
 
 	/** ANCHOR: User Properties */
@@ -16,29 +16,25 @@ export default class User<Meta = Auth.Meta> {
 	public mfa_enabled: boolean;
 	public username: string;
 	public email: string;
-
-	// private readonly passwd_md5: string;
+	public readonly passwd_md5: string;
 	public readonly passwd_length: number;
 	public readonly passwd_changed_ms: number;
 	public readonly sessions: Session[] = [];
-	public readonly authorization: string;
 
-	private _meta: Meta;
+	private _meta: Auth.Meta;
 	
 	/** ANCHOR: Constructor */
-	constructor(data: Auth.Me<Meta>) {
+	constructor(data: Auth.User) {
 		this.id = data.id;
 		this.username = data.username;
 		this.email = data.email;
 		this.created_ms = data.created_ms;
 		this.mfa_enabled = data.mfa_enabled;
-
-		// this.passwd_md5 = data.passwd_md5;
+		this.passwd_md5 = data.passwd_md5;
 		this.passwd_length = data.passwd_length;
 		this.passwd_changed_ms = data.passwd_changed_ms;
 		data.sessions.map(session => this.sessions.push(new Session(session)));
 		this._meta = data.meta;
-		this.authorization = data.authorization;
 	}
 
 	public toJSON() {
@@ -54,7 +50,7 @@ export default class User<Meta = Auth.Meta> {
 		};
 	}
 
-	get meta(): Meta {
+	get meta(): Auth.Meta {
 		return this._meta;
 	}
 

@@ -88,20 +88,20 @@ export default function Authorize(): JSX.Element {
 		localStorage.setItem("authorization", json.session_id);
 
 		// Refetch
-		setTimeout(() => [ refetch(), setLoading(false) ], 100);
+		refetch();
 
 	}
 
 	return (
 		<div className="w-full h-full p-4 flex flex-col bg-gray-100 dark:bg-gray-900 relative z-[0]"
 			id="login-cover">
-			<div className="grow flex flex-col">
+			<div className="flex flex-col grow">
 				<form className="container grow"
 					onSubmit={ signin }
 					ref={ ref }>
-					<div className="grow flex flex-col justify-between">
-						<h1 className="text-4xl font-manrope font-bold select-none">Sign In</h1>
-						<p className="-mt-6 text-sm text-gray-600 dark:text-gray-400 select-none  font-medium">with your <a className="text-primary hover:underline underline-offset-2"
+					<div className="flex flex-col justify-between grow">
+						<h1 className="text-4xl font-bold select-none font-manrope">Sign In</h1>
+						<p className="-mt-6 text-sm font-medium text-gray-600 select-none dark:text-gray-400">with your <a className="text-primary hover:underline underline-offset-2"
 							href="https://embervpn.org">Ember VPN</a> account</p>
 						<InputField
 							defaultValue={ localStorage.getItem("last_user") || "" }
@@ -111,7 +111,7 @@ export default function Authorize(): JSX.Element {
 							placeholder="you@yourdomain.com"
 							required
 							type="email" />
-						<div className="flex gap-4 w-full">
+						<div className="flex w-full gap-4">
 							<InputField
 								className="grow"
 								disabled={ loading }
@@ -130,7 +130,7 @@ export default function Authorize(): JSX.Element {
 								type="text" />
 						</div>
 					</div>
-					<div className="flex justify-between items-center">
+					<div className="flex items-center justify-between">
 						<Checkbox className="w-auto"
 							defaultChecked
 							name="rememberme">Stay signed in</Checkbox>
