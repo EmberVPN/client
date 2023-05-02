@@ -42,12 +42,13 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 	const [ active, setActive ] = useState<false | string>(false);
 	const [ ipLocation, setIpLocation ] = useState<GeoLocation | null>(null);
 	const [ lastStateChange, setLastStateChange ] = useState<number>(Date.now());
-	const { data: servers } = useData("/ember/servers");
+	const { data: servers } = useData("/v2/ember/servers");
 	
 	// Sync state with main process
 	useEffect(function() {
 		
-		electron.ipcRenderer.on("openvpn", (_event, state: string) => {
+		electron.ipcRenderer.on("openvpn", (_event, state: string, ...args) => {
+			console.log(state, args);
 			switch (state) {
 				
 			case "error":

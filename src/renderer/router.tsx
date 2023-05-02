@@ -41,11 +41,11 @@ root.render(
 export function Application() {
 
 	const { user } = useUser();
-	const { data } = useData("/ember/servers");
+	const { data } = useData("/v2/ember/servers");
 	const { ipLocation } = useConnection();
 
 	if (user === false) return (
-		<div className="h-screen flex flex-col">
+		<div className="flex flex-col h-screen">
 			<Titlebar className="!bg-gray-100 dark:!bg-transparent"
 				resizeable={ false }>Sign In</Titlebar>
 			<Authorize />
@@ -53,9 +53,9 @@ export function Application() {
 	);
 	
 	if (user && ipLocation && data) return (
-		<div className="h-screen flex flex-col overflow-hidden">
+		<div className="flex flex-col h-screen overflow-hidden">
 			<Titlebar />
-			<div className="grow overflow-x-hidden overflow-auto flex flex-col select-none relative">
+			<div className="relative flex flex-col overflow-auto overflow-x-hidden select-none grow">
 				<Settings />
 				<EntryPoint />
 			</div>
@@ -63,11 +63,11 @@ export function Application() {
 	);
 
 	return (
-		<div className="w-full h-screen flex items-center justify-center">
-			<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+		<div className="flex items-center justify-center w-full h-screen">
+			<div className="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
 				<div className="bg-primary aspect-square w-[400px] rounded-full animate-ember -z-10"></div>
 			</div>
-			<img className="select-none z-10"
+			<img className="z-10 select-none"
 				src={ favicon } />
 		</div>
 	);

@@ -11,7 +11,7 @@ import { useUser } from "./util/hooks/useUser";
 
 export default function EntryPoint(): JSX.Element | null {
 
-	const { data } = useData("/ember/servers");
+	const { data } = useData("/v2/ember/servers");
 	const { user } = useUser();
 	const ref = useRef<HTMLWebViewElement>(null);
 	
@@ -74,7 +74,6 @@ export default function EntryPoint(): JSX.Element | null {
 				id="entrypoint">
 				<div className="flex flex-col gap-4 p-4 py-20 m-auto">
 					{Object.values(data.servers)
-						.sort((a, b) => a.ping - b.ping)
 						.map((server, key) => (
 							<Server key={ key }
 								server={ server } />
