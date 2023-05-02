@@ -10,6 +10,7 @@ jobs:
     name: Bump Version
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
+    needs: test
     permissions:
       contents: write
     steps:
@@ -28,7 +29,6 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: version
     permissions:
       contents: write
     steps:
@@ -86,7 +86,7 @@ jobs:
     name: Build (win32)
     runs-on: windows-latest
     if: github.ref == 'refs/heads/master'
-    needs: [ test ]
+    needs: [ version ]
     permissions:
       contents: write
     env:
@@ -121,7 +121,7 @@ jobs:
     name: Build (linux)
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: [ test ]
+    needs: [ version ]
     permissions:
       contents: write
     env:
@@ -159,7 +159,7 @@ jobs:
     name: Build (macos)
     runs-on: macos-latest
     if: github.ref == 'refs/heads/master'
-    needs: [ test ]
+    needs: [ version ]
     permissions:
       contents: write
     env:
