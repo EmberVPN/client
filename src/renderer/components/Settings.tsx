@@ -42,14 +42,14 @@ export default function Settings(): JSX.Element {
 				<code className="font-mono border-[1px] px-2 rounded-2xl select-none border-gray-500/10 text-gray-500 bg-gray-500/10 mx-4 ml-auto">v{VERSION}</code>
 			</Toolbar>
 			
-			<div className="grow p-4 max-h-[calc(100%_-_64px)] overflow-x-hidden overflow-y-auto bg-white/50 dark:bg-gray-800/50 h-full"
+			<div className="grow p-4 max-h-[calc(100%_-_64px)] overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-gray-850 h-full"
 				id="settings">
 				<div className="container !max-w-xl mx-auto grow">
 
 					<section className="flex flex-col gap-2">
-						<h1 className="text-gray-600 dark:text-gray-400 text-sm font-medium">Application</h1>
+						<h1 className="text-sm font-medium text-gray-600 dark:text-gray-400">Application</h1>
 						<ul>
-							<ThemeToggle className="flex h-14 items-center gap-4 hover:bg-gray-200 dark:hover:bg-gray-800 px-6 rounded-md transition-colors duration-75">
+							<ThemeToggle className="flex items-center gap-4 px-6 transition-colors duration-75 rounded-md h-14 hover:bg-gray-200 dark:hover:bg-gray-800">
 								<kbd className="px-2 py-1.5 text-xs font-semibold border rounded-lg border-gray-400/50 bg-gray-400/10 dark:border-gray-700/50 dark:bg-gray-700/10">F10</kbd>
 							</ThemeToggle>
 						</ul>

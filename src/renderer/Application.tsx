@@ -24,7 +24,7 @@ export default function EntryPoint(): JSX.Element | null {
 
 	// If no servers
 	if (!data?.servers || !user) return (
-		<div className="grow relative overflow-hidden bg-white/50 dark:bg-gray-800/50 overflow-y-auto flex flex-col items-center justify-center"
+		<div className="relative flex flex-col items-center justify-center overflow-hidden overflow-y-auto bg-gray-100 grow dark:bg-gray-850"
 			id="entrypoint">
 			<Spinner />
 		</div>
@@ -35,16 +35,16 @@ export default function EntryPoint(): JSX.Element | null {
 			<Toolbar htmlFor="entrypoint">
 				<ConnectionStatus />
 				<div className="flex items-center ml-auto">
-					{ !user && <Spinner className="w-9 mx-3" /> }
+					{ !user && <Spinner className="mx-3 w-9" /> }
 					{ user && <MyAccount user={ user } /> }
 				</div>
 			</Toolbar>
-			<div className="grow relative overflow-hidden bg-white/50 dark:bg-gray-800/50 overflow-y-auto flex flex-col items-center justify-center"
+			<div className="relative flex flex-col items-center justify-center overflow-hidden overflow-y-auto bg-gray-100 grow dark:bg-gray-850"
 				id="entrypoint">
-				<div className="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
-					<div className="mx-auto max-w-screen-sm text-center">
-						<h1 className="mb-4 text-7xl tracking-tight font-extrabold lg:text-9xl text-primary-600 dark:text-primary-500">Uh Oh</h1>
-						<p className="mb-4 text-3xl tracking-tight font-bold text-gray-900 md:text-4xl dark:text-white">Something&apos;s missing.</p>
+				<div className="max-w-screen-xl px-4 py-8 mx-auto sm:py-16 lg:px-6">
+					<div className="max-w-screen-sm mx-auto text-center">
+						<h1 className="mb-4 font-extrabold tracking-tight text-7xl lg:text-9xl text-primary-600 dark:text-primary-500">Uh Oh</h1>
+						<p className="mb-4 text-3xl font-bold tracking-tight text-gray-900 md:text-4xl dark:text-white">Something&apos;s missing.</p>
 						<p className="mb-4 text-lg font-light text-gray-500 dark:text-gray-400">It appears you do not currently have an active subscription with us or that it may have expired.</p>
 						<a href="https://embervpn.org/"
 							rel="noreferrer"
@@ -66,13 +66,13 @@ export default function EntryPoint(): JSX.Element | null {
 			<Toolbar htmlFor="entrypoint">
 				<ConnectionStatus />
 				<div className="flex items-center ml-auto">
-					{ !user && <Spinner className="w-9 mx-3" /> }
+					{ !user && <Spinner className="mx-3 w-9" /> }
 					{ user && <MyAccount user={ user } /> }
 				</div>
 			</Toolbar>
-			<div className="grow relative overflow-hidden bg-white/50 dark:bg-gray-800/50 overflow-y-auto flex flex-col"
+			<div className="relative flex flex-col overflow-hidden overflow-y-auto bg-gray-100 grow dark:bg-gray-850"
 				id="entrypoint">
-				<div className="flex p-4 gap-4 m-auto py-20 flex-col">
+				<div className="flex flex-col gap-4 p-4 py-20 m-auto">
 					{Object.values(data.servers)
 						.sort((a, b) => a.ping - b.ping)
 						.map((server, key) => (

@@ -2,7 +2,7 @@ name: CI/CD
 
 on:
   push:
-    branches: 'master'
+    branches: '**'
 
 jobs:
 
@@ -10,7 +10,6 @@ jobs:
     name: Bump Version
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: lint
     permissions:
       contents: write
     steps:
@@ -29,6 +28,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
+    needs: version
     permissions:
       contents: write
     steps:
@@ -45,7 +45,12 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: "Lint"
+      - if: ${{ github.event_name == 'pull_request' }}
+        name: "Lint"
+        run: npm run lint
+
+      - if: ${{ github.event_name == 'push' }}
+        name: "Fix"
         run: |
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
@@ -53,11 +58,35 @@ jobs:
           git commit -am "Eslint: fix all" || true
           git push || true
 
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: [ lint ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: "Build"
+        run: npm run build
+
+      - name: "Test"
+        run: npm run test
+
   build-win32:
     name: Build (win32)
     runs-on: windows-latest
     if: github.ref == 'refs/heads/master'
-    needs: [ version ]
+    needs: [ test ]
     permissions:
       contents: write
     env:
@@ -92,7 +121,7 @@ jobs:
     name: Build (linux)
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: [ version ]
+    needs: [ test ]
     permissions:
       contents: write
     env:
@@ -130,7 +159,7 @@ jobs:
     name: Build (macos)
     runs-on: macos-latest
     if: github.ref == 'refs/heads/master'
-    needs: [ version ]
+    needs: [ test ]
     permissions:
       contents: write
     env:
