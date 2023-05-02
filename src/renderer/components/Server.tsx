@@ -2,6 +2,7 @@ import Button from "@ui-elements/Button";
 import Card from "@ui-elements/Card";
 import Spinner from "@ui-elements/Spinner";
 import classNames from "classnames";
+import { useState } from "react";
 import { MdOutlineTimer } from "react-icons/md";
 import { calculateDistance } from "../util/calculateDistance";
 import useConnection from "../util/hooks/useConnection";
@@ -11,16 +12,13 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 	// Get the current IP location
 	const { status, active, ipLocation, setStatus, setActive, lastStateChange } = useConnection();
-
-	// Parse the server location
-	const latitude = parseFloat(server.location.latitude);
-	const longitude = parseFloat(server.location.longitude);
+	const [ ping ] = useState(10);
 
 	// If location is still loading
 	if (!ipLocation) return null;
   
 	// Calculate the distance from the user to the server
-	const distance = calculateDistance(latitude, longitude, ipLocation.latitude, ipLocation.longitude);
+	const distance = calculateDistance(server.location.latitude, server.location.longitude, ipLocation.latitude, ipLocation.longitude);
 	const isActive = active === server.hash;
 	const isLoading = isActive && (status.endsWith("ing") || status === "will-connect");
 	const authorization = localStorage.getItem("authorization");
@@ -46,30 +44,30 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 			<div className="flex items-center gap-4 p-1">
 
 				{/* Icon/spinner */}
-				<div className="w-12 h-12 relative shrink-0">
+				<div className="relative w-12 h-12 shrink-0">
 					<img className={ classNames(isLoading && "!opacity-0", "opacity-100 transition-opacity") }
-						src={ `https://cdn.ipregistry.co/flags/emojitwo/${ server.location.country_code2.toLowerCase() }.svg` } />
+						src={ `https://cdn.ipregistry.co/flags/emojitwo/${ server.location.countryCode.toLowerCase() }.svg` } />
 					<Spinner className={ classNames("absolute top-0 left-0 !stroke-gray-800 dark:!stroke-gray-200", !isLoading && "!opacity-0", "opacity-100 transition-opacity") } />
 				</div>
 					
 				{/* Server details */}
-				<div className="leading-tight  font-medium whitespace-nowrap w-full">
+				<div className="w-full font-medium leading-tight whitespace-nowrap">
 
 					{/* Server location */}
-					<div className="flex w-full justify-between items-center text-gray-700 dark:text-gray-300 text-lg">
-						<h1>{server.location.country_name}</h1>
-						<p>{ server.location.district || server.location.state_prov || server.location.country_capital }</p>
+					<div className="flex items-center justify-between w-full text-lg text-gray-700 dark:text-gray-300">
+						<h1>{ server.location.country }</h1>
+						<p>{ server.location.state }</p>
 					</div>
 
 					{/* Server stats and IP */}
-					<div className="text-sm flex justify-between gap-2 w-full">
-						<div className="flex grow gap-2 justify-between">
+					<div className="flex justify-between w-full gap-2 text-sm">
+						<div className="flex justify-between gap-2 grow">
 
 							{(!isActive || status !== "connected") ? (
 
 								// Measure ping and distance
 								<>
-									<p className={ classNames(server.ping < 50 ? "text-success" : server.ping < 150 ? "text-warn" : "text-error") }>{server.ping}ms</p>
+									<p className={ classNames(ping < 50 ? "text-success" : ping < 150 ? "text-warn" : "text-error") }>{ping}ms</p>
 									<span className="text-gray-400 dark:text-gray-600">•</span>
 									<p>{Intl.NumberFormat().format(Math.floor(distance * (ipLocation.country_code === "US" ? 0.621371 : 1)))} {ipLocation.country_code === "US" ? "Mi" : "Km"}</p>
 								</>) : (
@@ -83,7 +81,7 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 							{/* IP address */}
 							<span className="text-gray-400 dark:text-gray-600">•</span>
-							<p className="self-end">{server.location.ip}</p>
+							<p className="self-end">{server.ip}</p>
 							
 						</div>
 					</div>
