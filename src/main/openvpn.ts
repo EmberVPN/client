@@ -221,7 +221,7 @@ export function install() {
 
 // Download server config
 export async function downloadConfig(server: Ember.Server, authorization: string) {
-	const { success, config } = await fetch(`https://api.embervpn.org/rsa/download-client-config?server=${ server.hash }`, {
+	const { success, config } = await fetch(`https://api.embervpn.org/v2/rsa/download-client-config?server=${ server.hash }`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -248,7 +248,7 @@ export function connect(server: Ember.Server) {
 		if (lastIp === server.ip) {
 			clearInterval(iv);
 			tray.setConnected();
-			tray.notify(`Connected to ${ server.hostname } (${ server.ip })`, "Ember VPN • Connected", resolve(resources, "./assets/tray-connected.png"));
+			tray.notify(`Connected to ${ server.ip }`, "Ember VPN • Connected", resolve(resources, "./assets/tray-connected.png"));
 			contents?.send("openvpn", "connected");
 		}
 
@@ -298,7 +298,7 @@ export function connect(server: Ember.Server) {
 		// Check if process exited with error
 		if (code !== 0) {
 			contents?.send("openvpn", "error", server.hash, "OpenVPN exited with code " + code);
-			tray.notify(`Could not connect to ${ server.hostname } (${ server.ip })`, "Ember VPN • Not Connected", resolve(resources, "./assets/tray.png"));
+			tray.notify(`Could not connect to ${ server.ip }`, "Ember VPN • Not Connected", resolve(resources, "./assets/tray.png"));
 		}
 		return;
 
@@ -311,6 +311,6 @@ export function disconnect() {
 	if (!proc || proc.exitCode !== null) return;
 	proc?.kill();
 	tray.disconnect();
-	tray.notify(`Disconnected from ${ lastServer.hostname } (${ lastServer.ip })`, "Ember VPN • Disconnected", resolve(resources, "./assets/tray.png"));
+	tray.notify(`Disconnected from ${ lastServer.ip }`, "Ember VPN • Disconnected", resolve(resources, "./assets/tray.png"));
 	contents?.send("openvpn", "disconnecting");
 }
