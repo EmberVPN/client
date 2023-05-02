@@ -1,7 +1,7 @@
 import { useQuery } from "react-query";
 
 interface Endpoints {
-	"/ember/servers": EmberAPI.Servers;
+	"/v2/ember/servers": EmberAPI.Servers;
 	"/ember/downloads": EmberAPI.ClientDownloads;
 }
 
