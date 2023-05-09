@@ -63,7 +63,7 @@ export default function Authorize(): JSX.Element {
 		const formData = Object.fromEntries(new FormData(form).entries());
 		
 		// Sign in
-		const resp = await fetch(APIROOT + "/auth/session", {
+		const resp = await fetch(`${ APIROOT }/auth/session`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ ...formData, noredirect: true }),
