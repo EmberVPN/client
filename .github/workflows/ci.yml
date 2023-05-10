@@ -38,7 +38,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm run lint || true
           git commit -am "Eslint: fix all" || true
-          git push origin HEAD:refs/heads/${{ github.ref_name }}
+          git push origin HEAD:refs/heads/${{ github.head_ref }}
 
   test:
     name: Test
@@ -81,5 +81,5 @@ jobs:
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm version patch -m "Bump: %s"
-          git push origin HEAD:refs/heads/${{ github.ref_name }}
+          git push origin HEAD:refs/heads/${{ github.head_ref }}
 
