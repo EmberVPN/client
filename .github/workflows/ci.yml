@@ -18,13 +18,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          branch: ${{ github.ref }}
+          ref: ${{ github.ref }}
 
       - run: |
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm version patch -m "Bump: %s"
-          git push
+          git push origin HEAD:${{ github.ref }}
 
   lint:
     name: Lint
@@ -35,7 +35,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          branch: ${{ github.ref }}
+          ref: ${{ github.ref }}
           submodules: recursive
 
       - name: Use Node.js 18
@@ -46,18 +46,13 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - if: ${{ github.event_name == 'pull_request' }}
-        name: "Lint"
-        run: npm run lint
-
-      - if: ${{ github.event_name == 'push' }}
-        name: "Fix"
+      -  name: "Lint"
         run: |
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm run lint || true
           git commit -am "Eslint: fix all" || true
-          git push || true
+          git push origin HEAD:${{ github.ref }}|| true
 
   test:
     name: Test
