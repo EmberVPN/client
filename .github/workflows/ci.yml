@@ -29,8 +29,6 @@ jobs:
 
       - name: "Lint"
         run: |
-          git config --global pull.ff only
-          git pull origin HEAD:${{ github.head_ref }}
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm run lint || true
@@ -81,8 +79,6 @@ jobs:
 
       - name: Bump Version
         run: |
-          git config --global pull.ff only
-          git pull origin HEAD:${{ github.head_ref }}
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm version patch -m "Bump: %s"
