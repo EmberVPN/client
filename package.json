@@ -31,7 +31,7 @@
 		"@electron-toolkit/tsconfig": "^1.0.1",
 		"@electron/notarize": "^1.2.3",
 		"@exponent/electron-cookies": "^2.0.0",
-		"@types/node": "^18.15.11",
+		"@types/node": "^20.1.1",
 		"@types/react": "^18.0.33",
 		"@types/react-dom": "^18.0.11",
 		"@types/semver": "^7.3.13",
