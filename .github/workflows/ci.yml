@@ -24,7 +24,7 @@ jobs:
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm version patch -m "Bump: %s"
-          git push origin HEAD:${{ github.ref }}
+          hub push origin HEAD:${{ github.ref }}
 
   lint:
     name: Lint
