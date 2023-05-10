@@ -26,11 +26,6 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
-      
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
 
       - name: "Lint"
         run: |
