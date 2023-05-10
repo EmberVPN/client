@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.ref }}
+          branch: ${{ github.head_ref || github.ref_name }}
           submodules: recursive
 
       - name: Use Node.js 18
@@ -41,7 +41,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.ref }}
+          branch: ${{ github.head_ref || github.ref_name }}
           submodules: recursive
 
       - name: Use Node.js 18
@@ -75,7 +75,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.ref }}
+          branch: ${{ github.head_ref || github.ref_name }}
 
       - run: |
           git config --global user.name 'CI/CD'
