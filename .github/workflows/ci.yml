@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: '**'
+    branches: 'master'
 
 jobs:
 
@@ -26,6 +26,11 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
+      
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
 
       - name: "Lint"
         run: |
@@ -33,7 +38,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm run lint || true
           git commit -am "Eslint: fix all" || true
-          git push origin HEAD:refs/heads/${{ github.ref_name }}/merge
+          git push origin HEAD:refs/heads/${{ github.ref_name }}
 
   test:
     name: Test
@@ -76,5 +81,5 @@ jobs:
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm version patch -m "Bump: %s"
-          git push origin HEAD:refs/heads/${{ github.ref_name }}/merge
+          git push origin HEAD:refs/heads/${{ github.ref_name }}
 
