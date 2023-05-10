@@ -2,6 +2,7 @@ import { electronApp, is, optimizer } from "@electron-toolkit/utils";
 import { BrowserWindow, app, ipcMain, shell } from "electron";
 import Store from "electron-store";
 import { join, resolve } from "path";
+import semver from "semver";
 import attachClient from "./openvpn";
 import attachTaskbar from "./taskbar";
 import attachTray from "./tray";
@@ -65,6 +66,42 @@ function createWindow(): void {
 	attachTaskbar(win);
 	attachTray(win);
 	attachClient(win);
+	
+	// Check for updates every 10 minutes
+	(async function checkForUpdates() {
+
+		// Not in development mode
+		if (is.dev) return;
+
+		console.log("Checking for updates...");
+		const res = await fetch("https://api.embervpn.org/ember/downloads")
+			.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>);
+		
+		// If it failed for some reason, try again in 60 seconds
+		if (!res.success) return setTimeout(checkForUpdates, 60000);
+
+		const { version, files } = res.platform[process.platform];
+		const currentVersion = app.getVersion();
+		
+		console.log(`Current version: ${ currentVersion }`);
+		console.log(`Latest version: ${ version }`);
+		
+		// If the current version is outdated
+		if (semver.gt(version, currentVersion)) {
+		
+			// What kind of update is it?
+			const updateType = semver.major(version) > semver.major(currentVersion) ? "major" : semver.minor(version) > semver.minor(currentVersion) ? "minor" : "patch";
+
+			// Show console message like npm
+			console.log(`New ${ updateType } version available! ${ version }`);
+			
+			// TODO: Begin download and install
+
+		}
+
+		// Check again in 1 hour
+		return setTimeout(checkForUpdates, 3600000);
+	}());
 
 	// IPC listener
 	ipcMain.on("electron-store-get", async(event, val) => {
