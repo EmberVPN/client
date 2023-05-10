@@ -6,23 +6,30 @@ on:
 
 jobs:
 
-  version:
-    name: Bump Version
+  test:
+    name: Test
     runs-on: ubuntu-latest
-    needs: [ test ]
-    permissions:
-      contents: write
+    needs: [ lint ]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
+          submodules: recursive
 
-      - run: |
-          git config --global user.name 'CI/CD'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          npm version patch -m "Bump: %s"
-          hub push origin HEAD:${{ github.ref }}
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: "Build"
+        run: npm run build
+
+      - name: "Test"
+        run: npm run test
 
   lint:
     name: Lint
@@ -51,29 +58,32 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm run lint || true
           git commit -am "Eslint: fix all" || true
-          git push origin HEAD:${{ github.ref }}|| true
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
 
-  test:
-    name: Test
+  version:
+    name: Bump Version
     runs-on: ubuntu-latest
-    needs: [ lint ]
+    needs: [ test ]
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
-          submodules: recursive
 
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
+      - run: |
+          git config --global user.name 'CI/CD'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          npm version patch -m "Bump: %s"
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@master
         with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: "Build"
-        run: npm run build
-
-      - name: "Test"
-        run: npm run test
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
