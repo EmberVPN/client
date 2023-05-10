@@ -1,8 +1,8 @@
 name: CI
 
 on:
-  pull_request:
-    branches: 'master'
+  push:
+    branches: '*'
 
 jobs:
 
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: refs/heads/${{ github.head_ref }}
+          ref: ${{ github.ref }}
           submodules: recursive
 
       - name: Use Node.js 18
@@ -30,12 +30,12 @@ jobs:
       - name: "Lint"
         run: |
           git config --global pull.ff only
-          git pull origin HEAD:refs/heads/${{ github.head_ref }}
+          git pull origin HEAD:${{ github.head_ref }}
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm run lint || true
           git commit -am "Eslint: fix all" || true
-          git push origin HEAD:refs/heads/${{ github.head_ref }}
+          git push origin HEAD:${{ github.head_ref }}
 
   test:
     name: Test
@@ -45,7 +45,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: refs/heads/${{ github.head_ref }}
+          ref: ${{ github.ref }}
           submodules: recursive
 
       - name: Use Node.js 18
@@ -72,13 +72,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: refs/heads/${{ github.head_ref }}
+          ref: ${{ github.ref }}
 
-      - run: |
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Bump Version
+        run: |
           git config --global pull.ff only
-          git pull origin HEAD:refs/heads/${{ github.head_ref }}
+          git pull origin HEAD:${{ github.head_ref }}
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm version patch -m "Bump: %s"
-          git push origin HEAD:refs/heads/${{ github.head_ref }}
+          git push origin HEAD:${{ github.head_ref }}
 
