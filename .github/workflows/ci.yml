@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.ref }}
+          ref: refs/heads/${{ github.head_ref }}
           submodules: recursive
 
       - name: Use Node.js 18
@@ -29,6 +29,7 @@ jobs:
 
       - name: "Lint"
         run: |
+
           git pull origin HEAD:refs/heads/${{ github.head_ref }}
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
@@ -44,7 +45,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.ref }}
+          ref: refs/heads/${{ github.head_ref }}
           submodules: recursive
 
       - name: Use Node.js 18
@@ -71,9 +72,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.ref }}
+          ref: refs/heads/${{ github.head_ref }}
 
       - run: |
+
           git pull origin HEAD:refs/heads/${{ github.head_ref }}
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
