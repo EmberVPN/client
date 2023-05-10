@@ -1,29 +1,10 @@
-name: CI
+name: Continuous Integration
 
 on:
-  pull_request:
-    branches: 'master'
+  push:
+    branches: '*'
 
 jobs:
-
-  version:
-    name: Bump Version
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    needs: test
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
-
-      - run: |
-          git config --global user.name 'CI/CD'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          npm version patch -m "Bump: %s"
-          git push
 
   lint:
     name: Lint
@@ -31,6 +12,7 @@ jobs:
     permissions:
       contents: write
     steps:
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -45,18 +27,13 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - if: ${{ github.event_name == 'pull_request' }}
-        name: "Lint"
-        run: npm run lint
-
-      - if: ${{ github.event_name == 'push' }}
-        name: "Fix"
+      - name: "Lint"
         run: |
           git config --global user.name 'CI/CD'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm run lint || true
           git commit -am "Eslint: fix all" || true
-          git push || true
+          git push origin ${{ github.head_ref }}
 
   test:
     name: Test
@@ -82,3 +59,28 @@ jobs:
 
       - name: "Test"
         run: npm run test
+
+  version:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    needs: [ test ]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Bump Version
+        run: |
+          git config --global user.name 'CI/CD'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          npm version patch -m "Bump: %s"
+          git push origin ${{ github.head_ref }}
+
