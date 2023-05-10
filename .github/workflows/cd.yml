@@ -165,16 +165,7 @@ jobs:
         with:
           name: darwin
           path: darwin/
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            win32/*${{ steps.get_latest.outputs.version }}*
-            linux/*${{ steps.get_latest.outputs.version }}*
-            darwin/*${{ steps.get_latest.outputs.version }}*
-    
-
+          
       - name: Push binarys to releases (win32)
         uses: cpina/github-action-push-to-another-repository@main
         env:
