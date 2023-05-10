@@ -7,6 +7,7 @@ on:
       - completed
     branches:
       - master
+      
 
 jobs:
 
@@ -15,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -31,6 +33,7 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: write
+    needs: [ get-latest ]
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -64,6 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    needs: [ get-latest ]
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -100,6 +104,7 @@ jobs:
     runs-on: macos-latest
     permissions:
       contents: write
+    needs: [ get-latest ]
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
