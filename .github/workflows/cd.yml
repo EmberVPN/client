@@ -1,4 +1,4 @@
-name: CI/CD
+name: Continuous Deployment
 
 on:
   push:
@@ -9,7 +9,6 @@ jobs:
   build-win32:
     name: Build (win32)
     runs-on: windows-latest
-    needs: [ version ]
     permissions:
       contents: write
     env:
@@ -43,7 +42,6 @@ jobs:
   build-linux:
     name: Build (linux)
     runs-on: ubuntu-latest
-    needs: [ version ]
     permissions:
       contents: write
     env:
@@ -80,7 +78,6 @@ jobs:
   build-macos:
     name: Build (macos)
     runs-on: macos-latest
-    needs: [ version ]
     permissions:
       contents: write
     env:
@@ -147,7 +144,7 @@ jobs:
       - name: Push binarys to releases (win32)
         uses: cpina/github-action-push-to-another-repository@main
         env:
-          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
+          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
         with:
           source-directory: 'win32'
           destination-github-username: 'EmberVPN'
@@ -159,7 +156,7 @@ jobs:
       - name: Push binarys to releases (linux)
         uses: cpina/github-action-push-to-another-repository@main
         env:
-          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
+          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
         with:
           source-directory: 'linux'
           destination-github-username: 'EmberVPN'
@@ -170,7 +167,7 @@ jobs:
       - name: Push binarys to releases (macos)
         uses: cpina/github-action-push-to-another-repository@main
         env:
-          API_TOKEN_GITHUB: ${{ secrets.TOKEN }}
+          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
         with:
           source-directory: 'darwin'
           destination-github-username: 'EmberVPN'
