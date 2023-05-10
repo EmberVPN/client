@@ -11,8 +11,7 @@ jobs:
   version:
     name: Bump Version
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    needs: test
+    needs: [ test ]
     permissions:
       contents: write
     steps:
