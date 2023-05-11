@@ -18,7 +18,8 @@ export default function Servers({ server: { ping = -1, ...server }}: { server: E
 	// Calculate the distance from the user to the server
 	const distance = calculateDistance(server.location.latitude, server.location.longitude, ipLocation.latitude, ipLocation.longitude);
 	const isActive = active === server.hash;
-	const isLoading = isActive && (status.endsWith("ing") || status === "will-connect");
+	const willConnect = (status.endsWith("ing") || status === "will-connect");
+	const isLoading = isActive && willConnect;
 	const authorization = localStorage.getItem("authorization");
 
 	// Connect to the server
@@ -90,7 +91,7 @@ export default function Servers({ server: { ping = -1, ...server }}: { server: E
 				</div>
 
 				{/* Connect/disconnect action */}
-				<Button className={ classNames("shrink-0", isLoading && "opacity-50 pointer-events-none", active && isLoading && "!opacity-0") }
+				<Button className={ classNames("shrink-0", willConnect && "opacity-50 pointer-events-none", active && isLoading && "!opacity-0") }
 					color={ isActive && status === "connected" ? "error" : "success" }
 					onClick={ isActive && status === "connected" ? disconnect : connect }>
 					{(isActive && status === "connected") ? "Disconnect" : "Connect"}
