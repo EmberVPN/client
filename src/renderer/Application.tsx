@@ -97,24 +97,20 @@ function Entrypoint({ servers: _servers }: { servers: Ember.Server[] }): JSX.Ele
 		return () => clearInterval(interval);
 	}, [ ipLocation, ping ]);
 	
-	// Sort servers
-	function sort(servers: IServer[]) {
-		return servers
-			.sort((a, b) => {
-				if (!ipLocation) return 0;
-				const distanceA = calculateDistance(a.location.latitude, a.location.longitude, ipLocation?.latitude, ipLocation?.longitude);
-				const distanceB = calculateDistance(b.location.latitude, b.location.longitude, ipLocation?.latitude, ipLocation?.longitude);
-				return distanceA - distanceB;
-			})
-		
-			// Sort by active
-			.sort((a, b) => {
-				if (!active) return 0;
-				if (a.hash === active) return -1;
-				if (b.hash === active) return 1;
-				return 0;
-			});
-	}
+	// Sort servers by distance then by active
+	const sort = (servers: IServer[]) => servers
+		.sort((a, b) => {
+			if (!ipLocation) return 0;
+			const distanceA = calculateDistance(a.location.latitude, a.location.longitude, ipLocation?.latitude, ipLocation?.longitude);
+			const distanceB = calculateDistance(b.location.latitude, b.location.longitude, ipLocation?.latitude, ipLocation?.longitude);
+			return distanceA - distanceB;
+		})
+		.sort((a, b) => {
+			if (!active) return 0;
+			if (a.hash === active) return -1;
+			if (b.hash === active) return 1;
+			return 0;
+		});
 
 	// Helper function to ping servers
 	function ping(soft = false) {
