@@ -2,17 +2,15 @@ import Button from "@ui-elements/Button";
 import Card from "@ui-elements/Card";
 import Spinner from "@ui-elements/Spinner";
 import classNames from "classnames";
-import { useState } from "react";
 import { MdOutlineTimer } from "react-icons/md";
 import { calculateDistance } from "../util/calculateDistance";
 import useConnection from "../util/hooks/useConnection";
 import Timestamp from "./Timestamp";
 
-export default function Servers({ server }: { server: Ember.Server }): JSX.Element | null {
+export default function Servers({ server: { ping = -1, ...server }}: { server: Ember.Server & { ping: number } }): JSX.Element | null {
 
 	// Get the current IP location
 	const { status, active, ipLocation, setStatus, setActive, lastStateChange } = useConnection();
-	const [ ping ] = useState(10);
 
 	// If location is still loading
 	if (!ipLocation) return null;
@@ -38,74 +36,76 @@ export default function Servers({ server }: { server: Ember.Server }): JSX.Eleme
 
 	// Render the server
 	return (
-		<Card className={ classNames("transition-[height,margin,transform] duration-100", isLoading ? "h-[88px] my-[23px] scale-110 shadow-lg" : "h-[134px]", isActive && status === "connected" && "scale-110 shadow-lg my-2") }>
+		<li>
+			<Card className={ classNames("transition-[height,margin,transform] duration-100", isLoading ? "h-[88px] my-[23px] scale-110 shadow-lg" : "h-[134px]", isActive && status === "connected" && "scale-110 shadow-lg my-2") }>
 			
-			{/* Server Info */}
-			<div className="flex items-center gap-4 p-1">
+				{/* Server Info */}
+				<div className="flex items-center gap-4 p-1">
 
-				{/* Icon/spinner */}
-				<div className="relative w-12 h-12 shrink-0">
-					<img className={ classNames(isLoading && "!opacity-0", "opacity-100 transition-opacity") }
-						src={ `https://cdn.ipregistry.co/flags/emojitwo/${ server.location.countryCode.toLowerCase() }.svg` } />
-					<Spinner className={ classNames("absolute top-0 left-0 !stroke-gray-800 dark:!stroke-gray-200", !isLoading && "!opacity-0", "opacity-100 transition-opacity") } />
-				</div>
-					
-				{/* Server details */}
-				<div className="w-full font-medium leading-tight whitespace-nowrap">
-
-					{/* Server location */}
-					<div className="flex items-center justify-between w-full text-lg text-gray-700 dark:text-gray-300">
-						<h1>{ server.location.country }</h1>
-						<p>{ server.location.state }</p>
+					{/* Icon/spinner */}
+					<div className="relative w-12 h-12 shrink-0">
+						<img className={ classNames(isLoading && "!opacity-0", "opacity-100 transition-opacity") }
+							src={ `https://cdn.ipregistry.co/flags/emojitwo/${ server.location.countryCode.toLowerCase() }.svg` } />
+						<Spinner className={ classNames("absolute top-0 left-0 !stroke-gray-800 dark:!stroke-gray-200", !isLoading && "!opacity-0", "opacity-100 transition-opacity") } />
 					</div>
+					
+					{/* Server details */}
+					<div className="w-full font-medium leading-tight whitespace-nowrap">
 
-					{/* Server stats and IP */}
-					<div className="flex justify-between w-full gap-2 text-sm">
-						<div className="flex justify-between gap-2 grow">
+						{/* Server location */}
+						<div className="flex items-center justify-between w-full text-lg text-gray-700 dark:text-gray-300">
+							<h1>{ server.location.country }</h1>
+							<p>{ server.location.state }</p>
+						</div>
 
-							{(!isActive || status !== "connected") ? (
+						{/* Server stats and IP */}
+						<div className="flex justify-between w-full gap-2 text-sm">
+							<div className="flex justify-between gap-2 grow">
+
+								{(!isActive || status !== "connected") ? (
 
 								// Measure ping and distance
-								<>
-									<p className={ classNames(ping < 50 ? "text-success" : ping < 150 ? "text-warn" : "text-error") }>{ping}ms</p>
-									<span className="text-gray-400 dark:text-gray-600">•</span>
-									<p>{Intl.NumberFormat().format(Math.floor(distance * (ipLocation.country_code === "US" ? 0.621371 : 1)))} {ipLocation.country_code === "US" ? "Mi" : "Km"}</p>
-								</>) : (
+									<>
+										<p className={ classNames(ping < 50 ? "text-success" : ping < 150 ? "text-warn" : "text-error", "transition-colors duration-1000") }>{ping}ms</p>
+										<span className="text-gray-400 dark:text-gray-600">•</span>
+										<p>{Intl.NumberFormat().format(Math.floor(distance * (ipLocation.country_code === "US" ? 0.621371 : 1)))} {ipLocation.country_code === "US" ? "Mi" : "Km"}</p>
+									</>) : (
 								
 								// Measure time connected
-								<div className="flex items-center gap-1 opacity-70">
-									<MdOutlineTimer className="text-xl -translate-y-[1px]" />
-									<Timestamp timestamp={ lastStateChange } />
-								</div>
-							)}
+									<div className="flex items-center gap-1 opacity-70">
+										<MdOutlineTimer className="text-xl -translate-y-[1px]" />
+										<Timestamp timestamp={ lastStateChange } />
+									</div>
+								)}
 
-							{/* IP address */}
-							<span className="text-gray-400 dark:text-gray-600">•</span>
-							<p className="self-end">{server.ip}</p>
+								{/* IP address */}
+								<span className="text-gray-400 dark:text-gray-600">•</span>
+								<p className="self-end">{server.ip}</p>
 							
+							</div>
 						</div>
-					</div>
 					
+					</div>
+
 				</div>
 
-			</div>
+				{/* Connect/disconnect action */}
+				{ isLoading ? <Button className="opacity-0 !bg-transparent pointer-events-none" /> : (
+					(isActive && status === "connected") ? (
 
-			{/* Connect/disconnect action */}
-			{ isLoading ? <Button className="opacity-0 !bg-transparent pointer-events-none" /> : (
-				(isActive && status === "connected") ? (
+						// Disconnect button
+						<Button className={ classNames(status.endsWith("ing") && "opacity-50 pointer-events-none") }
+							color="error"
+							onClick={ disconnect }>Disconnect</Button>
+					) : (
 
-					// Disconnect button
-					<Button className={ classNames(status.endsWith("ing") && "opacity-50 pointer-events-none") }
-						color="error"
-						onClick={ disconnect }>Disconnect</Button>
-				) : (
-
-					// Connect button
-					<Button className={ classNames(status.endsWith("ing") && "opacity-50 pointer-events-none") }
-						color="success"
-						onClick={ connect }>Connect</Button>
-				))}
+						// Connect button
+						<Button className={ classNames(active && "opacity-50 pointer-events-none") }
+							color="success"
+							onClick={ connect }>Connect</Button>
+					))}
 				
-		</Card>
+			</Card>
+		</li>
 	);
 }
