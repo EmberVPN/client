@@ -18,7 +18,7 @@ win:
   requestedExecutionLevel: "requireAdministrator"
   target:
     - nsis
-    # - msi
+    - msi
 nsis:
   artifactName: ${name}-${version}-${platform}-setup.${ext}
   shortcutName: ${productName}
