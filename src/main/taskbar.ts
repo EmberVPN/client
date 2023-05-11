@@ -36,7 +36,7 @@ export default function(win: BrowserWindow) {
 			win.setSize(800, 600);
 			win.center();
 			isLocked = false;
-			tray.setMenu([ ...tray.settings, ...tray.defaults ]);
+			tray.setMenu([ ...tray.defaults ]);
 		}
 				
 	});
