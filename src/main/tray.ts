@@ -8,7 +8,7 @@ export let tray: Tray | null = null;
 let exit = () => { };
 
 export let defaults: (MenuItem | MenuItemConstructorOptions)[] = [];
-export let settings: (MenuItem | MenuItemConstructorOptions)[] = [];
+export const settings: (MenuItem | MenuItemConstructorOptions)[] = [];
 
 // Get mainwindow once it loads
 export default function(win: BrowserWindow) {
@@ -22,20 +22,11 @@ export default function(win: BrowserWindow) {
 		click: exit
 	} ];
 	
-	settings = [ {
-		label: "Settings",
-		click: () => {
-			win.show();
-			win.webContents.send("settings", "open");
-		}
-	},
-	{ type: "separator" } ];
-	
 	// Set disconnected state
 	tray.setToolTip("Ember VPN");
 	tray.setImage(resolve(resources, "./assets/tray.png"));
 	tray.on("click", () => win.show());
-	setMenu([ ...settings, ...defaults ]);
+	setMenu([ ...defaults ]);
 	
 }
 
@@ -69,7 +60,7 @@ export function disconnect() {
 
 	tray.setToolTip("Ember VPN");
 	tray.setImage(resolve(resources, "./assets/tray.png"));
-	setMenu([ ...settings, ...defaults ]);
+	setMenu([ ...defaults ]);
 	
 }
 
@@ -80,7 +71,7 @@ export function setConnecting() {
 
 	tray.setToolTip("Ember VPN • Connecting...");
 	tray.setImage(resolve(resources, "./assets/tray-pending.png"));
-	setMenu([ ...settings, ...defaults ]);
+	setMenu([ ...defaults ]);
 	
 }
 
