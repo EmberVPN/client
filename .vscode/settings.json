@@ -13,4 +13,8 @@
 		"useEslintrc": true,
 		"overrideConfigFile": "./.eslintrc.yml"
 	},
+	"github-actions.workflows.pinned.workflows": [
+		".github/workflows/ci.yml",
+		".github/workflows/cd.yml"
+	],
 }
