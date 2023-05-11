@@ -4,6 +4,7 @@ import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
 import fetch from "node-fetch";
 import { resolve } from "path";
+import { inetLatency } from "systeminformation";
 import { resources } from ".";
 import * as tray from "./tray";
 
@@ -21,6 +22,8 @@ let lastGeo = {};
 export default function(win: BrowserWindow) {
 	
 	contents = win.webContents;
+
+	ipcMain.handle("ping-server", async(_event, server: Ember.Server) => await inetLatency(server.ip));
 	
 	// Listen for openvpn events
 	ipcMain.on("openvpn", async(_, state: State, data: string) => {

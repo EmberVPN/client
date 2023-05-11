@@ -25,12 +25,14 @@
 		"@electron-toolkit/utils": "^1.0.2",
 		"electron-cookies": "github:heap/electron-cookies",
 		"electron-store": "^8.1.0",
-		"electron-updater": "^5.3.0"
+		"electron-updater": "^5.3.0",
+		"systeminformation": "^5.17.12"
 	},
 	"devDependencies": {
 		"@electron-toolkit/tsconfig": "^1.0.1",
 		"@electron/notarize": "^1.2.3",
 		"@exponent/electron-cookies": "^2.0.0",
+		"@formkit/auto-animate": "^1.0.0-beta.6",
 		"@types/node": "^20.1.1",
 		"@types/react": "^18.0.33",
 		"@types/react-dom": "^18.0.11",

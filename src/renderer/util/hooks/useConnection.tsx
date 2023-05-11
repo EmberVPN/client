@@ -47,8 +47,9 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 	// Sync state with main process
 	useEffect(function() {
 		
-		electron.ipcRenderer.on("openvpn", (_event, state: string, ...args) => {
-			console.log(state, args);
+		electron.ipcRenderer.on("openvpn", (_event, state: string) => {
+
+			// console.log(state, args);
 			switch (state) {
 				
 			case "error":
