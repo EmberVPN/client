@@ -10,28 +10,11 @@ on:
 
 jobs:
 
-  get-version:
-    name: Get Latest Version
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
-      - name: Get Latest Version
-        id: get_version
-        run: |
-          echo ::set-output name=version::$(cat package.json | jq -r '.version')
-
   build-win32:
     name: Build (win32)
     runs-on: windows-latest
     permissions:
       contents: write
-    needs: [ get-version ]
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -65,7 +48,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    needs: [ get-version ]
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -102,7 +84,6 @@ jobs:
     runs-on: macos-latest
     permissions:
       contents: write
-    needs: [ get-version ]
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -140,34 +121,47 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
 
+      # checkout
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          
+      # get version
+      - name: Get version
+        id: get-version
+        run: echo ::set-output name=current-version::$(node -p "require('./package.json').version")
+
+      # clear cwd
+      - name: Clear
+        run: rm -rf *
+
+      # download artifacts
       - name: Download (win32)
         uses: actions/download-artifact@v3
         with:
           name: win32
           path: win32/
-
       - name: Download (linux)
         uses: actions/download-artifact@v3
         with:
           name: linux
           path: linux/
-
       - name: Download (macos)
         uses: actions/download-artifact@v3
         with:
           name: darwin
           path: darwin/
       
+      # create release
       - name: Create release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           generate_release_notes: true
-          tag_name: v${{ steps.get-version.outputs.version }}
+          tag_name: v${{ steps.get-version.outputs.current-version }}
           files: |
             win32/*
             linux/*
             darwin/*
-
-
