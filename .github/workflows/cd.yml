@@ -9,30 +9,12 @@ on:
       - master      
 
 jobs:
-  
-  get-latest:
-    name: Get Latest Version
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
-          
-      - name: Get Latest Version
-        id: get_latest
-        run: |
-          echo ::set-output name=version::$(cat package.json | jq -r '.version')
 
   build-win32:
     name: Build (win32)
     runs-on: windows-latest
     permissions:
       contents: write
-    needs: [ get-latest ]
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -66,7 +48,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    needs: [ get-latest ]
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -103,7 +84,6 @@ jobs:
     runs-on: macos-latest
     permissions:
       contents: write
-    needs: [ get-latest ]
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -134,7 +114,7 @@ jobs:
   release:
     name: Release (all)
     runs-on: ubuntu-latest
-    needs: [ build-win32, build-macos, build-linux, get-latest ]
+    needs: [ build-win32, build-macos, build-linux ]
     permissions:
       contents: write
     env:
@@ -164,39 +144,18 @@ jobs:
         with:
           name: darwin
           path: darwin/
-
-      - name: Push binarys to releases (win32)
-        uses: cpina/github-action-push-to-another-repository@main
+      
+      - name: Create release
+        uses: softprops/action-gh-release@v1
         env:
-          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          source-directory: 'win32'
-          destination-github-username: 'EmberVPN'
-          destination-repository-name: 'releases'
-          target-directory: 'win32'
-          target-branch: 'master'
-          user-email: 'github-actions[bot]@users.noreply.github.com'
+          generate_release_notes: true
+          tag_name: ${{ github.ref }}
+          draft: true
+          files: |
+            win32/*
+            linux/*
+            darwin/*
 
-      - name: Push binarys to releases (linux)
-        uses: cpina/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          source-directory: 'linux'
-          destination-github-username: 'EmberVPN'
-          destination-repository-name: 'releases'
-          target-directory: 'linux'
-          target-branch: 'master'
-          user-email: 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Push binarys to releases (macos)
-        uses: cpina/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          source-directory: 'darwin'
-          destination-github-username: 'EmberVPN'
-          destination-repository-name: 'releases'
-          target-directory: 'darwin'
-          target-branch: 'master'
-          user-email: 'github-actions[bot]@users.noreply.github.com'
