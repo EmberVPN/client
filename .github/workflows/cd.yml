@@ -6,11 +6,10 @@ on:
     types:
       - completed
     branches:
-      - master
-      
+      - master      
 
 jobs:
-
+  
   get-latest:
     name: Get Latest Version
     runs-on: ubuntu-latest
@@ -27,7 +26,7 @@ jobs:
         id: get_latest
         run: |
           echo ::set-output name=version::$(cat package.json | jq -r '.version')
-  
+
   build-win32:
     name: Build (win32)
     runs-on: windows-latest
@@ -50,7 +49,7 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
-        
+
       - name: Build
         run: npm run build:win
 
@@ -61,7 +60,7 @@ jobs:
           path: |
             dist/*.exe
             dist/*.msi
-  
+
   build-linux:
     name: Build (linux)
     runs-on: ubuntu-latest
@@ -84,7 +83,7 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
-        
+
       - name: Build
         run: npm run build:linux
 
@@ -98,7 +97,7 @@ jobs:
             dist/*.deb
             dist/*.tar.gz
             dist/*.zip
-  
+
   build-macos:
     name: Build (macos)
     runs-on: macos-latest
@@ -165,7 +164,7 @@ jobs:
         with:
           name: darwin
           path: darwin/
-          
+
       - name: Push binarys to releases (win32)
         uses: cpina/github-action-push-to-another-repository@main
         env:
@@ -189,6 +188,7 @@ jobs:
           target-directory: 'linux'
           target-branch: 'master'
           user-email: 'github-actions[bot]@users.noreply.github.com'
+
       - name: Push binarys to releases (macos)
         uses: cpina/github-action-push-to-another-repository@main
         env:
