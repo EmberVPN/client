@@ -90,20 +90,13 @@ export default function Servers({ server: { ping = -1, ...server }}: { server: E
 				</div>
 
 				{/* Connect/disconnect action */}
-				{ isLoading ? <Button className="opacity-0 !bg-transparent pointer-events-none" /> : (
-					(isActive && status === "connected") ? (
-
-						// Disconnect button
-						<Button className={ classNames(status.endsWith("ing") && "opacity-50 pointer-events-none") }
-							color="error"
-							onClick={ disconnect }>Disconnect</Button>
-					) : (
-
-						// Connect button
-						<Button className={ classNames(active && "opacity-50 pointer-events-none") }
-							color="success"
-							onClick={ connect }>Connect</Button>
-					))}
+				{ isLoading ? <Button className="opacity-0 !bg-transparent pointer-events-none" /> :
+					<Button className={ classNames(isLoading && "opacity-50 pointer-events-none") }
+						color="error"
+						onClick={ isActive && status === "connected" ? disconnect : connect }>
+						{isActive && status === "connected" ? "Disconnect" : "Connect"}
+					</Button>
+				}
 				
 			</Card>
 		</li>
