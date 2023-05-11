@@ -44,15 +44,6 @@ function createWindow(): void {
 		return { action: "deny" };
 	});
 
-	// Open settings
-	win.webContents.on("before-input-event", (_, input) => {
-
-		if (input.control && input.key === ",") {
-			win.webContents.send("settings", "open");
-		}
-			
-	});
-
 	// HMR for renderer base on electron-vite cli.
 	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
 		win.loadURL(process.env["ELECTRON_RENDERER_URL"]);

@@ -11,18 +11,18 @@ export default function ConnectionStatus(): JSX.Element | null {
 	const { status, active, ipLocation } = useConnection();
 
 	// Get the list of servers
-	const { data: servers } = useData("/v2/ember/servers");
+	const { data } = useData("/v2/ember/servers");
 	
 	// If the VPN is connected 
 	const isConnected = status === "connected" || status === "will-connect";
 	
-	// If somethings loading, show the spinner
-	if (!ipLocation || !servers || status === "connecting" || status === "disconnecting" || status === "will-connect") return (
+	// If somethings loading, show the spinning version
+	if (!ipLocation || !data || status === "connecting" || status === "disconnecting" || status === "will-connect") return (
 		<div className="flex items-center justify-center h-12 gap-2 px-5 transition-colors border rounded-full border-warn/25 bg-warn/10">
 			<Spinner className="w-6 -ml-2 mr-0.5 !stroke-warn shrink-0" />
-			<div className="flex flex-col justify-center w-full pr-2 font-medium  whitespace-nowrap">
+			<div className="flex flex-col justify-center w-full pr-2 font-medium whitespace-nowrap">
 				<h1 className={ classNames("text-warn", (status === "will-connect" || status === "connecting") && "-mb-1") }>{status === "will-connect" ? "Pending" : status.includes("ing") ? status[0].toUpperCase() + status.substring(1) : "Loading"}</h1>
-				{ (status === "will-connect" || status === "connecting") && <p className="text-xs">{status === "will-connect" ? "Generating keypair" : "Obtaining IP"}</p>}
+				{(status === "will-connect" || status === "connecting") && <p className="text-xs">{status === "will-connect" ? "Generating keypair" : "Obtaining IP"}</p>}
 			</div>
 		</div>
 	);
@@ -31,9 +31,9 @@ export default function ConnectionStatus(): JSX.Element | null {
 	return (
 		<div className={ classNames("h-12 rounded-full flex items-center justify-center transition-colors border gap-2 px-3", isConnected ? "border-success/25 bg-success/10" : "border-error/25 bg-error/10") }>
 			{ isConnected ? <IoMdCheckmarkCircleOutline className="text-2xl text-success shrink-0" /> : <MdErrorOutline className="text-2xl text-error shrink-0" /> }
-			<div className="flex flex-col justify-center w-full pr-2 font-medium  whitespace-nowrap">
+			<div className="flex flex-col justify-center w-full pr-2 font-medium whitespace-nowrap">
 				<h1 className={ classNames("-mb-1", isConnected ? "text-success" : "text-error") }>{!isConnected && "Not "}Connected</h1>
-				<p className="text-xs">{active ? servers.servers[active].ip : ipLocation.ip || "Couldn't determine IP"}</p>
+				<p className="text-xs">{active ? data.servers[active].ip : ipLocation.ip || "Couldn't determine IP"}</p>
 			</div>
 		</div>
 	);
