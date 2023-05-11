@@ -104,7 +104,7 @@ function Entrypoint({ servers: _servers }: { servers: Ember.Server[] }): JSX.Ele
 				if (!ipLocation) return 0;
 				const distanceA = calculateDistance(a.location.latitude, a.location.longitude, ipLocation?.latitude, ipLocation?.longitude);
 				const distanceB = calculateDistance(b.location.latitude, b.location.longitude, ipLocation?.latitude, ipLocation?.longitude);
-				return distanceA * a.ping - distanceB * b.ping;
+				return distanceA - distanceB;
 			})
 		
 			// Sort by active
