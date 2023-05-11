@@ -36,7 +36,7 @@ export default function Servers({ server: { ping = -1, ...server }}: { server: E
 
 	// Render the server
 	return (
-		<li>
+		<li className={ classNames(isLoading && "z-10") }>
 			<Card className={ classNames("transition-[height,margin,transform] duration-100", isLoading ? "h-[88px] my-[23px] scale-110 shadow-lg" : "h-[134px]", isActive && status === "connected" && "scale-110 shadow-lg my-2") }>
 			
 				{/* Server Info */}
@@ -64,14 +64,14 @@ export default function Servers({ server: { ping = -1, ...server }}: { server: E
 
 								{(!isActive || status !== "connected") ? (
 
-								// Measure ping and distance
+									// Measure ping and distance
 									<>
-										<p className={ classNames(ping < 50 ? "text-success" : ping < 150 ? "text-warn" : "text-error", "transition-colors duration-1000") }>{ping}ms</p>
+										<p className={ classNames(ping < 50 ? "text-success" : ping < 150 ? "text-warn" : "text-error", "transition-colors") }>{ping}ms</p>
 										<span className="text-gray-400 dark:text-gray-600">•</span>
 										<p>{Intl.NumberFormat().format(Math.floor(distance * (ipLocation.country_code === "US" ? 0.621371 : 1)))} {ipLocation.country_code === "US" ? "Mi" : "Km"}</p>
 									</>) : (
 								
-								// Measure time connected
+									// Measure time connected
 									<div className="flex items-center gap-1 opacity-70">
 										<MdOutlineTimer className="text-xl -translate-y-[1px]" />
 										<Timestamp timestamp={ lastStateChange } />
@@ -90,13 +90,11 @@ export default function Servers({ server: { ping = -1, ...server }}: { server: E
 				</div>
 
 				{/* Connect/disconnect action */}
-				{ isLoading ? <Button className="opacity-0 !bg-transparent pointer-events-none" /> :
-					<Button className={ classNames(isLoading && "opacity-50 pointer-events-none") }
-						color="error"
-						onClick={ isActive && status === "connected" ? disconnect : connect }>
-						{isActive && status === "connected" ? "Disconnect" : "Connect"}
-					</Button>
-				}
+				<Button className={ classNames("shrink-0", isLoading && "opacity-50 pointer-events-none", active && isLoading && "!opacity-0") }
+					color={ isActive && status === "connected" ? "error" : "success" }
+					onClick={ isActive && status === "connected" ? disconnect : connect }>
+					{(isActive && status === "connected") ? "Disconnect" : "Connect"}
+				</Button>
 				
 			</Card>
 		</li>
