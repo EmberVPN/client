@@ -9,6 +9,13 @@ export default function(win: BrowserWindow) {
 	// Update the UI state when the window is minimized or restored.
 	win.on("maximize", () => win.webContents.send("titlebar", "maximize"));
 	win.on("unmaximize", () => win.webContents.send("titlebar", "restore"));
+
+	// Set size of window from renderer
+	ipcMain.handle("window-size", (_, width: number, height: number) => {
+		console.log(width, height);
+		win.setMinimumSize(width, height);
+		win.setSize(width, height);
+	});
 	
 	// Listen for titlebar events
 	ipcMain.on("titlebar", async(_, key) => {
