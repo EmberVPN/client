@@ -59,12 +59,15 @@ export default function Application() {
 
 			{/* Window title bar */}
 			<Titlebar className="bg-white dark:bg-gray-800" />
-			<div className="relative flex flex-col overflow-auto overflow-x-hidden select-none grow">
+			<div className="relative flex flex-col overflow-auto overflow-x-hidden select-none grow"
+				id="entrypoint">
 
 				<Toolbar />
 
 				{/* Application */}
-				<EntryPoint />
+				<div className="flex flex-col items-center justify-center w-full grow">
+					<EntryPoint />
+				</div>
 				
 			</div>
 			
