@@ -5,7 +5,7 @@ import { QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import EntryPoint from "./components/Application";
-import Authorize from "./components/Auth/Login";
+import Authorize from "./components/Authorize";
 import Titlebar from "./components/Titlebar";
 import Toolbar from "./components/Toolbar";
 import "./styles/index.less";
