@@ -5,7 +5,7 @@ import { QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import EntryPoint from "./components/Application";
-import Authorize from "./components/Auth/Login";
+import Authorize from "./components/Authorize";
 import Titlebar from "./components/Titlebar";
 import Toolbar from "./components/Toolbar";
 import "./styles/index.less";
@@ -51,17 +51,7 @@ export default function Application() {
 	const { ipLocation } = useConnection();
 
 	// If the user is definitely not logged in, show the login screen
-	if (user === false) return (
-		<div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
-
-			{/* Window title bar */}
-			<Titlebar resizeable={ false }>Sign In</Titlebar>
-
-			{/* Login screen */}
-			<Authorize />
-
-		</div>
-	);
+	if (user === false) return <Authorize />;
 	
 	// If we have all the data, render the app
 	if (user && ipLocation && data) return (
@@ -69,12 +59,15 @@ export default function Application() {
 
 			{/* Window title bar */}
 			<Titlebar className="bg-white dark:bg-gray-800" />
-			<div className="relative flex flex-col overflow-auto overflow-x-hidden select-none grow">
+			<div className="relative flex flex-col overflow-auto overflow-x-hidden select-none grow"
+				id="entrypoint">
 
 				<Toolbar />
 
 				{/* Application */}
-				<EntryPoint />
+				<div className="flex flex-col items-center justify-center w-full grow">
+					<EntryPoint />
+				</div>
 				
 			</div>
 			
