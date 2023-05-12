@@ -1,9 +1,9 @@
 import Spinner from "@ui-elements/Spinner";
 import { useEffect, useRef } from "react";
 import queryClient from "src/renderer/util/queryClient";
-import Titlebar from "../Titlebar";
+import Titlebar from "./Titlebar";
 
-export default function SelectPlan() {
+export default function Authorize() {
 
 	// Create a reference to the webview
 	const ref = useRef<HTMLWebViewElement>(null);
@@ -17,7 +17,13 @@ export default function SelectPlan() {
 		const auth = "";
 
 		// Steel the authorization from the webview
-		async function authorize() {
+		async function authorize(event?: { url: string }) {
+
+			const { url } = { url: webview.src, ...event };
+			if (url) {
+				const includes = url.includes("/authorize/login");
+				await electron.ipcRenderer.invoke("window-size", 600, includes ? 370 : 506);
+			}
 
 			// Wait for authorization to exist
 			const authorization: string = await webview.executeJavaScript("localStorage.getItem(\"authorization\");");
@@ -39,7 +45,7 @@ export default function SelectPlan() {
 		}
 
 		// On new history state, refetch user
-		webview.addEventListener("did-finish-load", authorize);
+		webview.addEventListener("did-finish-load", () => authorize());
 		webview.addEventListener("did-navigate-in-page", authorize);
 
 	}, [ ref ]);
