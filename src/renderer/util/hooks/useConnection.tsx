@@ -71,7 +71,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 		electron.ipcRenderer.on("iplocation", (_event, string) => {
 			const data = JSON.parse(string);
 			if (data.ip !== ipLocation?.ip) setIpLocation(data);
-			if (status === "disconnecting" && Object.values(servers?.servers || {}).filter(server => server.ip === data.ip).length === 0) {
+			if (status === "disconnecting" && Object.values((servers && servers.success && servers.servers) || {}).filter(server => server.ip === data.ip).length === 0) {
 				setStatus("disconnected");
 				setActive(false);
 			}
@@ -81,7 +81,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 			electron.ipcRenderer.removeAllListeners("openvpn");
 			electron.ipcRenderer.removeAllListeners("iplocation");
 		};
-	}, [ active, ipLocation, servers?.servers, setActive, setIpLocation, setStatus, status ]);
+	}, [ active, ipLocation, servers, setActive, setIpLocation, setStatus, status ]);
 
 	return <GlobalStateContext.Provider value={{ status, setStatus, active, setActive, ipLocation, setIpLocation, lastStateChange }}>{children}</GlobalStateContext.Provider>;
 }

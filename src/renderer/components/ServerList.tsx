@@ -60,8 +60,7 @@ export function ServerList({ servers: _servers }: { servers: Ember.Server[]; }):
 
 	// Render ServerList
 	return (
-		<div className="relative flex flex-col overflow-hidden overflow-y-auto bg-gray-100 grow dark:bg-gray-850"
-			id="entrypoint">
+		<div className="relative flex flex-col overflow-hidden overflow-y-auto bg-gray-100 grow dark:bg-gray-850">
 			{!servers.length ? (
 				<div className="flex flex-col items-center justify-center w-full h-full"
 					key={ -1 }>

@@ -9,7 +9,7 @@ export default function EntryPoint(): JSX.Element | null {
 	const { data } = useData("/v2/ember/servers");
 
 	// If the server registry is still loading
-	if (!data) return <Spinner />;
+	if (!data || !data.success) return <Spinner />;
 
 	// Show the server list
 	if (Object.keys(data.servers).length > 0) return <ServerList servers={ Object.values(data.servers) } />;
