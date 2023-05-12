@@ -13,16 +13,28 @@ export default function SelectPlan() {
 		if (!ref.current) return;
 		const webview = ref.current as HTMLWebViewElement & Electron.WebviewTag;
 
+		// Set the user's authorization token
+		const auth = "";
+
 		// Steel the authorization from the webview
 		async function authorize() {
 
 			// Wait for authorization to exist
-			const authorization = await webview.executeJavaScript("localStorage.getItem(\"authorization\");");
-			if (!authorization) return setTimeout(authorize, 10);
+			const authorization: string = await webview.executeJavaScript("localStorage.getItem(\"authorization\");");
+			if (auth === authorization) return;
 			
 			// Set the user's authorization token
 			localStorage.setItem("authorization", authorization);
-			queryClient.refetchQueries("user");
+
+			// Refetch with the new authorization
+			const [ user, servers ] = await Promise.all([
+				queryClient.fetchQuery<REST.APIResponse<Auth.User>>("user"),
+				queryClient.fetchQuery<REST.APIResponse<EmberAPI.Servers>>("/v2/ember/servers")
+			]);
+
+			// If we have the data, set it
+			if (user && user.success) queryClient.setQueryData("user", user);
+			if (servers && servers.success) queryClient.setQueryData("/v2/ember/servers", servers);
 
 		}
 
@@ -30,7 +42,7 @@ export default function SelectPlan() {
 		webview.addEventListener("did-finish-load", authorize);
 		webview.addEventListener("did-navigate-in-page", authorize);
 
-	}, []);
+	}, [ ref ]);
 
 	return (
 		<div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 isolate">
@@ -42,7 +54,7 @@ export default function SelectPlan() {
 			<webview
 				className="absolute w-full h-full"
 				ref={ ref }
-				src={ `//10.16.70.10:8080/authorize/login?redirect_uri=${ encodeURIComponent("/authorize/login") }` } />
+				src="//embervpn.org/authorize/login" />
 			
 			{/* Spinner */}
 			<div className="flex flex-col items-center justify-center grow -z-10">

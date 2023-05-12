@@ -1,3 +1,4 @@
+import Spinner from "@ui-elements/Spinner";
 import { useEffect, useRef } from "react";
 import queryClient from "../util/queryClient";
 
@@ -14,15 +15,27 @@ export default function SelectPlan() {
 		// Set the user's authorization token
 		webview.addEventListener("dom-ready", () => webview.executeJavaScript(`localStorage.setItem("authorization", "${ localStorage.getItem("authorization") }");`));
 		
-		// On new history state
-		webview.addEventListener("did-navigate-in-page", () => queryClient.invalidateQueries("/v2/ember/servers"));
+		// On new history state, refetch servers
+		webview.addEventListener("did-navigate-in-page", async function() {
+			const servers = await queryClient.fetchQuery<REST.APIResponse<EmberAPI.Servers>>("/v2/ember/servers");
+			if (servers && servers.success) queryClient.setQueryData("/v2/ember/servers", servers);
+		});
 
 	}, []);
 
 	return (
-		<webview
-			className="flex flex-col items-center h-full justify-evenly"
-			ref={ ref }
-			src="//embervpn.org/plans/" />
+		<div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 isolate">
+
+			<webview
+				className="flex flex-col items-center w-full h-full justify-evenly"
+				ref={ ref }
+				src="//embervpn.org/plans/" />
+		
+			{/* Spinner */}
+			<div className="flex flex-col items-center justify-center grow -z-10">
+				<Spinner />
+			</div>
+			
+		</div>
 	);
 }
