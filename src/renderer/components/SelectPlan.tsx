@@ -24,10 +24,10 @@ export default function SelectPlan() {
 	}, []);
 
 	return (
-		<div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 isolate">
+		<div className="flex flex-col w-full h-screen bg-gray-100 dark:bg-gray-900 isolate">
 
 			<webview
-				className="flex flex-col items-center w-full h-full justify-evenly"
+				className="absolute w-full h-full"
 				ref={ ref }
 				src="https://embervpn.org/plans/" />
 		
