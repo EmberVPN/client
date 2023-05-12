@@ -57,7 +57,7 @@ export default function Authorize() {
 			<webview
 				className="absolute w-full h-full"
 				ref={ ref }
-				src="//embervpn.org/authorize/login" />
+				src="https://embervpn.org/authorize/login" />
 			
 			{/* Spinner */}
 			<div className="flex flex-col items-center justify-center grow -z-10">
