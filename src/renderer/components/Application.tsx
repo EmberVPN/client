@@ -1,7 +1,7 @@
 import Spinner from "@ui-elements/Spinner";
-import SelectPlan from "./components/SelectPlan";
-import { ServerList } from "./components/ServerList";
-import useData from "./util/hooks/useData";
+import useData from "../util/hooks/useData";
+import SelectPlan from "./SelectPlan";
+import { ServerList } from "./ServerList";
 
 export default function EntryPoint(): JSX.Element | null {
 
