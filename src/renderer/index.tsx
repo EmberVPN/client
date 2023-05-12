@@ -51,17 +51,7 @@ export default function Application() {
 	const { ipLocation } = useConnection();
 
 	// If the user is definitely not logged in, show the login screen
-	if (user === false) return (
-		<div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
-
-			{/* Window title bar */}
-			<Titlebar resizeable={ false }>Sign In</Titlebar>
-
-			{/* Login screen */}
-			<Authorize />
-
-		</div>
-	);
+	if (user === false) return <Authorize />;
 	
 	// If we have all the data, render the app
 	if (user && ipLocation && data) return (
