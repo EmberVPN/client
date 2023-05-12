@@ -4,7 +4,7 @@ import { createRoot } from "react-dom/client";
 import { QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import EntryPoint from "./Application";
+import EntryPoint from "./components/Application";
 import Authorize from "./components/Auth/Login";
 import Titlebar from "./components/Titlebar";
 import Toolbar from "./components/Toolbar";

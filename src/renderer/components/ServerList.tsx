@@ -5,17 +5,18 @@ import { calculateDistance } from "../util/calculateDistance";
 import useConnection from "../util/hooks/useConnection";
 import Server from "./Server";
 
+export type PingedServer = Ember.Server & { ping: number; };
+
 /* eslint-disable react-hooks/exhaustive-deps */
 export function ServerList({ servers: _servers }: { servers: Ember.Server[]; }): JSX.Element {
-	type Server = Ember.Server & { ping: number; };
 
 	// Initialize state
 	const [ ref ] = useAutoAnimate();
 	const { active, ipLocation } = useConnection();
-	const [ servers, setServers ] = useState<Server[]>([]);
+	const [ servers, setServers ] = useState<PingedServer[]>([]);
 
 	// Sort servers by distance then by active
-	const sort = (servers: Server[]) => servers.sort((a, b) => {
+	const sort = (servers: PingedServer[]) => servers.sort((a, b) => {
 		if (!ipLocation) return 0;
 		const distanceA = calculateDistance(a.location.latitude, a.location.longitude, ipLocation?.latitude, ipLocation?.longitude);
 		const distanceB = calculateDistance(b.location.latitude, b.location.longitude, ipLocation?.latitude, ipLocation?.longitude);
@@ -42,7 +43,7 @@ export function ServerList({ servers: _servers }: { servers: Ember.Server[]; }):
 
 			// Filter out rejected promises
 		}))).then(results => results.filter(result => result.status === "fulfilled")
-			.map(result => (result as { value: Server; }).value))
+			.map(result => (result as { value: PingedServer; }).value))
 
 			// Sort & set
 			.then(sort)
