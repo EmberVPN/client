@@ -62,7 +62,7 @@ export default function Application() {
 			<Toolbar />
 
 			{/* Application Contents */}
-			<div className="relative flex flex-col overflow-x-hidden overflow-y-auto select-none grow"
+			<div className="relative flex flex-col items-center justify-center overflow-x-hidden overflow-y-auto select-none grow"
 				id="entrypoint">
 
 				{/* Application */}
