@@ -17,13 +17,10 @@ export default function Authorize() {
 		const auth = "";
 
 		// Steel the authorization from the webview
-		async function authorize(event?: { url: string }) {
+		async function authorize() {
 
-			const { url } = { url: webview.src, ...event };
-			if (url) {
-				const includes = url.includes("/authorize/login");
-				await electron.ipcRenderer.invoke("window-size", 600, includes ? 370 : 506);
-			}
+			const includes = webview.src.includes("/authorize/login");
+			await electron.ipcRenderer.invoke("window-size", 600, includes ? 370 : 506);
 
 			// Wait for authorization to exist
 			const authorization: string = await webview.executeJavaScript("localStorage.getItem(\"authorization\");");
@@ -44,9 +41,9 @@ export default function Authorize() {
 
 		}
 
-		// On new history state, refetch user
-		webview.addEventListener("did-finish-load", () => authorize());
-		webview.addEventListener("did-navigate-in-page", authorize);
+		// This is easier then listening
+		const iv = setInterval(authorize, 100);
+		return () => clearInterval(iv);
 
 	}, [ ref ]);
 
@@ -60,7 +57,7 @@ export default function Authorize() {
 			<webview
 				className="absolute w-full h-full"
 				ref={ ref }
-				src="//embervpn.org/authorize/login" />
+				src="//10.16.70.10:8080/authorize/login" />
 			
 			{/* Spinner */}
 			<div className="flex flex-col items-center justify-center grow -z-10">
