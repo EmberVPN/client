@@ -29,7 +29,7 @@ export default function SelectPlan() {
 			<webview
 				className="flex flex-col items-center w-full h-full justify-evenly"
 				ref={ ref }
-				src="//embervpn.org/plans/" />
+				src="https://embervpn.org/plans/" />
 		
 			{/* Spinner */}
 			<div className="flex flex-col items-center justify-center grow -z-10">
