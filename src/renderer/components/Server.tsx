@@ -91,7 +91,7 @@ export default function Servers({ server: { ping = -1, ...server }}: { server: E
 				</div>
 
 				{/* Connect/disconnect action */}
-				<Button className={ classNames("shrink-0", willConnect && "opacity-50 pointer-events-none", active && isLoading && "!opacity-0") }
+				<Button className={ classNames("shrink-0", willConnect && "opacity-50 pointer-events-none !shadow-none", active && isLoading && "!opacity-0") }
 					color={ isActive && status === "connected" ? "error" : "success" }
 					onClick={ isActive && status === "connected" ? disconnect : connect }>
 					{(isActive && status === "connected") ? "Disconnect" : "Connect"}
