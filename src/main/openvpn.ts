@@ -10,6 +10,7 @@ import { resources } from ".";
 import * as tray from "./tray";
 
 export type State = "connect" | "disconnect";
+const killCommand = process.platform === "win32" ? "taskkill /IM openvpn.exe /F" : "killall openvpn;";
 
 // export const proc: ChildProcessWithoutNullStreams | null = null;
 
@@ -24,7 +25,13 @@ export default function(win: BrowserWindow) {
 	
 	contents = win.webContents;
 
-	ipcMain.handle("ping-server", async(_event, server: Ember.Server) => await inetLatency(server.ip));
+	ipcMain.handle("ping-server", function(_event, server: Ember.Server) {
+		return new Promise(resolve => {
+			inetLatency(server.ip)
+				.then(data => resolve(data));
+			setTimeout(() => resolve(-1), 4000);
+		});
+	});
 	
 	// Listen for openvpn events
 	ipcMain.on("openvpn", async(_, state: State, data: string) => {
@@ -255,7 +262,8 @@ export function connect(server: Ember.Server) {
 	const binary = getBinary();
 	const path = resolve(resources, "ember.ovpn");
 
-	sudo.exec(`"${ binary }" --config "${ path }"`, (error, stdout) => {
+	sudo.exec(`${ killCommand }\n"${ binary }" --config "${ path }"`, (error, stdout) => {
+		console.error(error);
 		if (!stdout) return;
 		
 		// Get the line
@@ -278,7 +286,7 @@ export function connect(server: Ember.Server) {
 export function disconnect() {
 	
 	// Kill all openvpn processes
-	sudo.exec(process.platform === "win32" ? "taskkill /IM openvpn.exe /F" : "killall openvpn");
+	sudo.exec(killCommand);
 
 	tray.disconnect();
 	tray.notify(`Disconnected from ${ lastServer.ip }`, "Ember VPN • Disconnected", resolve(resources, "./assets/tray.png"));

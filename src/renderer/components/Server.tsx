@@ -7,7 +7,7 @@ import { calculateDistance } from "../util/calculateDistance";
 import useConnection from "../util/hooks/useConnection";
 import Timestamp from "./Timestamp";
 
-export default function Servers({ server: { ping = -1, ...server }}: { server: Ember.Server & { ping: number } }): JSX.Element | null {
+export default function Server({ server: { ping = -1, ...server }}: { server: Ember.Server & { ping: number } }): JSX.Element | null {
 
 	// Get the current IP location
 	const { status, active, ipLocation, setStatus, setActive, lastStateChange } = useConnection();
