@@ -1,16 +1,17 @@
-import { ChildProcessWithoutNullStreams, spawn, spawnSync } from "child_process";
+import { spawnSync } from "child_process";
 import { BrowserWindow, ipcMain } from "electron";
 import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
 import fetch from "node-fetch";
 import { resolve } from "path";
+import sudo from "sudo-prompt";
 import { inetLatency } from "systeminformation";
 import { resources } from ".";
 import * as tray from "./tray";
 
 export type State = "connect" | "disconnect";
 
-export let proc: ChildProcessWithoutNullStreams | null = null;
+// export const proc: ChildProcessWithoutNullStreams | null = null;
 
 let contents: Electron.WebContents | null = null;
 let lastServer: Ember.Server;
@@ -161,7 +162,7 @@ export function getBinary() {
 
 		// Check if openvpn is on path
 		const openvpn = spawnSync("which openvpn", { shell: true });
-		if (openvpn.status === 0) return "openvpn";
+		if (openvpn.status === 0) return openvpn.output.toString().trim();
 
 		// Check default location
 		const defaultLocation = resolve("/usr/local/sbin/openvpn");
@@ -177,7 +178,7 @@ export function getBinary() {
 
 	// Check if openvpn is on path
 	const openvpn = spawnSync("which openvpn", { shell: true });
-	if (openvpn.status === 0) return "openvpn";
+	if (openvpn.status === 0) return openvpn.output.toString().trim();
 
 	// Check default location
 	const defaultLocation = resolve("/usr/sbin/openvpn");
@@ -209,16 +210,6 @@ export function install() {
 		});
 	
 	}
-
-	if (process.platform === "darwin") {
-
-		// Install openvpn
-		spawnSync("brew install openvpn", { shell: true });
-
-	}
-
-	// Install openvpn
-	spawnSync("sudo apt-get install openvpn", { shell: true });
 
 }
 
@@ -257,53 +248,27 @@ export function connect(server: Ember.Server) {
 
 	}, 1000);
 
-	// Dispose of old process
-	proc?.kill();
-
 	// Set connecting
 	tray.setConnecting();
 
 	// Get binary path
 	const binary = getBinary();
-
-	// Spawn openvpn process
 	const path = resolve(resources, "ember.ovpn");
-	if (process.platform === "win32") {
-		proc = spawn(binary, [ "--config", path ], { detached: true });
-	} else {
-		proc = spawn("sudo", [ binary, "--config", path ], { detached: true });
-	}
 
-	// Kill the process on exit
-	process.on("exit", () => proc?.kill());
-
-	// Listen for data
-	proc?.stdout.on("data", chunk => {
-		const line = chunk.toString();
+	sudo.exec(`"${ binary }" --config "${ path }"`, (error, stdout) => {
+		if (!stdout) return;
+		
+		// Get the line
+		const line = stdout.toString().trim();
 		console.log("[openvpn]", line);
+
 		if (line.includes("error code 1")) {
 			contents?.send("openvpn", "error", server.hash, line);
-			proc?.kill();
+			disconnect();
 			return;
 		}
+		
 		contents?.send("openvpn", "log", server.hash, line);
-	});
-
-	// On exit
-	proc?.on("exit", code => {
-
-		clearInterval(iv);
-		tray.disconnect();
-
-		// Check if process was killed
-		if (code === null) return;
-
-		// Check if process exited with error
-		if (code !== 0) {
-			contents?.send("openvpn", "error", server.hash, "OpenVPN exited with code " + code);
-			tray.notify(`Could not connect to ${ server.ip }`, "Ember VPN • Not Connected", resolve(resources, "./assets/tray.png"));
-		}
-		return;
 
 	});
 		
@@ -311,8 +276,10 @@ export function connect(server: Ember.Server) {
 
 // Disconnect from openvpn
 export function disconnect() {
-	if (!proc || proc.exitCode !== null) return;
-	proc?.kill();
+	
+	// Kill all openvpn processes
+	sudo.exec(process.platform === "win32" ? "taskkill /IM openvpn.exe /F" : "killall openvpn");
+
 	tray.disconnect();
 	tray.notify(`Disconnected from ${ lastServer.ip }`, "Ember VPN • Disconnected", resolve(resources, "./assets/tray.png"));
 	contents?.send("openvpn", "disconnecting");
