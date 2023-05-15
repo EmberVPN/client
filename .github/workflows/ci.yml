@@ -2,8 +2,11 @@ name: Continuous Integration
 
 on:
   push:
-    branches: '**'
-
+    branches:
+      - '**'
+    branches-ignore:
+      - master
+      
 jobs:
 
   lint:
