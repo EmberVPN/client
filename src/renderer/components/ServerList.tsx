@@ -32,17 +32,9 @@ export function ServerList({ servers: _servers }: { servers: Ember.Server[]; }):
 	function ping() {
 
 		// Run for each server in parallel
-		Promise.allSettled(_servers.map(server => new Promise((resolve, reject) => {
-
-			// Otherwise, ping server
-			electron.ipcRenderer.invoke("ping-server", server)
-				.then(ping => resolve({ ...server, ping }));
-
-			// If no response within 1s, reject
-			setTimeout(() => reject(), 1000);
-
-			// Filter out rejected promises
-		}))).then(results => results.filter(result => result.status === "fulfilled")
+		Promise.allSettled(_servers.map(server => electron.ipcRenderer.invoke("ping-server", server)
+			.then(ping => ({ ...server, ping }))
+		)).then(results => results.filter(result => result.status === "fulfilled")
 			.map(result => (result as { value: PingedServer; }).value))
 
 			// Sort & set

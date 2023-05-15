@@ -7,7 +7,7 @@ import { calculateDistance } from "../util/calculateDistance";
 import useConnection from "../util/hooks/useConnection";
 import Timestamp from "./Timestamp";
 
-export default function Servers({ server: { ping = -1, ...server }}: { server: Ember.Server & { ping: number } }): JSX.Element | null {
+export default function Server({ server: { ping = -1, ...server }}: { server: Ember.Server & { ping: number } }): JSX.Element | null {
 
 	// Get the current IP location
 	const { status, active, ipLocation, setStatus, setActive, lastStateChange } = useConnection();
@@ -67,7 +67,8 @@ export default function Servers({ server: { ping = -1, ...server }}: { server: E
 
 									// Measure ping and distance
 									<>
-										<p className={ classNames(ping < 50 ? "text-success" : ping < 150 ? "text-warn" : "text-error", "transition-colors") }>{ping}ms</p>
+										<p className={ classNames(ping > 0 ? ping < 50 ? "text-success" : ping < 150 ? "text-warn" : "text-error" : "text-gray", "transition-colors") }>{ping > 0 ? `${ ping }ms` : "---"}</p>
+										
 										<span className="text-gray-400 dark:text-gray-600">•</span>
 										<p>{Intl.NumberFormat().format(Math.floor(distance * (ipLocation.country_code === "US" ? 0.621371 : 1)))} {ipLocation.country_code === "US" ? "Mi" : "Km"}</p>
 									</>) : (
