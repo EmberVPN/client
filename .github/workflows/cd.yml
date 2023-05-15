@@ -4,9 +4,12 @@ on:
   workflow_run:
     workflows: ["Continuous Integration"]
     types:
-      - completed
+    - completed
     branches:
-      - master      
+    - master    
+  push:
+    branches:
+    - master  
 
 jobs:
 
