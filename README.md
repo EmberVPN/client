@@ -5,3 +5,5 @@
 ```
 git clone --recurse-submodules https://github.com/EmberVPN/client.git embervpn-client
 ```
+
+## Building
