@@ -23,7 +23,14 @@ export default function(win: BrowserWindow) {
 	
 	contents = win.webContents;
 
-	ipcMain.handle("ping-server", async(_event, server: Ember.Server) => await inetLatency(server.ip));
+	// Ping server
+	ipcMain.handle("ping-server", function(_event, server: Ember.Server) {
+		return new Promise(resolve => {
+			inetLatency(server.ip)
+				.then(data => resolve(data));
+			setTimeout(() => resolve(-1), 4000);
+		});
+	});
 	
 	// Listen for openvpn events
 	ipcMain.on("openvpn", async(_, state: State, data: string) => {
