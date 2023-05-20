@@ -1,8 +1,8 @@
 import Spinner from "@ui-elements/Spinner";
 import ToolbarElement from "@ui-elements/Toolbar";
 import { useUser } from "../util/hooks/useUser";
-import MyAccount from "./Auth/MyAccount";
 import ConnectionStatus from "./ConnectionStatus";
+import { MyAccount } from "./MyAccount";
 
 export default function Toolbar() {
 
