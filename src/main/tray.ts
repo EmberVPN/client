@@ -11,7 +11,7 @@ export let defaults: (MenuItem | MenuItemConstructorOptions)[] = [];
 export const settings: (MenuItem | MenuItemConstructorOptions)[] = [];
 
 // Wrap icon as 16x16
-export const resizeImage = (name: string) => nativeImage.createFromPath(resolve(resources, `./assets/${ name }.png`)).resize({ width: 16, height: 16 });
+export const resizeImage = (name: string, size = 16) => nativeImage.createFromPath(resolve(resources, `./assets/${ name }.png`)).resize({ width: size, height: size });
 
 // Get mainwindow once it loads
 export default function(win: BrowserWindow) {
