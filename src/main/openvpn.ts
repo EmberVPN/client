@@ -220,7 +220,7 @@ export function connect(server: Ember.Server) {
 		if (lastIp === server.ip) {
 			clearInterval(iv);
 			tray.setConnected();
-			tray.notify(`Connected to ${ server.ip }`, "Ember VPN • Connected", resolve(resources, "./assets/tray-connected.png"));
+			tray.notify(`Connected to ${ server.ip }`, "Ember VPN • Connected", "tray");
 			contents?.send("openvpn", "connected");
 		}
 
@@ -270,7 +270,7 @@ export function connect(server: Ember.Server) {
 		// Check if process exited with error
 		if (code !== 0) {
 			contents?.send("openvpn", "error", server.hash, "OpenVPN exited with code " + code);
-			tray.notify(`Could not connect to ${ server.ip }`, "Ember VPN • Not Connected", resolve(resources, "./assets/tray.png"));
+			tray.notify(`Could not connect to ${ server.ip }`, "Ember VPN • Not Connected", "tray");
 		}
 		return;
 
@@ -283,6 +283,6 @@ export function disconnect() {
 	if (!proc || proc.exitCode !== null) return;
 	proc?.kill();
 	tray.disconnect();
-	tray.notify(`Disconnected from ${ lastServer.ip }`, "Ember VPN • Disconnected", resolve(resources, "./assets/tray.png"));
+	tray.notify(`Disconnected from ${ lastServer.ip }`, "Ember VPN • Disconnected", "tray");
 	contents?.send("openvpn", "disconnecting");
 }

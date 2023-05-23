@@ -48,11 +48,11 @@ export function setConnected() {
 }
 
 /** Send native notification balloon */
-export function notify(body: string, title = "Ember VPN", icon = resizeImage("icon")) {
+export function notify(body: string, title = "Ember VPN", icon = "icon") {
 	new Notification({
 		body,
 		title,
-		icon
+		icon: resizeImage(icon)
 	}).show();
 }
 
