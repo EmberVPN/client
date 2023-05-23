@@ -34,7 +34,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           npm run lint || true
           git commit -am "Eslint: fix all" || true
-          git push origin ${{ github.head_ref }}
+          git push origin ${{ github.head_ref }} || true
 
   test:
     name: Test
