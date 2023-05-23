@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Notification, Tray } from "electron";
+import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Notification, Tray, nativeImage } from "electron";
 import { resolve } from "path";
 import { resources } from ".";
 import * as openvpn from "./openvpn";
@@ -10,11 +10,14 @@ let exit = () => { };
 export let defaults: (MenuItem | MenuItemConstructorOptions)[] = [];
 export const settings: (MenuItem | MenuItemConstructorOptions)[] = [];
 
+// Wrap icon as 16x16
+export const resizeImage = (name: string) => nativeImage.createFromPath(resolve(resources, `./assets/${ name }.png`)).resize({ width: 16, height: 16 });
+
 // Get mainwindow once it loads
 export default function(win: BrowserWindow) {
 	
 	// Initialize the tray
-	if (!tray) tray = new Tray(resolve(resources, "./assets/tray.png"));
+	if (!tray) tray = new Tray(resizeImage("tray"));
 	exit = () => win.close();
 
 	defaults = [ {
@@ -24,7 +27,7 @@ export default function(win: BrowserWindow) {
 	
 	// Set disconnected state
 	tray.setToolTip("Ember VPN");
-	tray.setImage(resolve(resources, "./assets/tray.png"));
+	tray.setImage(resizeImage("tray"));
 	tray.on("click", () => win.show());
 	setMenu([ ...defaults ]);
 	
@@ -36,7 +39,7 @@ export function setConnected() {
 	if (!tray) return;
 	
 	tray.setToolTip("Ember VPN • Connected");
-	tray.setImage(resolve(resources, "./assets/tray-connected.png"));
+	tray.setImage(resizeImage("tray-connected"));
 	tray.setContextMenu(Menu.buildFromTemplate([ {
 		label: "Disconnect",
 		click: () => openvpn.disconnect()
@@ -45,7 +48,7 @@ export function setConnected() {
 }
 
 /** Send native notification balloon */
-export function notify(body: string, title = "Ember VPN", icon = resolve(resources, "./assets/icon.png")) {
+export function notify(body: string, title = "Ember VPN", icon = resizeImage("icon")) {
 	new Notification({
 		body,
 		title,
@@ -59,7 +62,7 @@ export function disconnect() {
 	if (!tray) return;
 
 	tray.setToolTip("Ember VPN");
-	tray.setImage(resolve(resources, "./assets/tray.png"));
+	tray.setImage(resizeImage("tray"));
 	setMenu([ ...defaults ]);
 	
 }
@@ -70,7 +73,7 @@ export function setConnecting() {
 	if (!tray) return;
 
 	tray.setToolTip("Ember VPN • Connecting...");
-	tray.setImage(resolve(resources, "./assets/tray-pending.png"));
+	tray.setImage(resizeImage("tray-pending"));
 	setMenu([ ...defaults ]);
 	
 }
