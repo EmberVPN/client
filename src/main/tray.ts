@@ -18,7 +18,7 @@ export default function(win: BrowserWindow) {
 	
 	// Initialize the tray
 	if (!tray) tray = new Tray(resizeImage("tray"));
-	exit = () => win.close();
+	exit = () => process.exit();
 
 	defaults = [ {
 		label: "Exit",
