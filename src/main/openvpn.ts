@@ -163,38 +163,8 @@ export function getBinary() {
 		return bundledLocation;
 
 	}
-
-	if (process.platform === "darwin") {
-
-		// Check if openvpn is on path
-		const openvpn = spawnSync("which openvpn", { shell: true });
-		if (openvpn.status === 0) return "openvpn";
-
-		// Check default location
-		const defaultLocation = resolve("/usr/local/sbin/openvpn");
-		if (existsSync(defaultLocation)) return defaultLocation;
-
-		// Install OpenVPN
-		install();
-
-		// Return openvpn
-		return "openvpn";
-
-	}
-
-	// Check if openvpn is on path
-	const openvpn = spawnSync("which openvpn", { shell: true });
-	if (openvpn.status === 0) return "openvpn";
-
-	// Check default location
-	const defaultLocation = resolve("/usr/sbin/openvpn");
-	if (existsSync(defaultLocation)) return defaultLocation;
-
-	// Install OpenVPN
-	install();
-
-	// Return openvpn
-	return "openvpn";
+	
+	throw new Error("Unsupported platform");
 
 }
 
@@ -204,7 +174,7 @@ export function install() {
 	if (process.platform === "win32") {
 			
 		// Run the bundled installer
-		spawnSync([
+		return spawnSync([
 			"msiexec",
 			"/i",
 			`"${ resolve(resources, ".bin/installer.msi") }"`,
@@ -217,15 +187,7 @@ export function install() {
 	
 	}
 
-	if (process.platform === "darwin") {
-
-		// Install openvpn
-		spawnSync("brew install openvpn", { shell: true });
-
-	}
-
-	// Install openvpn
-	spawnSync("sudo apt-get install openvpn", { shell: true });
+	throw new Error("Unsupported platform");
 
 }
 
@@ -278,7 +240,7 @@ export function connect(server: Ember.Server) {
 	if (process.platform === "win32") {
 		proc = spawn(binary, [ "--config", path ], { detached: true });
 	} else {
-		proc = spawn("sudo", [ binary, "--config", path ], { detached: true });
+		throw new Error("Unsupported platform");
 	}
 
 	// Kill the process on exit
