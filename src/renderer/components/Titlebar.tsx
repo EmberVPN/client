@@ -1,7 +1,6 @@
 import favicon from "@assets/icon.svg";
 import classNames from "classnames";
 import React, { HTMLAttributes, useState } from "react";
-import { MdMinimize } from "react-icons/md";
 import { VscChromeClose, VscChromeMaximize, VscChromeMinimize, VscChromeRestore } from "react-icons/vsc";
 
 interface Props {
