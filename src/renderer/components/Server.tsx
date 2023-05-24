@@ -67,7 +67,7 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 
 									// Measure ping and distance
 									<>
-										<p className={ classNames(ping > 0 ? ping < 50 ? "text-success" : ping < 150 ? "text-warn" : "text-error" : "text-gray", "transition-colors") }>{ping > 0 ? `${ ping }ms` : "---"}</p>
+										<p className={ classNames(ping > 0 ? ping < 50 ? "text-success" : ping < 150 ? "text-warn" : "text-error" : "text-gray", "transition-colors") }>{ping > 0 ? `${ Math.trunc(ping) }ms` : "---"}</p>
 										
 										<span className="text-gray-400 dark:text-gray-600">•</span>
 										<p>{Intl.NumberFormat().format(Math.floor(distance * (ipLocation.country_code === "US" ? 0.621371 : 1)))} {ipLocation.country_code === "US" ? "Mi" : "Km"}</p>
@@ -92,7 +92,8 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 				</div>
 
 				{/* Connect/disconnect action */}
-				<Button className={ classNames("shrink-0", willConnect && "opacity-50 pointer-events-none !shadow-none", active && isLoading && "!opacity-0") }
+				<Button
+					className={ classNames("justify-center shrink-0", willConnect && "opacity-50 pointer-events-none !shadow-none", active && isLoading && "!opacity-0") }
 					color={ isActive && status === "connected" ? "error" : "success" }
 					onClick={ isActive && status === "connected" ? disconnect : connect }>
 					{(isActive && status === "connected") ? "Disconnect" : "Connect"}

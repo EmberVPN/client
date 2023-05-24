@@ -46,73 +46,73 @@ jobs:
             dist/*.exe
             dist/*.msi
 
-  build-linux:
-    name: Build (linux)
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
-          submodules: recursive
-
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build:linux
-
-      - name: Upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: linux
-          path: |
-            dist/*.AppImage
-            dist/*.snap
-            dist/*.deb
-            dist/*.tar.gz
-            dist/*.zip
-
-  build-macos:
-    name: Build (macos)
-    runs-on: macos-latest
-    permissions:
-      contents: write
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
-          submodules: recursive
-
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: npm ci
-        
-      - name: Build
-        run: npm run build:mac
-
-      - name: Upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: darwin
-          path: |
-            dist/*.dmg
+#  build-linux:
+#    name: Build (linux)
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: write
+#    env:
+#      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#        with:
+#          ref: ${{ github.ref }}
+#          submodules: recursive
+#
+#      - name: Use Node.js 18
+#        uses: actions/setup-node@v3
+#        with:
+#          node-version: 18
+#
+#      - name: Install Dependencies
+#        run: npm ci
+#
+#      - name: Build
+#        run: npm run build:linux
+#
+#      - name: Upload
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: linux
+#          path: |
+#            dist/*.AppImage
+#            dist/*.snap
+#            dist/*.deb
+#            dist/*.tar.gz
+#            dist/*.zip
+#
+#  build-macos:
+#    name: Build (macos)
+#    runs-on: macos-latest
+#    permissions:
+#      contents: write
+#    env:
+#      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#        with:
+#          ref: ${{ github.ref }}
+#          submodules: recursive
+#
+#      - name: Use Node.js 18
+#        uses: actions/setup-node@v3
+#        with:
+#          node-version: 18
+#
+#      - name: Install Dependencies
+#        run: npm ci
+#        
+#      - name: Build
+#        run: npm run build:mac
+#
+#      - name: Upload
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: darwin
+#          path: |
+#            dist/*.dmg
 
   release:
     name: Release (all)
@@ -145,16 +145,16 @@ jobs:
         with:
           name: win32
           path: win32/
-      - name: Download (linux)
-        uses: actions/download-artifact@v3
-        with:
-          name: linux
-          path: linux/
-      - name: Download (macos)
-        uses: actions/download-artifact@v3
-        with:
-          name: darwin
-          path: darwin/
+      #- name: Download (linux)
+      #  uses: actions/download-artifact@v3
+      #  with:
+      #    name: linux
+      #    path: linux/
+      #- name: Download (macos)
+      #  uses: actions/download-artifact@v3
+      #  with:
+      #    name: darwin
+      #    path: darwin/
       
       # create release
       - name: Create release
@@ -166,5 +166,5 @@ jobs:
           tag_name: v${{ steps.get-version.outputs.current-version }}
           files: |
             win32/*
-            linux/*
-            darwin/*
+       #     linux/*
+       #     darwin/*

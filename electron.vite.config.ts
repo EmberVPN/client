@@ -22,6 +22,7 @@ export default defineConfig({
 			APIROOT: JSON.stringify("https://api.embervpn.org"),
 			VERSION: JSON.stringify(version),
 			DEVELOPMENT: JSON.stringify(process.env.NODE_ENV === "development"),
+			PLATFORM: JSON.stringify(process.platform)
 		},
 		plugins: [
 			react(),

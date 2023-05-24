@@ -163,38 +163,8 @@ export function getBinary() {
 		return bundledLocation;
 
 	}
-
-	if (process.platform === "darwin") {
-
-		// Check if openvpn is on path
-		const openvpn = spawnSync("which openvpn", { shell: true });
-		if (openvpn.status === 0) return "openvpn";
-
-		// Check default location
-		const defaultLocation = resolve("/usr/local/sbin/openvpn");
-		if (existsSync(defaultLocation)) return defaultLocation;
-
-		// Install OpenVPN
-		install();
-
-		// Return openvpn
-		return "openvpn";
-
-	}
-
-	// Check if openvpn is on path
-	const openvpn = spawnSync("which openvpn", { shell: true });
-	if (openvpn.status === 0) return "openvpn";
-
-	// Check default location
-	const defaultLocation = resolve("/usr/sbin/openvpn");
-	if (existsSync(defaultLocation)) return defaultLocation;
-
-	// Install OpenVPN
-	install();
-
-	// Return openvpn
-	return "openvpn";
+	
+	throw new Error("Unsupported platform");
 
 }
 
@@ -204,7 +174,7 @@ export function install() {
 	if (process.platform === "win32") {
 			
 		// Run the bundled installer
-		spawnSync([
+		return spawnSync([
 			"msiexec",
 			"/i",
 			`"${ resolve(resources, ".bin/installer.msi") }"`,
@@ -217,15 +187,7 @@ export function install() {
 	
 	}
 
-	if (process.platform === "darwin") {
-
-		// Install openvpn
-		spawnSync("brew install openvpn", { shell: true });
-
-	}
-
-	// Install openvpn
-	spawnSync("sudo apt-get install openvpn", { shell: true });
+	throw new Error("Unsupported platform");
 
 }
 
@@ -258,7 +220,7 @@ export function connect(server: Ember.Server) {
 		if (lastIp === server.ip) {
 			clearInterval(iv);
 			tray.setConnected();
-			tray.notify(`Connected to ${ server.ip }`, "Ember VPN • Connected", resolve(resources, "./assets/tray-connected.png"));
+			tray.notify(`Connected to ${ server.ip }`, "Ember VPN • Connected", "tray");
 			contents?.send("openvpn", "connected");
 		}
 
@@ -278,7 +240,7 @@ export function connect(server: Ember.Server) {
 	if (process.platform === "win32") {
 		proc = spawn(binary, [ "--config", path ], { detached: true });
 	} else {
-		proc = spawn("sudo", [ binary, "--config", path ], { detached: true });
+		throw new Error("Unsupported platform");
 	}
 
 	// Kill the process on exit
@@ -308,7 +270,7 @@ export function connect(server: Ember.Server) {
 		// Check if process exited with error
 		if (code !== 0) {
 			contents?.send("openvpn", "error", server.hash, "OpenVPN exited with code " + code);
-			tray.notify(`Could not connect to ${ server.ip }`, "Ember VPN • Not Connected", resolve(resources, "./assets/tray.png"));
+			tray.notify(`Could not connect to ${ server.ip }`, "Ember VPN • Not Connected", "tray");
 		}
 		return;
 
@@ -321,6 +283,6 @@ export function disconnect() {
 	if (!proc || proc.exitCode !== null) return;
 	proc?.kill();
 	tray.disconnect();
-	tray.notify(`Disconnected from ${ lastServer.ip }`, "Ember VPN • Disconnected", resolve(resources, "./assets/tray.png"));
+	tray.notify(`Disconnected from ${ lastServer.ip }`, "Ember VPN • Disconnected", "tray");
 	contents?.send("openvpn", "disconnecting");
 }

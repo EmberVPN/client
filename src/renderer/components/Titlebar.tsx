@@ -9,8 +9,11 @@ interface Props {
 }
 
 export default function Titlebar({ children, resizeable = true, className, ...props }: Props & HTMLAttributes<HTMLDivElement>): JSX.Element {
+
+	// Maximize state
 	const [ maximized, setMaximized ] = useState(false);
 	
+	// Listen for maximize/restore events
 	electron.ipcRenderer.on("titlebar", (_, action: string) => {
 		switch (action) {
 		case "maximize":
@@ -22,23 +25,45 @@ export default function Titlebar({ children, resizeable = true, className, ...pr
 		}
 	});
 
+	// Is macos
+	const isMac = PLATFORM === "darwin";
+
+	// Window button class
+	const button = classNames("flex items-center justify-center h-8 text-base bg-opacity-0 select-none no-drag bg-neutral-500 hover:bg-opacity-10 active:hover:bg-opacity-20 last:hover:bg-red-500 last:hover:bg-opacity-100 last:hover:active:bg-opacity-70 last:hover:text-white w-[46px]");
+
 	return (
-		<div className={ classNames("titlebar--root text-sm h-8 flex w-full justify-between items-center relative select-none text-gray-800 dark:text-gray-200 z-[70] font-windows app-drag", className) }
+		<div className={ classNames("flex w-full items-center relative select-none text-gray-800 dark:text-gray-200 z-[70] font-windows app-drag text-xs", className, isMac ? "h-7 justify-center" : "h-8 justify-between") }
 			{ ...props }>
-			<div className="z-10 flex items-center gap-2 px-3">
-				<img alt=""
-					className="h-5 aspect-square"
+			
+			{/* Left side */}
+			<div className="z-10 flex items-center gap-2.5 px-3">
+
+				{/* Icon */}
+				<img className={ classNames("h-5 aspect-square", isMac && "hidden") }
 					src={ favicon } />
-				<span>{children ? `Ember VPN - ${ children }` : "Ember VPN"}</span>
+				
+				{/* Title */}
+				<span className="flex items-center my-auto h-7">{children ? `Ember VPN - ${ children }` : "Ember VPN"}</span>
+				
 			</div>
-			<div className="flex">
-				<div className="flex items-center justify-center h-8 text-base bg-opacity-0 select-none no-drag bg-neutral-500 hover:bg-opacity-10 active:hover:bg-opacity-20 last:hover:bg-red-500 last:hover:bg-opacity-100 last:hover:active:bg-opacity-70 last:hover:text-white w-[46px]"
-					onClick={ () => electron.ipcRenderer.send("titlebar", "minimize") }><VscChromeMinimize /></div>
-				{ resizeable && <div className="flex items-center justify-center h-8 text-base bg-opacity-0 select-none no-drag bg-neutral-500 hover:bg-opacity-10 active:hover:bg-opacity-20 last:hover:bg-red-500 last:hover:bg-opacity-100 last:hover:active:bg-opacity-70 last:hover:text-white w-[46px]"
+
+			{/* Window controls (hide for mac) */}
+			<div className={ classNames(isMac ? "hidden" : "flex") }>
+				
+				{/* Minimize */}
+				<div className={ button }
+					onClick={ () => electron.ipcRenderer.send("titlebar", "minimize") }>{ <VscChromeMinimize /> }</div>
+				
+				{/* Maximize/restore */}
+				{ resizeable && <div className={ button }
 					onClick={ () => electron.ipcRenderer.send("titlebar", "restore") }>{maximized ? <VscChromeRestore /> : <VscChromeMaximize />}</div>}
-				<div className="flex items-center justify-center h-8 text-base bg-opacity-0 select-none no-drag bg-neutral-500 hover:bg-opacity-10 active:hover:bg-opacity-20 last:hover:bg-red-500 last:hover:bg-opacity-100 last:hover:active:bg-opacity-70 last:hover:text-white w-[46px]"
+				
+				{/* Close */}
+				<div className={ button }
 					onClick={ () => electron.ipcRenderer.send("titlebar", "hide") }><VscChromeClose /></div>
+				
 			</div>
+
 		</div>
 	);
 }
