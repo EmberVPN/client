@@ -8,7 +8,11 @@ export class TrayManager {
 	private tray: Tray;
 
 	// Initialize the tray state
-	private state: "connected" | "disconnected" | "connecting" = "disconnected";
+	private _state: "connected" | "disconnected" | "connecting" = "disconnected";
+
+	get state() {
+		return this._state;
+	}
 
 	// Initialize the tray tooltip
 	private tooltip = "Ember VPN";
@@ -18,7 +22,7 @@ export class TrayManager {
 		"connected": "tray-connected",
 		"disconnected": "tray",
 		"connecting": "tray-pending"
-	} satisfies Record<typeof this.state, string>;
+	} satisfies Record<typeof this._state, string>;
 
 	// Initialize the tray menu
 	private menu: Record<string, Electron.MenuItemConstructorOptions> = {};
@@ -63,7 +67,7 @@ export class TrayManager {
 		this.tray.on("click", () => win.show());
 
 		// Set the default state
-		this.setState(this.state);
+		this.setState(this._state);
 
 		// Add context menu
 		this.pushMenuItem({
@@ -78,27 +82,27 @@ export class TrayManager {
 		this.tray.setToolTip(this.tooltip);
 	}
 
-	public setState(state: typeof this.state) {
+	public setState(state: typeof this._state) {
 
 		// Set the state
-		this.state = state;
+		this._state = state;
 
 		// Set the tray image
-		this.tray.setImage(this.resizeImage(this.imagesByState[this.state]));
+		this.tray.setImage(this.resizeImage(this.imagesByState[this._state]));
 
 		// Set tooltip
-		this.setToolTip(this.state.replace(/^\w/, c => c.toUpperCase()));
+		this.setToolTip(this._state.replace(/^\w/, c => c.toUpperCase()));
 
 		// Add the disconnect button if we're connected
 		this.removeMenuItem("Disconnect");
-		if (this.state === "connected") this.pushMenuItem({
+		if (this._state === "connected") this.pushMenuItem({
 			label: "Disconnect",
 			click: () => ovpn.disconnect()
 		});
 
 	}
 
-	public notify(body: string, title = this.tooltip, icon = this.imagesByState[this.state]) {
+	public notify(body: string, title = this.tooltip, icon = this.imagesByState[this._state]) {
 		new Notification({
 			body,
 			title,
