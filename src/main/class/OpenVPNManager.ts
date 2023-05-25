@@ -145,10 +145,10 @@ export class OpenVPNManager {
 				
 				// Download server config
 				await this.downloadConfig(server)
-					.then(e => win.webContents.send("openvpn", "connecting", server.hash, e))
+					.then(e => win.webContents.send("openvpn", "connecting", server.hash))
 					.then(() => this.connect())
 					.then(() => this.confirmConnection(server))
-					.catch(e => win.webContents.send("openvpn", "error", server.hash, e));
+					.catch(e => win.webContents.send("openvpn", "error", server.hash, e.toString()));
 					
 			}
 
