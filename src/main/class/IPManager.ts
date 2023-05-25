@@ -101,7 +101,13 @@ export class IPManager extends EventEmitter {
 			}
 		}, 1000);
 
-		setInterval(() => this.win.webContents.send("iplocation", JSON.stringify(this.lastGeo)), 50);
+		// Send IP location to renderer
+		setInterval(() => {
+			if (!this.win) return;
+			if (this.win.isDestroyed()) return;
+			if (this.win.webContents.isDestroyed()) return;
+			this.win.webContents.send("iplocation", JSON.stringify(this.lastGeo));
+		}, 50);
 
 	}
 
