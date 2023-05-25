@@ -47,9 +47,9 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 	// Sync state with main process
 	useEffect(function() {
 		
-		electron.ipcRenderer.on("openvpn", (_event, state: string) => {
+		electron.ipcRenderer.on("openvpn", (_event, state: string, ...args) => {
+			console.log(state, ...args);
 
-			// console.log(state, args);
 			switch (state) {
 				
 			case "error":
@@ -66,9 +66,10 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 				
 			}
 		});
-
+		
 		// Observe IP address changes
 		electron.ipcRenderer.on("iplocation", (_event, string) => {
+			console.log(string);
 			const data = JSON.parse(string);
 			if (data.ip !== ipLocation?.ip) setIpLocation(data);
 			if (status === "disconnecting" && Object.values((servers && servers.success && servers.servers) || {}).filter(server => server.ip === data.ip).length === 0) {
