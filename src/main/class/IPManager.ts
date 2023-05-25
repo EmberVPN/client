@@ -86,28 +86,31 @@ export class IPManager extends EventEmitter {
 		super();
 		this.win = win;
 		
-		// Fetch IP address every 5 seconds and emit event if it changes
-		setInterval(async() => {
-			const ip = await this.fetchAddress();
+		// On window contents load
+		win.webContents.once("did-finish-load", async() => {
 
-			// Observe IP changes
-			if (ip !== this.lastIP) {
-				this.lastIP = ip;
-
-				// Lookup geolocation for IP
-				this.lastGeo = await this.fetchGeo(ip);
-				this.emit("change", this.lastGeo);
+			// Fetch IP address every second and emit event if it changes
+			setInterval(async() => {
+				const ip = await this.fetchAddress();
 				
-			}
-		}, 1000);
+				// Observe IP changes
+				if (ip !== this.lastIP) {
+					this.emit("change", ip);
+					this.lastIP = ip;
+					this.lastGeo = await this.fetchGeo(ip);
+				}
+				
+			}, 1000);
 
-		// Send IP location to renderer
-		setInterval(() => {
-			if (!this.win) return;
-			if (this.win.isDestroyed()) return;
-			if (this.win.webContents.isDestroyed()) return;
-			this.win.webContents.send("iplocation", JSON.stringify(this.lastGeo));
-		}, 50);
+			// Send IP location to renderer
+			setInterval(() => {
+				if (!this.win) return;
+				if (this.win.isDestroyed()) return;
+				if (this.win.webContents.isDestroyed()) return;
+				this.win.webContents.send("iplocation", JSON.stringify(this.lastGeo));
+			}, 50);
+			
+		});
 
 	}
 

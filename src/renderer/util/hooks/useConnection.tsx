@@ -44,11 +44,13 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 	const [ ipLocation, setIpLocation ] = useState<GeoLocation | null>(null);
 	const [ lastStateChange, setLastStateChange ] = useState<number>(Date.now());
 	const { data: servers } = useData("/v2/ember/servers");
+	let lastServerHash = "";
 	
 	// Sync state with main process
 	useEffect(function() {
 		
 		electron.ipcRenderer.on("openvpn", (_event, state: string, ...args) => {
+			lastServerHash = args[0];
 			switch (state) {
 				
 			case "error":
@@ -69,27 +71,47 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 		
 		// Observe IP address changes
 		electron.ipcRenderer.on("iplocation", (_event, string) => {
-			console.log(string);
 			const data = JSON.parse(string);
+
+			console.log(data);
+
+			// If the IP has changed, update the location
 			if (data.ip !== ipLocation?.ip) setIpLocation(data);
+
+			// If we're disconnecting, set the status to disconnected
 			if (status === "disconnecting") {
+				console.log("lookng for server", servers, data);
+
+				// If we dont have the IP of one of the servers, set it as disconnected
+				if (!servers || !servers.success) return;
+				if (Object.values(servers.servers).find(server => server.ip === data.ip)) return;
+
 				setStatus("disconnected");
 				setActive(false);
+
 			}
 
-			// If we have the IP of one of the servers, set it as active
-			if (servers && servers.success) {
-				const server = Object.values(servers.servers).find(server => server.ip === data.ip);
-				if (!server) {
-					if (status === "connected") {
-						setActive(false);
-						setStatus("disconnected");
-					}
-					return;
-				}
-				setActive(server.hash);
+			// Get the server that matches the IP
+			if (!servers || !servers.success) return;
+			const server = Object.values(servers.servers).find(server => server.ip === data.ip);
+
+			// If we have a server, set the status to connected
+			if (server && ![ "will-connect", "disconnecting" ].includes(status) && data.ip === lastServerHash) {
 				setStatus("connected");
+				setActive(server.hash);
+				return;
 			}
+
+			// if (!server) {
+			// 		if (status === "connected") {
+			// 			setActive(false);
+			// 			setStatus("disconnected");
+			// 		}
+			// 		return;
+			// 	}
+			// 	setActive(server.hash);
+			// 	setStatus("connected");
+			// }
 
 		});
 
