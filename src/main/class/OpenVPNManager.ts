@@ -44,7 +44,7 @@ function install() {
 		return spawnSync([
 			"msiexec",
 			"/i",
-			`"${ resolve(resources, ".bin/installer.msi") }"`,
+			`"${ resolve(resources, ".bin/OpenVPN-2.6.4-I001-amd64.msi") }"`,
 			`PRODUCTDIR="${ resolve(resources, ".bin") }"`,
 			"ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun",
 			"/passive",
