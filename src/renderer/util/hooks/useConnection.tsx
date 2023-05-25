@@ -80,7 +80,11 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 			// If we have the IP of one of the servers, set it as active
 			if (servers && servers.success) {
 				const server = Object.values(servers.servers).find(server => server.ip === data.ip);
-				if (!server) return;
+				if (!server) {
+					setActive(false);
+					setStatus("disconnected");
+					return;
+				}
 				setActive(server.hash);
 				setStatus("connected");
 			}
