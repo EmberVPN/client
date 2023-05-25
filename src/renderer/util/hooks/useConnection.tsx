@@ -81,7 +81,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 			if (servers && servers.success) {
 				const server = Object.values(servers.servers).find(server => server.ip === data.ip);
 				if (!server) {
-					if (status === "connected" || status === "connecting") {
+					if (status === "connected") {
 						setActive(false);
 						setStatus("disconnected");
 					}
