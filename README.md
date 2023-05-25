@@ -7,3 +7,8 @@ git clone --recurse-submodules https://github.com/EmberVPN/client.git embervpn-c
 ```
 
 ## Building
+```
+cd embervpn-client
+npm install
+npm run build:<win | mac | lin>
+```
