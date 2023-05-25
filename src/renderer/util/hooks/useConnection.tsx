@@ -48,8 +48,6 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 	useEffect(function() {
 		
 		electron.ipcRenderer.on("openvpn", (_event, state: string, ...args) => {
-			console.log(state, ...args);
-
 			switch (state) {
 				
 			case "error":
@@ -72,10 +70,19 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 			console.log(string);
 			const data = JSON.parse(string);
 			if (data.ip !== ipLocation?.ip) setIpLocation(data);
-			if (status === "disconnecting" && Object.values((servers && servers.success && servers.servers) || {}).filter(server => server.ip === data.ip).length === 0) {
+			if (status === "disconnecting") {
 				setStatus("disconnected");
 				setActive(false);
 			}
+
+			// If we have the IP of one of the servers, set it as active
+			if (servers && servers.success) {
+				const server = Object.values(servers.servers).find(server => server.ip === data.ip);
+				if (!server) return;
+				setActive(server.hash);
+				setStatus("connected");
+			}
+
 		});
 
 		return () => {
