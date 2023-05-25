@@ -173,6 +173,7 @@ export class OpenVPNManager {
 	 * @returns void
 	 */
 	public async disconnect() {
+		this.eventDispatcher.send("openvpn", "disconnecting");
 		
 		// Kill process
 		if (this.proc) this.proc.kill();
@@ -181,6 +182,7 @@ export class OpenVPNManager {
 		// Set disconnected state
 		tray.setState("disconnected");
 		tray.notify("Disconnected from VPN");
+		this.eventDispatcher.send("openvpn", "disconnected");
 
 	}
 
