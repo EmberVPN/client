@@ -17,4 +17,9 @@
 		".github/workflows/ci.yml",
 		".github/workflows/cd.yml"
 	],
+	"cSpell.words": [
+		"embervpn",
+		"Titlebar",
+		"unmaximize"
+	],
 }

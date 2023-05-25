@@ -9,7 +9,7 @@ import Authorize from "./components/Authorize";
 import Titlebar from "./components/Titlebar";
 import Toolbar from "./components/Toolbar";
 import "./styles/index.less";
-import useConnection, { ConnectionProvider } from "./util/hooks/useConnection";
+import { ConnectionProvider } from "./util/hooks/useConnection";
 import useData from "./util/hooks/useData";
 import { useUser } from "./util/hooks/useUser";
 import queryClient from "./util/queryClient";
@@ -48,13 +48,12 @@ export default function Application() {
 	// Get the user, ip location and server registry
 	const { user } = useUser();
 	const { data } = useData("/v2/ember/servers");
-	const { ipLocation } = useConnection();
 
 	// If the user is definitely not logged in, show the login screen
 	if (user === false) return <Authorize />;
 	
 	// If we have all the data, render the app
-	if (user && ipLocation && data) return (
+	if (user && data) return (
 		<div className="flex flex-col w-screen h-screen overflow-hidden">
 
 			{/* Window title bar */}

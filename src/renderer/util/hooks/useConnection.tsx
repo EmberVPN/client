@@ -1,5 +1,6 @@
 import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 import useData from "./useData";
+import { toast } from "react-toastify";
 
 type State =| "connected"
 			| "disconnected"
@@ -47,12 +48,11 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 	// Sync state with main process
 	useEffect(function() {
 		
-		electron.ipcRenderer.on("openvpn", (_event, state: string) => {
-
-			// console.log(state, args);
+		electron.ipcRenderer.on("openvpn", (_event, state: string, ...args) => {
 			switch (state) {
 				
 			case "error":
+				toast.error(args[0]);
 				setStatus("disconnected");
 				setActive(false);
 				break;
@@ -66,15 +66,25 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 				
 			}
 		});
-
+		
 		// Observe IP address changes
 		electron.ipcRenderer.on("iplocation", (_event, string) => {
+			console.log(string);
 			const data = JSON.parse(string);
 			if (data.ip !== ipLocation?.ip) setIpLocation(data);
-			if (status === "disconnecting" && Object.values((servers && servers.success && servers.servers) || {}).filter(server => server.ip === data.ip).length === 0) {
+			if (status === "disconnecting") {
 				setStatus("disconnected");
 				setActive(false);
 			}
+
+			// If we have the IP of one of the servers, set it as active
+			if (servers && servers.success) {
+				const server = Object.values(servers.servers).find(server => server.ip === data.ip);
+				if (!server) return;
+				setActive(server.hash);
+				setStatus("connected");
+			}
+
 		});
 
 		return () => {

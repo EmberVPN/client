@@ -117,7 +117,7 @@ jobs:
   release:
     name: Release (all)
     runs-on: ubuntu-latest
-    needs: [ build-win32, build-macos, build-linux ]
+    needs: [ build-win32 ]
     permissions:
       contents: write
     env:
