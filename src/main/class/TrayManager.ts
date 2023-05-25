@@ -1,6 +1,6 @@
 import { BrowserWindow, Menu, Notification, Tray, nativeImage } from "electron";
 import { resolve } from "path";
-import { resources } from "..";
+import { ovpn, resources } from "..";
 
 export class TrayManager {
 
@@ -93,7 +93,7 @@ export class TrayManager {
 		this.removeMenuItem("Disconnect");
 		if (this.state === "connected") this.pushMenuItem({
 			label: "Disconnect",
-			click: () => this.setState("disconnected")
+			click: () => ovpn.disconnect()
 		});
 
 	}
