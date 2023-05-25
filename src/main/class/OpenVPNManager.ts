@@ -173,10 +173,12 @@ export class OpenVPNManager {
 		if (this.proc) this.proc.kill();
 		this.proc = null;
 		
-		if (tray.state !== "disconnected") tray.notify("Disconnected from VPN");
+		if (tray.state !== "disconnected") {
+			tray.setState("disconnected");
+			tray.notify("Disconnected from VPN");
+		}
 
 		// Set disconnected state
-		tray.setState("disconnected");
 		this.eventDispatcher.send("openvpn", "disconnected");
 		
 	}
