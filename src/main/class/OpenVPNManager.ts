@@ -88,6 +88,20 @@ export class OpenVPNManager {
 
 	private async confirmConnection(server: Ember.Server) {
 
+		// On process exit
+		if (!this.proc) throw new Error("Process not started");
+		this.proc.on("exit", () => this.disconnect());
+		this.proc.on("error", error => {
+			this.eventDispatcher.send("openvpn", "error", server.hash, error.toString());
+			this.disconnect();
+		});
+
+		// Log stdout
+		this.proc.stdout?.on("data", data => {
+			console.log("[OpenVPN]", data.toString());
+			this.eventDispatcher.send("openvpn", "log", server.hash, data.toString());
+		});
+
 		// Await new geolocation
 		const geo: IpGeo = await new Promise(resolve => ipvm.once("change", resolve));
 		if (geo.ip !== server.ip) throw new Error("Failed to connect to server");
@@ -96,14 +110,14 @@ export class OpenVPNManager {
 		tray.setState("connected");
 		tray.notify(`Connected to ${ geo.country_code }`);
 		this.eventDispatcher.send("openvpn", "connected", server.hash);
-
+		
 	}
-
+	
 	constructor(win: BrowserWindow) {
 
 		// Set event dispatcher
 		this.eventDispatcher = win.webContents;
-
+		
 		// Ping server handler
 		ipcMain.handle("ping-server", async function(_, server: Ember.Server) {
 			return await Promise.race([
@@ -111,7 +125,7 @@ export class OpenVPNManager {
 				inetLatency(server.ip)
 			]);
 		});
-
+		
 		// Listen for openvpn events
 		ipcMain.on("openvpn", async(_, state: string, json) => {
 			
@@ -128,49 +142,26 @@ export class OpenVPNManager {
 				// Get authorization
 				const { authorization, server } = JSON.parse(json);
 				this.authorization = authorization;
-
+				
 				// Download server config
 				await this.downloadConfig(server)
 					.then(e => win.webContents.send("openvpn", "connecting", server.hash, e))
 					.then(() => this.connect())
 					.then(() => this.confirmConnection(server))
 					.catch(e => win.webContents.send("openvpn", "error", server.hash, e));
-
+					
 			}
 
+			// Kill VPN on process exit
+			process.on("exit", () => this.disconnect());
+				
 		});
 
 	}
 
 	/**
-	 * Connect to the VPN
-	 * @param server The server to connect to
-	 * @returns void
-	 */
-	private async connect() {
-
-		// Set connecting state
-		tray.setState("connecting");
-
-		// Get binary and config path
-		const binary = await getBinary();
-		const config = resolve(resources, "ember.ovpn");
-
-		// Spawn openvpn process
-		if (process.platform === "win32") {
-
-			if (this.proc !== null) this.proc.kill();
-			return this.proc = spawn(binary, [ "--config", config ], { detached: true });
-
-		}
-
-		throw new Error("Unsupported platform");
-
-	}
-	
-	/**
-	 * Disconnect from the VPN
-	 * @returns void
+	* Disconnect from the VPN
+	* @returns void
 	 */
 	public async disconnect() {
 		this.eventDispatcher.send("openvpn", "disconnecting");
@@ -178,12 +169,36 @@ export class OpenVPNManager {
 		// Kill process
 		if (this.proc) this.proc.kill();
 		this.proc = null;
-
+		
 		// Set disconnected state
 		tray.setState("disconnected");
 		tray.notify("Disconnected from VPN");
 		this.eventDispatcher.send("openvpn", "disconnected");
+		
+	}
 
+	/**
+	* Connect to the VPN
+	* @param server The server to connect to
+	* @returns void
+	*/
+	private async connect() {
+		
+		// Set connecting state
+		tray.setState("connecting");
+		
+		// Get binary and config path
+		const binary = await getBinary();
+		const config = resolve(resources, "ember.ovpn");
+		
+		// Kill existing process
+		if (this.proc !== null) this.proc.kill();
+		
+		// Spawn openvpn process for windows (requires elevation)
+		if (process.platform === "win32") return this.proc = spawn(binary, [ "--config", config ], { detached: true });
+		
+		throw new Error("Unsupported platform");
+		
 	}
 
 }

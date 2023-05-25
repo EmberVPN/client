@@ -1,5 +1,6 @@
 import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 import useData from "./useData";
+import { toast } from "react-toastify";
 
 type State =| "connected"
 			| "disconnected"
@@ -51,6 +52,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 			switch (state) {
 				
 			case "error":
+				toast.error(args[0]);
 				setStatus("disconnected");
 				setActive(false);
 				break;
