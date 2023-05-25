@@ -5,7 +5,6 @@ import { writeFile } from "fs/promises";
 import { resolve } from "path";
 import { inetLatency } from "systeminformation";
 import { ipvm, resources, tray } from "..";
-import { IpGeo } from "./IPManager";
 
 function getBinary() {
 
@@ -62,6 +61,7 @@ export class OpenVPNManager {
 	private proc: ChildProcess | null = null;
 	private eventDispatcher: Electron.WebContents;
 	private authorization: string | null = null;
+	private server: Ember.Server | null = null;
 
 	private async downloadConfig(server: Ember.Server) {
 
@@ -90,7 +90,11 @@ export class OpenVPNManager {
 
 		// On process exit
 		if (!this.proc) throw new Error("Process not started");
-		this.proc.on("exit", () => this.disconnect());
+		this.proc.on("exit", () => {
+
+			// TODO: add same logic in detect connected state
+			if (server.hash === this.server?.hash) this.disconnect();
+		});
 		this.proc.on("error", error => {
 			this.eventDispatcher.send("openvpn", "error", server.hash, error.toString());
 			this.disconnect();
@@ -103,7 +107,9 @@ export class OpenVPNManager {
 		});
 
 		// Await new geolocation
-		const geo: IpGeo = await new Promise(resolve => ipvm.once("change", resolve));
+		const newIp: string = await new Promise(resolve => ipvm.once("change", resolve));
+		const geo = await ipvm.fetchGeo(newIp);
+
 		if (geo.ip !== server.ip) throw new Error("Failed to connect to server");
 		
 		// Set connected
@@ -130,11 +136,13 @@ export class OpenVPNManager {
 		ipcMain.on("openvpn", async(_, state: string, json) => {
 			
 			// On disconnect
-			if (state === "disconnect") return this.disconnect()
-				.then(() => {
-					tray.setState("disconnected");
-					this.eventDispatcher.send("openvpn", "disconnected");
-				});
+			if (state === "disconnect") {
+				this.eventDispatcher.send("openvpn", "disconnecting");
+				await this.disconnect();
+				tray.setState("disconnected");
+				tray.notify("Disconnected from VPN");
+				this.eventDispatcher.send("openvpn", "disconnected");
+			}
 			
 			// On connect
 			if (state === "connect") {
@@ -142,13 +150,16 @@ export class OpenVPNManager {
 				// Get authorization
 				const { authorization, server } = JSON.parse(json);
 				this.authorization = authorization;
+				this.server = server;
 				
 				// Download server config
 				await this.downloadConfig(server)
-					.then(e => win.webContents.send("openvpn", "connecting", server.hash))
 					.then(() => this.connect())
 					.then(() => this.confirmConnection(server))
-					.catch(e => win.webContents.send("openvpn", "error", server.hash, e.toString()));
+					.catch(e => {
+						win.webContents.send("openvpn", "error", server.hash, e.toString());
+						this.disconnect();
+					});
 					
 			}
 
@@ -164,16 +175,10 @@ export class OpenVPNManager {
 	* @returns void
 	 */
 	public async disconnect() {
-		this.eventDispatcher.send("openvpn", "disconnecting");
-		
+
 		// Kill process
 		if (this.proc) this.proc.kill();
 		this.proc = null;
-		
-		// Set disconnected state
-		tray.setState("disconnected");
-		tray.notify("Disconnected from VPN");
-		this.eventDispatcher.send("openvpn", "disconnected");
 		
 	}
 
@@ -183,9 +188,13 @@ export class OpenVPNManager {
 	* @returns void
 	*/
 	private async connect() {
+
+		// Ensure we have a server to connect to
+		if (!this.server) throw new Error("Server not set");
 		
 		// Set connecting state
 		tray.setState("connecting");
+		this.eventDispatcher.send("openvpn", "connecting", this.server.hash);
 		
 		// Get binary and config path
 		const binary = await getBinary();
