@@ -148,7 +148,10 @@ export class OpenVPNManager {
 					.then(e => win.webContents.send("openvpn", "connecting", server.hash))
 					.then(() => this.connect())
 					.then(() => this.confirmConnection(server))
-					.catch(e => win.webContents.send("openvpn", "error", server.hash, e.toString()));
+					.catch(e => {
+						win.webContents.send("openvpn", "error", server.hash, e.toString());
+						this.disconnect();
+					});
 					
 			}
 
