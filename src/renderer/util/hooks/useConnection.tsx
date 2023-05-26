@@ -102,17 +102,6 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 				return;
 			}
 
-			// if (!server) {
-			// 		if (status === "connected") {
-			// 			setActive(false);
-			// 			setStatus("disconnected");
-			// 		}
-			// 		return;
-			// 	}
-			// 	setActive(server.hash);
-			// 	setStatus("connected");
-			// }
-
 		});
 
 		return () => {
