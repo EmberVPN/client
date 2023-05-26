@@ -98,8 +98,15 @@ export class OpenVPNManager {
 
 		// Log stdout
 		this.proc.stdout?.on("data", data => {
-			console.log("[OpenVPN]", data.toString());
-			this.eventDispatcher.send("openvpn", "log", server.hash, data.toString());
+			const line = data.toString().trim();
+			console.log("[OpenVPN]", line);
+			
+			if (line.includes("ERROR:")) {
+				this.proc?.emit("error", new Error(line.split("ERROR:")[1].trim()));
+				return;
+			}
+
+			this.eventDispatcher.send("openvpn", "log", server.hash, line);
 		});
 
 		// Await new geolocation
