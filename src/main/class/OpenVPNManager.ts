@@ -63,7 +63,7 @@ export class OpenVPNManager {
 	private authorization: string | null = null;
 	private server: Ember.Server | null = null;
 
-	private async downloadConfig(server: Ember.Server) {
+	public async downloadConfig(server: Ember.Server) {
 
 		// Ensure authorization is set
 		if (!this.authorization) throw new Error("Authorization not set");
@@ -87,14 +87,10 @@ export class OpenVPNManager {
 	}
 
 	private async confirmConnection(server: Ember.Server) {
-
-		// On process exit
 		if (!this.proc) throw new Error("Process not started");
-		this.proc.on("exit", () => {
-
-			// TODO: add same logic in detect connected state
-			if (server.hash === this.server?.hash) this.disconnect();
-		});
+		
+		// On process exit
+		this.proc.on("exit", () => server.hash === this.server?.hash && this.disconnect());
 		this.proc.on("error", error => {
 			this.eventDispatcher.send("openvpn", "error", server.hash, error.toString());
 			this.disconnect();
