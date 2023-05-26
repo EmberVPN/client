@@ -21,11 +21,6 @@ export function ServerList({ servers: _servers }: { servers: Ember.Server[]; }):
 		const distanceA = calculateDistance(a.location.latitude, a.location.longitude, ipLocation?.latitude, ipLocation?.longitude);
 		const distanceB = calculateDistance(b.location.latitude, b.location.longitude, ipLocation?.latitude, ipLocation?.longitude);
 		return distanceA - distanceB;
-	}).sort((a, b) => {
-		if (!active) return 0;
-		if (a.hash === active) return -1;
-		if (b.hash === active) return 1;
-		return 0;
 	});
 	
 	// Side effect to ping servers
@@ -43,12 +38,16 @@ export function ServerList({ servers: _servers }: { servers: Ember.Server[]; }):
 	}
 
 	// Ping on mount
-	useEffect(ping, [ active ]);
+	useEffect(() => {
+		if (!ipLocation || active) return;
+		ping();
+	}, [ ipLocation, active ]);
+	
 	useEffect(function() {
 		if (!ipLocation) return;
 		const interval = setInterval(ping, 5000);
 		return () => clearInterval(interval);
-	}, [ ipLocation, ping ]);
+	}, [ ipLocation, ping, servers ]);
 
 	// Render ServerList
 	return (
@@ -61,7 +60,11 @@ export function ServerList({ servers: _servers }: { servers: Ember.Server[]; }):
 			) : (
 				<ul className="flex flex-col w-[380px] gap-4 p-4 py-20 m-auto"
 					ref={ ref }>
-					{servers.map(server => (
+					{servers.sort((a, b) => {
+						if (a.hash === active) return -1;
+						if (b.hash === active) return 1;
+						return 0;
+					}).map(server => (
 						<Server key={ server.hash }
 							server={ server } />))}
 				</ul>

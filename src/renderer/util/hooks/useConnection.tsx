@@ -55,8 +55,10 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 				
 			case "error":
 				toast.error(args[1]);
+			case "disconnected":
 				setStatus("disconnected");
 				setActive(false);
+				
 				break;
 					
 			case "connected":
@@ -73,14 +75,11 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 		electron.ipcRenderer.on("iplocation", (_event, string) => {
 			const data = JSON.parse(string);
 
-			console.log(data);
-
 			// If the IP has changed, update the location
 			if (data.ip !== ipLocation?.ip) setIpLocation(data);
 
 			// If we're disconnecting, set the status to disconnected
 			if (status === "disconnecting") {
-				console.log("lookng for server", servers, data);
 
 				// If we dont have the IP of one of the servers, set it as disconnected
 				if (!servers || !servers.success) return;
