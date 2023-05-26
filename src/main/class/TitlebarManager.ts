@@ -1,4 +1,5 @@
 import { BrowserWindow, ipcMain } from "electron";
+import { ovpn } from "..";
 
 export class TitlebarManager {
 
@@ -28,9 +29,7 @@ export class TitlebarManager {
 			// Set mini window
 			if (key === "lock") {
 				win.setResizable(false);
-
-				// TODO: OPENVPN DISCONNECT
-				
+				ovpn.disconnect();
 				this.unlocked = false;
 			}
 
