@@ -1,6 +1,6 @@
 import Button from "@ui-elements/Button";
 import { useState } from "react";
-import Titlebar from "./Titlebar";
+import Titlebar from "../components/Titlebar";
 
 export function SettingsWindow(): JSX.Element {
 
