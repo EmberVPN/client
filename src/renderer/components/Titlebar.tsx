@@ -1,6 +1,6 @@
 import favicon from "@assets/icon.svg";
 import classNames from "classnames";
-import React, { HTMLAttributes, useState } from "react";
+import React, { HTMLAttributes, useEffect, useState } from "react";
 import { VscChromeClose, VscChromeMaximize, VscChromeMinimize, VscChromeRestore } from "react-icons/vsc";
 
 interface Props {
@@ -12,6 +12,11 @@ export default function Titlebar({ children, resizeable = true, className, ...pr
 
 	// Maximize state
 	const [ maximized, setMaximized ] = useState(false);
+	
+	// On mount, set resizeable
+	useEffect(function() {
+		electron.ipcRenderer.send("titlebar", "resizeable", resizeable);
+	}, [ resizeable ]);
 	
 	// Listen for maximize/restore events
 	electron.ipcRenderer.on("titlebar", (_, action: string) => {

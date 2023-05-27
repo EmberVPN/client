@@ -49,6 +49,13 @@ export default function Application() {
 	const { user } = useUser();
 	const { data } = useData("/v2/ember/servers");
 
+	// If this is the settings window
+	if (window.location.hash.includes("settings")) return (
+		<div className="flex flex-col w-screen h-screen overflow-hidden">
+			<Titlebar resizeable={ false }>Settings</Titlebar>
+		</div>
+	);
+
 	// If the user is definitely not logged in, show the login screen
 	if (user === false) return <Authorize />;
 	

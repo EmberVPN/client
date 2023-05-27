@@ -4,6 +4,7 @@ import { BrowserWindow, app, shell } from "electron";
 import { join, resolve } from "path";
 import { IPManager } from "./class/IPManager";
 import { OpenVPNManager } from "./class/OpenVPNManager";
+import SettingsManager from "./class/SettingsManager";
 import { TitlebarManager } from "./class/TitlebarManager";
 import { TrayManager } from "./class/TrayManager";
 
@@ -15,12 +16,13 @@ export let tray: TrayManager;
 export let ovpn: OpenVPNManager;
 export let tbar: TitlebarManager;
 export let ipvm: IPManager;
+export let setm: SettingsManager;
 
 /**
  * Create the main window
  * @returns void
  */
-function createWindow(): void {
+export function createWindow(subWindow = false) {
 
 	// Create the browser window.
 	const win = new BrowserWindow({
@@ -42,15 +44,6 @@ function createWindow(): void {
 			webviewTag: true
 		}
 	});
-
-	// Prevent multiple instances
-	const isUnlocked = app.requestSingleInstanceLock();
-	if (!isUnlocked && !is.dev) return app.quit();
-	app.on("second-instance", function() {
-		if (!win) return;
-		win.show();
-		win.focus();
-	});
 	
 	// Open links in external browser
 	win.webContents.setWindowOpenHandler(details => {
@@ -59,19 +52,32 @@ function createWindow(): void {
 	});
 
 	// In development load the react app
-	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) win.loadURL(process.env["ELECTRON_RENDERER_URL"]);
+	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) win.loadURL(process.env["ELECTRON_RENDERER_URL"] + (subWindow ? "#settings" : ""));
 		
 	// Otherwise load the index.html file
-	else win.loadFile(join(__dirname, "../renderer/index.html"));
+	else win.loadFile(join(__dirname, "../renderer/index.html") + (subWindow ? "#settings" : ""));
     
 	// and load the index.html of the app.
 	win.on("ready-to-show", win.show);
+
+	if (subWindow) return win;
+
+	// Prevent multiple instances
+	const isUnlocked = app.requestSingleInstanceLock();
+	if (!isUnlocked && !is.dev) app.quit();
+	app.on("second-instance", function() {
+		if (!win) return;
+		win.show();
+		win.focus();
+	});
 
 	// Initialize state managers
 	tray = new TrayManager(win);
 	tbar = new TitlebarManager(win);
 	ovpn = new OpenVPNManager(win);
 	ipvm = new IPManager(win);
+	setm = new SettingsManager(win);
+	return win;
 	
 }
 
@@ -103,5 +109,5 @@ app.whenReady()
 	})
 
 	// Create the window
-	.then(createWindow);
+	.then(() => createWindow());
 

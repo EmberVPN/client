@@ -1,6 +1,6 @@
 import { BrowserWindow, Menu, Notification, Tray, ipcMain, nativeImage } from "electron";
 import { resolve } from "path";
-import { ovpn, resources } from "..";
+import { ovpn, resources, setm } from "..";
 
 export class TrayManager {
 
@@ -100,6 +100,21 @@ export class TrayManager {
 		// Reset the tray menu
 		this.removeMenuItem("Disconnect");
 		this.removeMenuItem("Quick Connect");
+		this.removeMenuItem("Settings");
+		this.removeMenuItem("settings-sep");
+		
+		// Add settings button
+		if (this.authorization) {
+			this.pushMenuItem({
+				label: "Settings",
+				click: () => setm.open()
+			});
+
+			this.pushMenuItem({
+				type: "separator",
+				label: "settings-sep"
+			});
+		}
 		
 		// Add the disconnect button if we're connected
 		if (this._state === "connected") this.pushMenuItem({

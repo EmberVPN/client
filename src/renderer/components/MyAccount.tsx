@@ -4,6 +4,7 @@ import useRipple from "@ui-elements/util/useCenteredRipple";
 import classNames from "classnames";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
+import { IoMdSettings } from "react-icons/io";
 import { MdExitToApp, MdManageAccounts } from "react-icons/md";
 import User from "../util/class/User";
 import { signout } from "../util/signout";
@@ -28,7 +29,7 @@ export function MyAccount({ user }: { user: User }): JSX.Element {
 					alt="user photo"
 					className="rounded-full w-9 h-9"
 					src={ User.getAvatarURL(user.id) } />
-				<Tooltip>More</Tooltip>
+				<Tooltip anchor="right">More</Tooltip>
 			</button>
 			<PopupWindow user={ user } />
 		</div>
@@ -70,6 +71,12 @@ export function PopupWindow({ user }: { user: User }): JSX.Element {
 					onClick={ () => [ close(), window.open("https://embervpn.org/my/account") ] }
 					size="dense">
 					My account
+				</DrawerItem>
+				
+				<DrawerItem icon={ IoMdSettings }
+					onClick={ () => [ close(), electron.ipcRenderer.send("open-settings") ] }
+					size="dense">
+					Settings
 				</DrawerItem>
 				
 				<DrawerItem icon={ MdExitToApp }
