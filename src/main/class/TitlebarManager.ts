@@ -14,14 +14,12 @@ export class TitlebarManager {
 		// Set size of window from renderer
 		ipcMain.handle("window-size", (_, width: number, height: number) => {
 
-			const win = BrowserWindow.getFocusedWindow();
-			if (!win) return;
-
+			const win = BrowserWindow.getFocusedWindow() || mainWindow;
 			const size = win.getSize();
 			const dw = size[0] - width;
 			const dh = size[1] - height;
 			const pos = win.getPosition();
-			if (mainWindow.id === win.id) win.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
+			win.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
 
 			win.setResizable(false);
 			win.setMinimumSize(width, height);
@@ -31,8 +29,7 @@ export class TitlebarManager {
 		// Listen for titlebar events
 		ipcMain.on("titlebar", async(_, key: string, val?: boolean) => {
 			
-			const win = BrowserWindow.getFocusedWindow();
-			if (!win) return;
+			const win = BrowserWindow.getFocusedWindow() || mainWindow;
 	
 			// Handle events
 			if (key === "minimize") win.minimize();

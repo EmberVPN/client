@@ -1,11 +1,11 @@
 import favicon from "@assets/icon.svg";
-import ThemeToggle from "@ui-elements/ThemeToggle";
 import { createRoot } from "react-dom/client";
 import { QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import EntryPoint from "./components/Application";
 import Authorize from "./components/Authorize";
+import { SettingsWindow } from "./components/SettingsWindow";
 import Titlebar from "./components/Titlebar";
 import Toolbar from "./components/Toolbar";
 import "./styles/index.less";
@@ -32,7 +32,6 @@ root.render(
 			rtl={ false }
 			theme="colored"
 		/>
-		<ThemeToggle provider />
 		<ConnectionProvider>
 
 			{/* Application entry point */}
@@ -50,12 +49,7 @@ export default function Application() {
 	const { data } = useData("/v2/ember/servers");
 
 	// If this is the settings window
-	if (window.location.hash.includes("settings")) return (
-		<div className="flex flex-col w-screen h-screen overflow-hidden">
-			<Titlebar minimizeable={ false }
-				resizeable={ false }>Settings</Titlebar>
-		</div>
-	);
+	if (window.location.hash.includes("settings")) return <SettingsWindow />;
 
 	// If the user is definitely not logged in, show the login screen
 	if (user === false) return <Authorize />;
