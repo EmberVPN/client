@@ -1,11 +1,7 @@
 import Button from "@ui-elements/Button";
-import { useState } from "react";
 import Titlebar from "../components/Titlebar";
 
 export function UpdateWindow(): JSX.Element {
-
-	// Whether the save button is disabled
-	const [ disabled ] = useState(true);
 
 	return (
 		<div className="flex flex-col w-screen h-screen overflow-hidden">
