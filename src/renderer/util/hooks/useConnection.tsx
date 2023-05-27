@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
+import React, { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import useData from "./useData";
 
@@ -44,13 +44,13 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 	const [ ipLocation, setIpLocation ] = useState<GeoLocation | null>(null);
 	const [ lastStateChange, setLastStateChange ] = useState<number>(Date.now());
 	const { data: servers } = useData("/v2/ember/servers");
-	let lastServerHash = "";
+	const lastServerRef = useRef<string>("");
 	
 	// Sync state with main process
 	useEffect(function() {
 		
 		electron.ipcRenderer.on("openvpn", (_event, state: string, hash?: string, message?: string) => {
-			if (hash) lastServerHash = hash;
+			if (hash) lastServerRef.current = hash;
 			switch (state) {
 				
 			case "error":
@@ -99,7 +99,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 			const server = Object.values(servers.servers).find(server => server.ip === data.ip);
 
 			// If we have a server, set the status to connected
-			if (server && ![ "will-connect", "disconnecting" ].includes(status) && data.ip === lastServerHash) {
+			if (server && ![ "will-connect", "disconnecting" ].includes(status) && data.ip === lastServerRef.current) {
 				setStatus("connected");
 				setActive(server.hash);
 				return;
