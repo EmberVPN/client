@@ -49,7 +49,7 @@ export class TrayManager {
 		this.menu[label] = item;
 
 		// Set the menu
-		this.setMenu(Object.values(this.menu));
+		this.setMenu(Object.values(this.menu).reverse());
 
 	}
 
@@ -75,6 +75,10 @@ export class TrayManager {
 		this.pushMenuItem({
 			label: "Exit",
 			click: () => process.exit()
+		});
+
+		this.pushMenuItem({
+			type: "separator"
 		});
 
 		// Handle authorization token changes

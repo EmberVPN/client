@@ -258,8 +258,10 @@ export class OpenVPNManager {
 				return distA - distB;
 			})[0];
 		
+		// Notify the UI that we are connecting
 		this.eventDispatcher.send("openvpn", "will-connect", server.hash);
 
+		// Attempt to connect
 		return await this.downloadConfig(server)
 			.then(() => this.connect())
 			.then(() => this.confirmConnection(server))
