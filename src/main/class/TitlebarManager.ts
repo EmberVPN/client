@@ -1,4 +1,5 @@
 import { BrowserWindow, ipcMain } from "electron";
+import { ovpn } from "..";
 
 export class TitlebarManager {
 
@@ -12,6 +13,13 @@ export class TitlebarManager {
 
 		// Set size of window from renderer
 		ipcMain.handle("window-size", (_, width: number, height: number) => {
+
+			const size = win.getSize();
+			const dw = size[0] - width;
+			const dh = size[1] - height;
+			const pos = win.getPosition();
+			win.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
+
 			win.setResizable(false);
 			win.setMinimumSize(width, height);
 			win.setSize(width, height);
@@ -28,9 +36,7 @@ export class TitlebarManager {
 			// Set mini window
 			if (key === "lock") {
 				win.setResizable(false);
-
-				// TODO: OPENVPN DISCONNECT
-				
+				ovpn.disconnect();
 				this.unlocked = false;
 			}
 
@@ -38,7 +44,13 @@ export class TitlebarManager {
 			if (key === "unlock") {
 				win.setResizable(true);
 				win.setMinimumSize(600, 400);
+				const size = win.getSize();
 				if (!this.unlocked) win.setSize(800, 600);
+				const dw = size[0] - 800;
+				const dh = size[1] - 600;
+				const pos = win.getPosition();
+				win.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
+
 				this.unlocked = true;
 			}
 

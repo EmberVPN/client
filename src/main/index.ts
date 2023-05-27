@@ -1,4 +1,5 @@
 import { electronApp, is } from "@electron-toolkit/utils";
+import AutoLaunch from "auto-launch";
 import { BrowserWindow, app, shell } from "electron";
 import { join, resolve } from "path";
 import { IPManager } from "./class/IPManager";
@@ -73,6 +74,12 @@ function createWindow(): void {
 	ipvm = new IPManager(win);
 	
 }
+
+// Request start on boot
+new AutoLaunch({
+	name: "Ember VPN",
+	path: process.execPath,
+}).enable();
 
 // When the app loads, create the window
 app.whenReady()

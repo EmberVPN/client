@@ -30,10 +30,13 @@ export function useUser() {
 		// Check if the user is authorized
 		if (data && data.success && "user" in data) {
 			electron.ipcRenderer.send("titlebar", "unlock");
+			electron.ipcRenderer.send("authorization", localStorage.getItem("authorization"));
 			setIsAuthorized(true);
 			localStorage.setItem("last_user", data.user.email);
 			setUser(new User(data.user));
 			return;
+		} else {
+			electron.ipcRenderer.send("authorization", null);
 		}
 		
 		if (data && !data.success) {

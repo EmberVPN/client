@@ -5,6 +5,7 @@ import { writeFile } from "fs/promises";
 import { resolve } from "path";
 import { inetLatency } from "systeminformation";
 import { ipvm, resources, tray } from "..";
+import { calculateDistance } from "../../calculateDistance";
 
 function getBinary() {
 
@@ -58,12 +59,19 @@ function install() {
 
 export class OpenVPNManager {
 
+	private _isConnecting = false;
+	public isConnecting() {
+		return this._isConnecting;
+	}
+
 	private proc: ChildProcess | null = null;
 	private eventDispatcher: Electron.WebContents;
 	private authorization: string | null = null;
 	private server: Ember.Server | null = null;
 
-	private async downloadConfig(server: Ember.Server) {
+	public async downloadConfig(server: Ember.Server) {
+		this._isConnecting = true;
+		tray.refreshMenu();
 
 		// Ensure authorization is set
 		if (!this.authorization) throw new Error("Authorization not set");
@@ -87,14 +95,11 @@ export class OpenVPNManager {
 	}
 
 	private async confirmConnection(server: Ember.Server) {
-
-		// On process exit
+		this._isConnecting = false;
 		if (!this.proc) throw new Error("Process not started");
-		this.proc.on("exit", () => {
-
-			// TODO: add same logic in detect connected state
-			if (server.hash === this.server?.hash) this.disconnect();
-		});
+		
+		// On process exit
+		this.proc.on("exit", () => server.hash === this.server?.hash && this.disconnect());
 		this.proc.on("error", error => {
 			this.eventDispatcher.send("openvpn", "error", server.hash, error.toString());
 			this.disconnect();
@@ -102,8 +107,15 @@ export class OpenVPNManager {
 
 		// Log stdout
 		this.proc.stdout?.on("data", data => {
-			console.log("[OpenVPN]", data.toString());
-			this.eventDispatcher.send("openvpn", "log", server.hash, data.toString());
+			const line = data.toString().trim();
+			console.log("[OpenVPN]", line);
+			
+			if (line.includes("ERROR:")) {
+				this.proc?.emit("error", new Error(line.split("ERROR:")[1].trim()));
+				return;
+			}
+
+			this.eventDispatcher.send("openvpn", "log", server.hash, line);
 		});
 
 		// Await new geolocation
@@ -131,6 +143,12 @@ export class OpenVPNManager {
 				inetLatency(server.ip)
 			]);
 		});
+
+		// Handle authorization token changes
+		ipcMain.on("authorization", (_, authorization: string) => {
+			this.authorization = authorization;
+			if (!authorization) this.disconnect();
+		});
 		
 		// Listen for openvpn events
 		ipcMain.on("openvpn", async(_, state: string, json) => {
@@ -139,9 +157,6 @@ export class OpenVPNManager {
 			if (state === "disconnect") {
 				this.eventDispatcher.send("openvpn", "disconnecting");
 				await this.disconnect();
-				tray.setState("disconnected");
-				tray.notify("Disconnected from VPN");
-				this.eventDispatcher.send("openvpn", "disconnected");
 			}
 			
 			// On connect
@@ -174,11 +189,17 @@ export class OpenVPNManager {
 	* Disconnect from the VPN
 	* @returns void
 	 */
-	public async disconnect() {
+	public async disconnect(switching = false) {
 
 		// Kill process
 		if (this.proc) this.proc.kill();
 		this.proc = null;
+		this._isConnecting = false;
+
+		if (switching) return;
+		tray.setState("disconnected");
+		if (tray.state !== "disconnected") tray.notify("Disconnected from VPN");
+		this.eventDispatcher.send("openvpn", "disconnecting");
 		
 	}
 
@@ -201,13 +222,54 @@ export class OpenVPNManager {
 		const config = resolve(resources, "ember.ovpn");
 		
 		// Kill existing process
-		if (this.proc !== null) this.proc.kill();
+		if (this.proc !== null) this.disconnect(true);
 		
 		// Spawn openvpn process for windows (requires elevation)
 		if (process.platform === "win32") return this.proc = spawn(binary, [ "--config", config ], { detached: true });
 		
 		throw new Error("Unsupported platform");
 		
+	}
+
+	public async quickConnect() {
+
+		// Ensure authorization is set
+		if (!this.authorization) throw new Error("Authorization not set");
+		this.eventDispatcher.send("openvpn", "will-connect");
+		this._isConnecting = true;
+		tray.refreshMenu();
+		
+		// Get servers
+		const servers = await fetch("https://api.embervpn.org/v2/ember/servers", {
+			headers: { "authorization": this.authorization }
+		}).then(res => res.json() as Promise<REST.APIResponse<EmberAPI.Servers>>);
+
+		// Check for errors
+		if (!servers || !servers.success) throw new Error("Failed to fetch servers");
+		
+		// Fetch geolocation
+		const geo = await ipvm.fetchGeo();
+
+		// Get the closest server
+		const server = this.server = Object.values(servers.servers)
+			.sort((a, b) => {
+				const distA = calculateDistance(a.location.latitude, a.location.longitude, geo.latitude, geo.longitude);
+				const distB = calculateDistance(b.location.latitude, b.location.longitude, geo.latitude, geo.longitude);
+				return distA - distB;
+			})[0];
+		
+		// Notify the UI that we are connecting
+		this.eventDispatcher.send("openvpn", "will-connect", server.hash);
+
+		// Attempt to connect
+		return await this.downloadConfig(server)
+			.then(() => this.connect())
+			.then(() => this.confirmConnection(server))
+			.catch(e => {
+				this.eventDispatcher.send("openvpn", "error", server.hash, e.toString());
+				this.disconnect();
+			});
+
 	}
 
 }
