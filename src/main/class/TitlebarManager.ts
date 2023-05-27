@@ -13,6 +13,13 @@ export class TitlebarManager {
 
 		// Set size of window from renderer
 		ipcMain.handle("window-size", (_, width: number, height: number) => {
+
+			const size = win.getSize();
+			const dw = size[0] - width;
+			const dh = size[1] - height;
+			const pos = win.getPosition();
+			win.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
+
 			win.setResizable(false);
 			win.setMinimumSize(width, height);
 			win.setSize(width, height);
