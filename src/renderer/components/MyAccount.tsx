@@ -28,7 +28,7 @@ export function MyAccount({ user }: { user: User }): JSX.Element {
 					alt="user photo"
 					className="rounded-full w-9 h-9"
 					src={ User.getAvatarURL(user.id) } />
-				<Tooltip anchor="right">More</Tooltip>
+				<Tooltip>More</Tooltip>
 			</button>
 			<PopupWindow user={ user } />
 		</div>
