@@ -7,6 +7,7 @@ import { OpenVPNManager } from "./class/OpenVPNManager";
 import SettingsManager from "./class/SettingsManager";
 import { TitlebarManager } from "./class/TitlebarManager";
 import { TrayManager } from "./class/TrayManager";
+import UpdateManager from "./class/UpdateManager";
 
 // Get app resource path
 export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "../resources");
@@ -17,12 +18,13 @@ export let ovpn: OpenVPNManager;
 export let tbar: TitlebarManager;
 export let ipvm: IPManager;
 export let setm: SettingsManager;
+export const updateManager = new UpdateManager();
 
 /**
  * Create the main window
  * @returns void
  */
-export function createWindow(subWindow = false) {
+export function createWindow(subWindow?: string) {
 
 	// Create the browser window.
 	const win = new BrowserWindow({
@@ -52,10 +54,10 @@ export function createWindow(subWindow = false) {
 	});
 
 	// In development load the react app
-	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) win.loadURL(process.env["ELECTRON_RENDERER_URL"] + (subWindow ? "#settings" : ""));
+	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) win.loadURL(process.env["ELECTRON_RENDERER_URL"] + (subWindow ? `#${ subWindow }` : ""));
 		
 	// Otherwise load the index.html file
-	else win.loadFile(join(__dirname, "../renderer/index.html") + (subWindow ? "#settings" : ""));
+	else win.loadFile(join(__dirname, "../renderer/index.html") + (subWindow ? `#${ subWindow }` : ""));
     
 	// and load the index.html of the app.
 	win.on("ready-to-show", win.show);

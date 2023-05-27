@@ -1,6 +1,6 @@
 import { BrowserWindow, Menu, Notification, Tray, app, ipcMain, nativeImage } from "electron";
 import { resolve } from "path";
-import { ovpn, resources, setm } from "..";
+import { ovpn, resources, setm, updateManager } from "..";
 
 export class TrayManager {
 
@@ -88,7 +88,7 @@ export class TrayManager {
 
 	public refreshMenu() {
 
-		const label = [ "Ember VPN", `v${ app.getVersion() }` ].join(Array(4).fill(" ").join(""));
+		const label = [ "Ember VPN", `v${ app.getVersion() }` ].join(Array(8).fill(" ").join(""));
 
 		// Reset the tray menu
 		this.removeMenuItem("Disconnect");
@@ -98,6 +98,8 @@ export class TrayManager {
 		this.removeMenuItem(label);
 		this.removeMenuItem("title-sep");
 		this.removeMenuItem("Exit");
+		this.removeMenuItem("Check for Updates");
+		this.removeMenuItem("update-sep");
 
 		// Add context menu
 		this.pushMenuItem({
@@ -137,6 +139,17 @@ export class TrayManager {
 				
 			});
 		}
+
+		// Check for updates
+		this.pushMenuItem({
+			label: "Check for Updates",
+			click: () => updateManager.open(),
+		});
+
+		this.pushMenuItem({
+			type: "separator",
+			label: "update-sep"
+		});
 		
 		// Add the disconnect button if we're connected
 		if (this._state === "connected") this.pushMenuItem({

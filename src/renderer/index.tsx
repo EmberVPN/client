@@ -7,6 +7,7 @@ import { ConnectionProvider } from "./util/hooks/useConnection";
 import queryClient from "./util/queryClient";
 import { MainWindow } from "./windows/Main";
 import { SettingsWindow } from "./windows/Settings";
+import { UpdateWindow } from "./windows/Update";
 
 // Create the root element
 const root = createRoot(document.getElementById("root") as HTMLElement);
@@ -40,6 +41,9 @@ export default function Application() {
 
 	// If the URL contains the settings hash, show the settings window
 	if (window.location.hash.includes("settings")) return <SettingsWindow />;
+
+	// If the URL contains the update hash, show the update window
+	if (window.location.hash.includes("updates")) return <UpdateWindow />;
 	
 	// Otherwise, show the main window
 	return <MainWindow />;
