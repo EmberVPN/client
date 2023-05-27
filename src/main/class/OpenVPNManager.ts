@@ -5,6 +5,7 @@ import { writeFile } from "fs/promises";
 import { resolve } from "path";
 import { inetLatency } from "systeminformation";
 import { ipvm, resources, tray } from "..";
+import { calculateDistance } from "../../calculateDistance";
 
 function getBinary() {
 
@@ -211,6 +212,34 @@ export class OpenVPNManager {
 		
 		throw new Error("Unsupported platform");
 		
+	}
+
+	private async quickConnect() {
+
+		// Ensure authorization is set
+		if (!this.authorization) throw new Error("Authorization not set");
+
+		// Get servers
+		const servers = await fetch("https://api.embervpn.org/v2/embers/servers", {
+			headers: { "authorization": this.authorization }
+		}).then(res => res.json() as Promise<REST.APIResponse<EmberAPI.Servers>>);
+
+		// Check for errors
+		if (!servers || !servers.success) throw new Error("Failed to fetch servers");
+
+		// Fetch geolocation
+		const geo = await ipvm.fetchGeo();
+
+		// Get the closest server
+		this.server = Object.values(servers.servers)
+			.sort((a, b) => {
+				const distA = calculateDistance(a.location.latitude, a.location.longitude, geo.latitude, geo.longitude);
+				const distB = calculateDistance(b.location.latitude, b.location.longitude, geo.latitude, geo.longitude);
+				return distA - distB;
+			})[0];
+
+		return await this.connect();
+
 	}
 
 }

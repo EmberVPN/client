@@ -3,7 +3,7 @@ import Card from "@ui-elements/Card";
 import Spinner from "@ui-elements/Spinner";
 import classNames from "classnames";
 import { MdOutlineTimer } from "react-icons/md";
-import { calculateDistance } from "../util/calculateDistance";
+import { calculateDistance } from "../../calculateDistance";
 import useConnection from "../util/hooks/useConnection";
 import Timestamp from "./Timestamp";
 

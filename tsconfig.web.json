@@ -7,7 +7,8 @@
 		"src/renderer/**/*.tsx",
 		"src/preload/*.d.ts",
 		"types/*",
-		"assets"
+		"assets",
+		"src/*.ts"
 	],
 	"compilerOptions": {
 		"composite": true,

@@ -1,7 +1,7 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Spinner from "@ui-elements/Spinner";
 import { useEffect, useState } from "react";
-import { calculateDistance } from "../util/calculateDistance";
+import { calculateDistance } from "../../calculateDistance";
 import useConnection from "../util/hooks/useConnection";
 import Server from "./Server";
 

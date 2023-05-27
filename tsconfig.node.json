@@ -6,7 +6,8 @@
 		"src/preload/**/*",
 		"types/*",
 		"package.json",
-		"assets"
+		"assets",
+		"src/*.ts"
 	],
 	"compilerOptions": {
 		"composite": true,
