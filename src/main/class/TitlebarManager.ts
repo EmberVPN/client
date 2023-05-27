@@ -37,7 +37,13 @@ export class TitlebarManager {
 			if (key === "unlock") {
 				win.setResizable(true);
 				win.setMinimumSize(600, 400);
+				const size = win.getSize();
 				if (!this.unlocked) win.setSize(800, 600);
+				const dw = size[0] - 800;
+				const dh = size[1] - 600;
+				const pos = win.getPosition();
+				win.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
+
 				this.unlocked = true;
 			}
 
