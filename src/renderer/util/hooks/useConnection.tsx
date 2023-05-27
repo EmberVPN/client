@@ -49,12 +49,12 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 	// Sync state with main process
 	useEffect(function() {
 		
-		electron.ipcRenderer.on("openvpn", (_event, state: string, hash?: string, ...args) => {
+		electron.ipcRenderer.on("openvpn", (_event, state: string, hash?: string, message?: string) => {
 			if (hash) lastServerHash = hash;
 			switch (state) {
 				
 			case "error":
-				toast.error(args[1]);
+				toast.error(message);
 			case "disconnected":
 				setStatus("disconnected");
 				setActive(false);
