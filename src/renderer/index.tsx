@@ -52,7 +52,8 @@ export default function Application() {
 	// If this is the settings window
 	if (window.location.hash.includes("settings")) return (
 		<div className="flex flex-col w-screen h-screen overflow-hidden">
-			<Titlebar resizeable={ false }>Settings</Titlebar>
+			<Titlebar minimizeable={ false }
+				resizeable={ false }>Settings</Titlebar>
 		</div>
 	);
 

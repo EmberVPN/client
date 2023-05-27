@@ -6,9 +6,10 @@ import { VscChromeClose, VscChromeMaximize, VscChromeMinimize, VscChromeRestore 
 interface Props {
 	children?: React.ReactNode;
 	resizeable?: boolean;
+	minimizeable?: boolean;
 }
 
-export default function Titlebar({ children, resizeable = true, className, ...props }: Props & HTMLAttributes<HTMLDivElement>): JSX.Element {
+export default function Titlebar({ children, resizeable = true, minimizeable = true, className, ...props }: Props & HTMLAttributes<HTMLDivElement>): JSX.Element {
 
 	// Maximize state
 	const [ maximized, setMaximized ] = useState(false);
@@ -17,6 +18,11 @@ export default function Titlebar({ children, resizeable = true, className, ...pr
 	useEffect(function() {
 		electron.ipcRenderer.send("titlebar", "resizeable", resizeable);
 	}, [ resizeable ]);
+	
+	// On mount, set minimizeable
+	useEffect(function() {
+		electron.ipcRenderer.send("titlebar", "minimizeable", minimizeable);
+	}, [ minimizeable ]);
 	
 	// Listen for maximize/restore events
 	electron.ipcRenderer.on("titlebar", (_, action: string) => {
@@ -48,7 +54,7 @@ export default function Titlebar({ children, resizeable = true, className, ...pr
 					src={ favicon } />
 				
 				{/* Title */}
-				<span className="flex items-center my-auto h-7">{children ? `Ember VPN - ${ children }` : "Ember VPN"}</span>
+				<span className="flex items-center my-auto h-7">{children ? `${ children } • Ember VPN` : "Ember VPN"}</span>
 				
 			</div>
 
@@ -56,8 +62,8 @@ export default function Titlebar({ children, resizeable = true, className, ...pr
 			<div className={ classNames(isMac ? "hidden" : "flex") }>
 				
 				{/* Minimize */}
-				<div className={ button }
-					onClick={ () => electron.ipcRenderer.send("titlebar", "minimize") }>{ <VscChromeMinimize /> }</div>
+				{ minimizeable && <div className={ button }
+					onClick={ () => electron.ipcRenderer.send("titlebar", "minimize") }>{ <VscChromeMinimize /> }</div>}
 				
 				{/* Maximize/restore */}
 				{ resizeable && <div className={ button }

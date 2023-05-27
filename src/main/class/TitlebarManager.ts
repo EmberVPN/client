@@ -67,6 +67,10 @@ export class TitlebarManager {
 			if (key === "resizeable" && val !== undefined) {
 				win.setResizable(val);
 			}
+			
+			if (key === "minimizeable" && val !== undefined) {
+				win.setMinimizable(val);
+			}
 
 		});
 
