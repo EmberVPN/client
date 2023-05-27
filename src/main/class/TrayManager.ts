@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, Notification, Tray, nativeImage } from "electron";
+import { BrowserWindow, Menu, Notification, Tray, ipcMain, nativeImage } from "electron";
 import { resolve } from "path";
 import { ovpn, resources } from "..";
 
@@ -9,6 +9,8 @@ export class TrayManager {
 
 	// Initialize the tray state
 	private _state: "connected" | "disconnected" | "connecting" = "disconnected";
+
+	private authorization: string | null = null;
 
 	get state() {
 		return this._state;
@@ -75,11 +77,40 @@ export class TrayManager {
 			click: () => process.exit()
 		});
 
+		// Handle authorization token changes
+		ipcMain.on("authorization", (_, authorization: string) => {
+			this.authorization = authorization;
+			this.refreshMenu();
+			if (!authorization) this.setState("disconnected");
+		});
+
 	}
 
 	private setToolTip(tooltip?: string) {
 		this.tooltip = tooltip ? `Ember VPN • ${ tooltip }` : "Ember VPN";
 		this.tray.setToolTip(this.tooltip);
+	}
+
+	public refreshMenu() {
+
+		// Reset the tray menu
+		this.removeMenuItem("Disconnect");
+		this.removeMenuItem("Quick Connect");
+		
+		// Add the disconnect button if we're connected
+		if (this._state === "connected") this.pushMenuItem({
+			label: "Disconnect",
+			click: () => ovpn.disconnect(),
+			enabled: this._state === "connected"
+		});
+
+		// Add the quick connect button if we're disconnected
+		else if (this.authorization) this.pushMenuItem({
+			label: "Quick Connect",
+			click: () => ovpn.quickConnect(),
+			enabled: this._state === "disconnected" && !ovpn.isConnecting()
+		});
+
 	}
 
 	public setState(state: typeof this._state) {
@@ -93,12 +124,8 @@ export class TrayManager {
 		// Set tooltip
 		this.setToolTip(this._state.replace(/^\w/, c => c.toUpperCase()));
 
-		// Add the disconnect button if we're connected
-		this.removeMenuItem("Disconnect");
-		if (this._state === "connected") this.pushMenuItem({
-			label: "Disconnect",
-			click: () => ovpn.disconnect()
-		});
+		// Reload the menu
+		this.refreshMenu();
 
 	}
 
