@@ -29,7 +29,7 @@ export default class SettingsManager {
 		// Prevent multiple instances
 		if (this.isOpen && this.win) return this.win.focus();
 		
-		this.win = createWindow("settings") || undefined;
+		this.win = createWindow("Settings") || undefined;
 		if (!this.win) return;
 
 		// Prevent multiple instances

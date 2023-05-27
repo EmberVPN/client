@@ -31,7 +31,7 @@ export function createWindow(subWindow?: string) {
 		icon: resolve(resources, "./assets/icon.png"),
 		show: false,
 		resizable: false,
-		title: "Ember VPN",
+		title: subWindow ? `${ subWindow } - Ember VPN` : "Ember VPN",
 		titleBarStyle: "hidden",
 		frame: process.platform === "win32",
 		width: 600,

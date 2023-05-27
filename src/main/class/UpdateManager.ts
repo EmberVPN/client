@@ -39,7 +39,7 @@ export default class UpdateManager {
 		// Prevent multiple instances
 		if (this.isOpen && this.win) return this.win.focus();
 		
-		this.win = createWindow("updates") || undefined;
+		this.win = createWindow("Check for Updates") || undefined;
 		if (!this.win) return;
 
 		// Prevent multiple instances

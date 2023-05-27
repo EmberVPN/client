@@ -40,12 +40,10 @@ root.render(
 export default function Application() {
 
 	// If the URL contains the settings hash, show the settings window
-	if (window.location.hash.includes("settings")) return <SettingsWindow />;
-
-	// If the URL contains the update hash, show the update window
-	if (window.location.hash.includes("updates")) return <UpdateWindow />;
-	
-	// Otherwise, show the main window
-	return <MainWindow />;
+	switch (decodeURIComponent(window.location.hash.substring(1))) {
+	case "Settings": return <SettingsWindow />;
+	case "Check for Updates": return <UpdateWindow />;
+	default: return <MainWindow />;
+	}
 
 }
