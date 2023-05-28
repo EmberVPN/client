@@ -1,30 +1,18 @@
-import Button from "@ui-elements/Button";
-import { useState } from "react";
+import useMounted from "@ui-elements/util/useMounted";
 import Titlebar from "../components/Titlebar";
 
 export function SettingsWindow(): JSX.Element {
 
-	// Whether the save button is disabled
-	const [ disabled ] = useState(true);
+	// Adjust the window size
+	useMounted(() => electron.ipcRenderer.invoke("window-size", 600, 400));
 
 	return (
-		<div className="flex flex-col w-screen h-screen overflow-hidden">
+		<div className="flex flex-col w-screen h-screen overflow-hidden bg-gray-100 dark:bg-gray-850">
 			<Titlebar minimizeable={ false }
 				resizeable={ false }>Settings</Titlebar>
-
-			{/* Settings content */}
-			<div className="flex flex-col px-12 py-6 overflow-y-auto border-gray-200 divide-y divide-gray-200 grow border-y dark:border-gray-850 dark:divide-gray-850">
-
-				welcome to the settings
-
+			<div className="flex gap-2 px-8 py-4 select-none grow">
+				
 			</div>
-
-			{/* Actions & Save button */}
-			<div className="flex items-center justify-end gap-4 p-4">
-				<Button disabled={ disabled }
-					variant="raised">save changes</Button>
-			</div>
-			
 		</div>
 	);
 }
