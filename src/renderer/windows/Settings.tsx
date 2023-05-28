@@ -31,14 +31,14 @@ export function SettingsWindow() {
 			<div className="flex flex-col gap-2 px-8 overflow-auto divide-y select-none grow divide-gray-20 dark:divide-gray-700/50">
 
 				<section>
-					<h1 className="mt-6 -mb-2 text-2xl font-medium">App appearance</h1>
+					<h1 className="mt-6 text-2xl font-medium">App appearance</h1>
 					<div className="divide-y divide-gray-20 dark:divide-gray-700/50">
 
 						{/* Distance Units */}
 						<div className="flex items-center justify-between gap-4 py-2">
 							<div className="flex flex-col justify-center">
 								<h1 className="-mb-0.5 text-lg font-medium opacity-80">Distance Units</h1>
-								<p className="text-sm opacity-50">Change the units used to display distances.</p>
+								<p className="text-sm font-medium dark:font-normal opacity-60">Change the units used to display distances.</p>
 							</div>
 							<div className="pt-3 my-auto">
 								<DropDown
@@ -56,15 +56,15 @@ export function SettingsWindow() {
 						<div className="flex items-center justify-between gap-4 py-2">
 							<div className="flex flex-col justify-center">
 								<h1 className="-mb-0.5 text-lg font-medium opacity-80">App theme</h1>
-								<p className="text-sm opacity-50">Change the theme used by the app.</p>
+								<p className="text-sm font-medium dark:font-normal opacity-60">Change the theme used by the app.</p>
 							</div>
 							<div className="pt-3 my-auto">
 								<DropDown
-									defaultValue={ [ "LIGHT", "DARK" ].includes(theme) ? theme.toLowerCase().replace(/^[a-z]/, letter => letter.toUpperCase()) : "Automatic (default)" }
+									defaultValue={ [ "LIGHT", "DARK" ].includes(theme) ? theme.toLowerCase().replace(/^[a-z]/, letter => letter.toUpperCase()) : "System (default)" }
 									label="App theme"
 									onChange={ (event: ChangeEvent<HTMLInputElement>) => setTheme(event.target.value.toUpperCase()) }
 									options={ [
-										"Automatic (default)",
+										"System (default)",
 										"Light",
 										"Dark"
 									] } />
