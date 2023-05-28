@@ -57,7 +57,7 @@ export function createWindow(subWindow?: string) {
 	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) win.loadURL(process.env["ELECTRON_RENDERER_URL"] + (subWindow ? `#${ subWindow }` : ""));
 		
 	// Otherwise load the index.html file
-	else win.loadFile(join(__dirname, "../renderer/index.html") + (subWindow ? `#${ subWindow }` : ""));
+	else win.loadFile(join(__dirname, "../renderer/index.html"), { hash: subWindow || undefined });
     
 	// and load the index.html of the app.
 	win.on("ready-to-show", win.show);
