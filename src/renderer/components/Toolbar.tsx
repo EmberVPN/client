@@ -22,7 +22,7 @@ export default function Toolbar() {
 				{!user && <Spinner className="mx-3 w-9" />}
 
 				{/* Menu button */}
-				{ user && <MyAccount user={ user } />}
+				{user && <MyAccount user={ user } />}
 				
 			</div>
 

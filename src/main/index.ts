@@ -2,10 +2,13 @@ import { electronApp, is } from "@electron-toolkit/utils";
 import AutoLaunch from "auto-launch";
 import { BrowserWindow, app, shell } from "electron";
 import { join, resolve } from "path";
+import { Config } from "./class/Config";
 import { IPManager } from "./class/IPManager";
 import { OpenVPNManager } from "./class/OpenVPNManager";
+import SettingsManager from "./class/SettingsManager";
 import { TitlebarManager } from "./class/TitlebarManager";
 import { TrayManager } from "./class/TrayManager";
+import UpdateManager from "./class/UpdateManager";
 
 // Get app resource path
 export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "../resources");
@@ -15,23 +18,26 @@ export let tray: TrayManager;
 export let ovpn: OpenVPNManager;
 export let tbar: TitlebarManager;
 export let ipvm: IPManager;
+export let setm: SettingsManager;
+export let updateManager: UpdateManager;
+export const config = new Config();
 
 /**
  * Create the main window
  * @returns void
  */
-function createWindow(): void {
+export function createWindow(subWindow?: string) {
 
 	// Create the browser window.
 	const win = new BrowserWindow({
 		icon: resolve(resources, "./assets/icon.png"),
 		show: false,
 		resizable: false,
-		title: "Ember VPN",
+		title: subWindow ? `${ subWindow } - Ember VPN` : "Ember VPN",
 		titleBarStyle: "hidden",
 		frame: process.platform === "win32",
-		width: 600,
-		height: 400,
+		width: subWindow ? 512 : 600,
+		height: subWindow ? 128 : 400,
 		minWidth: 600,
 		minHeight: 400,
 		autoHideMenuBar: true,
@@ -42,15 +48,6 @@ function createWindow(): void {
 			webviewTag: true
 		}
 	});
-
-	// Prevent multiple instances
-	const isUnlocked = app.requestSingleInstanceLock();
-	if (!isUnlocked && !is.dev) return app.quit();
-	app.on("second-instance", function() {
-		if (!win) return;
-		win.show();
-		win.focus();
-	});
 	
 	// Open links in external browser
 	win.webContents.setWindowOpenHandler(details => {
@@ -59,19 +56,33 @@ function createWindow(): void {
 	});
 
 	// In development load the react app
-	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) win.loadURL(process.env["ELECTRON_RENDERER_URL"]);
+	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) win.loadURL(process.env["ELECTRON_RENDERER_URL"] + (subWindow ? `#${ subWindow }` : ""));
 		
 	// Otherwise load the index.html file
-	else win.loadFile(join(__dirname, "../renderer/index.html"));
+	else win.loadFile(join(__dirname, "../renderer/index.html"), { hash: subWindow || undefined });
     
 	// and load the index.html of the app.
 	win.on("ready-to-show", win.show);
+
+	if (subWindow) return win;
+
+	// Prevent multiple instances
+	const isUnlocked = app.requestSingleInstanceLock();
+	if (!isUnlocked && !is.dev) app.quit();
+	app.on("second-instance", function() {
+		if (!win) return;
+		win.show();
+		win.focus();
+	});
 
 	// Initialize state managers
 	tray = new TrayManager(win);
 	tbar = new TitlebarManager(win);
 	ovpn = new OpenVPNManager(win);
 	ipvm = new IPManager(win);
+	setm = new SettingsManager(win);
+	updateManager = new UpdateManager(win);
+	return win;
 	
 }
 
@@ -103,5 +114,5 @@ app.whenReady()
 	})
 
 	// Create the window
-	.then(createWindow);
+	.then(() => createWindow());
 

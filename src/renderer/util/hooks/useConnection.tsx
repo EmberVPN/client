@@ -77,8 +77,6 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 		electron.ipcRenderer.on("iplocation", (_event, string) => {
 			const data = JSON.parse(string);
 
-			console.log(data.ip, ipLocation?.ip);
-
 			// If the IP has changed, update the location
 			if (data.ip !== ipLocation?.ip) setIpLocation(data);
 

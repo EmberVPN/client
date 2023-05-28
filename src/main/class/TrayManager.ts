@@ -1,6 +1,6 @@
-import { BrowserWindow, Menu, Notification, Tray, ipcMain, nativeImage } from "electron";
+import { BrowserWindow, Menu, Notification, Tray, app, ipcMain, nativeImage } from "electron";
 import { resolve } from "path";
-import { ovpn, resources } from "..";
+import { ovpn, resources, setm, updateManager } from "..";
 
 export class TrayManager {
 
@@ -70,16 +70,7 @@ export class TrayManager {
 
 		// Set the default state
 		this.setState(this._state);
-
-		// Add context menu
-		this.pushMenuItem({
-			label: "Exit",
-			click: () => process.exit()
-		});
-
-		this.pushMenuItem({
-			type: "separator"
-		});
+		this.refreshMenu();
 
 		// Handle authorization token changes
 		ipcMain.on("authorization", (_, authorization: string) => {
@@ -97,9 +88,68 @@ export class TrayManager {
 
 	public refreshMenu() {
 
+		const label = [ "Ember VPN", `v${ app.getVersion() }` ].join(Array(8).fill(" ").join(""));
+
 		// Reset the tray menu
 		this.removeMenuItem("Disconnect");
 		this.removeMenuItem("Quick Connect");
+		this.removeMenuItem("Settings");
+		this.removeMenuItem("settings-sep");
+		this.removeMenuItem(label);
+		this.removeMenuItem("title-sep");
+		this.removeMenuItem("Exit");
+		this.removeMenuItem("Check for Updates");
+		this.removeMenuItem("update-sep");
+
+		// Add context menu
+		this.pushMenuItem({
+			label: "Exit",
+			role: "quit",
+			click: () => process.exit()
+		});
+
+		this.pushMenuItem({
+			type: "separator",
+			label: "settings-sep"
+		});
+		
+		this.addMenuItems();
+
+		this.pushMenuItem({
+			type: "separator",
+			label: "title-sep"
+		});
+
+		// Add the tray title
+		this.pushMenuItem({
+			label,
+			enabled: false,
+			icon: this.resizeImage("icon", 16),
+		});
+
+	}
+	
+	private addMenuItems() {
+
+		// Add settings button
+		if (this.authorization) {
+			this.pushMenuItem({
+				label: "Settings",
+				click: () => setm.open(),
+				
+			});
+		}
+
+		// Check for updates
+		this.pushMenuItem({
+			label: "Check for Updates",
+			click: () => updateManager.open(),
+		});
+
+		this.pushMenuItem({
+			type: "separator",
+			label: "update-sep"
+		});
 		
 		// Add the disconnect button if we're connected
 		if (this._state === "connected") this.pushMenuItem({
@@ -114,7 +164,6 @@ export class TrayManager {
 			click: () => ovpn.quickConnect(),
 			enabled: this._state === "disconnected" && !ovpn.isConnecting()
 		});
-
 	}
 
 	public setState(state: typeof this._state) {

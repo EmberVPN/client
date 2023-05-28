@@ -2,8 +2,10 @@ import Button from "@ui-elements/Button";
 import Card from "@ui-elements/Card";
 import Spinner from "@ui-elements/Spinner";
 import classNames from "classnames";
+import { useMemo } from "react";
 import { MdOutlineTimer } from "react-icons/md";
 import { calculateDistance } from "../../calculateDistance";
+import { useConfigKey } from "../util/hooks/useConfigKey";
 import useConnection from "../util/hooks/useConnection";
 import Timestamp from "./Timestamp";
 
@@ -11,6 +13,10 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 
 	// Get the current IP location
 	const { status, active, ipLocation, setStatus, setActive, lastStateChange } = useConnection();
+
+	// Get the config
+	const [ config ] = useConfigKey("units.distance");
+	const imperial = useMemo(() => config === undefined ? ipLocation?.country_code === "US" : config === "IMPERIAL", [ config, ipLocation ]);
 
 	// If location is still loading
 	if (!ipLocation) return null;
@@ -70,7 +76,7 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 										<p className={ classNames(ping > 0 ? ping < 50 ? "text-success" : ping < 150 ? "text-warn" : "text-error" : "text-gray", "transition-colors") }>{ping > 0 ? `${ Math.trunc(ping) }ms` : "---"}</p>
 										
 										<span className="text-gray-400 dark:text-gray-600">•</span>
-										<p>{Intl.NumberFormat().format(Math.floor(distance * (ipLocation.country_code === "US" ? 0.621371 : 1)))} {ipLocation.country_code === "US" ? "Mi" : "Km"}</p>
+										<p>{Intl.NumberFormat().format(Math.floor(distance * (imperial ? 0.621371 : 1)))} {imperial ? "Mi" : "Km"}</p>
 									</>) : (
 								
 									// Measure time connected
