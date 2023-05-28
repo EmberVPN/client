@@ -42,6 +42,12 @@ export class TitlebarManager {
 			// Set mini window
 			if (key === "lock") {
 				mainWindow.setResizable(false);
+				
+				// Iterate through all windows and close all but the main window
+				BrowserWindow.getAllWindows()
+					.filter(window => window.id !== mainWindow.id)
+					.map(window => window.close());
+
 				ovpn.disconnect();
 				this.unlocked = false;
 			}
