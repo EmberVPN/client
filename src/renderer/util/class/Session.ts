@@ -31,7 +31,7 @@ export default class Session implements Auth.Session {
 	}
 
 	public async revoke() {
-		return await fetch(`https://api.embervpn.org/auth/session`, {
+		return await fetch("https://api.embervpn.org/auth/session", {
 			method: "DELETE",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ session_id: this.session_id })
