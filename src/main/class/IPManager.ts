@@ -1,4 +1,4 @@
-import { BrowserWindow } from "electron";
+import electron, { BrowserWindow } from "electron";
 import EventEmitter from "events";
 
 export interface IpGeo {
@@ -104,10 +104,8 @@ export class IPManager extends EventEmitter {
 
 			// Send IP location to renderer
 			setInterval(() => {
-				if (!this.win) return;
-				if (this.win.isDestroyed()) return;
-				if (this.win.webContents.isDestroyed()) return;
-				this.win.webContents.send("iplocation", JSON.stringify(this.lastGeo));
+				const wins = electron.BrowserWindow.getAllWindows();
+				wins.map(win => win.webContents.send("iplocation", JSON.stringify(this.lastGeo)));
 			}, 50);
 			
 		});
