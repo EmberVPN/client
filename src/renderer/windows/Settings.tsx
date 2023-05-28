@@ -13,9 +13,12 @@ export function SettingsWindow() {
 	// Adjust the window size
 	useMounted(() => electron.ipcRenderer.invoke("window-size", 600, 400));
 
-	// Get the config
+	// Get the distance units
 	const [ units, setUnits ] = useConfigKey("units.distance");
 	const imperial = units === undefined ? ipLocation?.country_code === "US" : units === "IMPERIAL";
+
+	// Get the theme
+	const [ theme, setTheme ] = useConfigKey("theme");
 
 	// If location is still loading
 	if (!ipLocation) return null;
@@ -31,9 +34,10 @@ export function SettingsWindow() {
 					<h1 className="mt-6 -mb-2 text-2xl font-medium">App appearance</h1>
 					<div className="divide-y divide-gray-20 dark:divide-gray-700/50">
 
+						{/* Distance Units */}
 						<div className="flex items-center justify-between gap-4 py-2">
 							<div className="flex flex-col justify-center">
-								<h1 className="-mb-1 text-lg font-medium opacity-80">Distance Units</h1>
+								<h1 className="-mb-0.5 text-lg font-medium opacity-80">Distance Units</h1>
 								<p className="text-sm opacity-50">Change the units used to display distances.</p>
 							</div>
 							<div className="pt-3 my-auto">
@@ -44,6 +48,25 @@ export function SettingsWindow() {
 									options={ [
 										"Metric (km)",
 										"Imperial (mi)"
+									] } />
+							</div>
+						</div>
+						
+						{/* App theme */}
+						<div className="flex items-center justify-between gap-4 py-2">
+							<div className="flex flex-col justify-center">
+								<h1 className="-mb-0.5 text-lg font-medium opacity-80">App theme</h1>
+								<p className="text-sm opacity-50">Change the theme used by the app.</p>
+							</div>
+							<div className="pt-3 my-auto">
+								<DropDown
+									defaultValue={ [ "LIGHT", "DARK" ].includes(theme) ? theme.toLowerCase().replace(/^[a-z]/, letter => letter.toUpperCase()) : "Automatic (default)" }
+									label="App theme"
+									onChange={ (event: ChangeEvent<HTMLInputElement>) => setTheme(event.target.value.toUpperCase()) }
+									options={ [
+										"Automatic (default)",
+										"Light",
+										"Dark"
 									] } />
 							</div>
 						</div>

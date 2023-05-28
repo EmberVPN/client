@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/index.less";
+import { useConfigKey } from "./util/hooks/useConfigKey";
 import { ConnectionProvider } from "./util/hooks/useConnection";
 import queryClient from "./util/queryClient";
 import { MainWindow } from "./windows/Main";
@@ -38,6 +40,16 @@ root.render(
 
 // Export the application
 export default function Application() {
+
+	const [ theme ] = useConfigKey("theme");
+	useEffect(function() {
+		
+		if (theme === "DARK") return document.documentElement.classList.add("dark");
+		if (theme === "LIGHT") return document.documentElement.classList.remove("dark");
+		if (window.matchMedia("(prefers-color-scheme: dark)").matches) return document.documentElement.classList.add("dark");
+		document.documentElement.classList.remove("dark");
+
+	}, [ theme ]);
 
 	// If the URL contains the settings hash, show the settings window
 	switch (decodeURIComponent(window.location.hash.substring(1))) {

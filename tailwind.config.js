@@ -18,6 +18,7 @@ module.exports = {
 			}
 		},
 	},
+	darkMode: "class",
 	fontFamily: {
 		"body": [
 			"Roboto"
