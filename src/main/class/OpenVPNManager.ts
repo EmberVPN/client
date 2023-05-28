@@ -197,8 +197,8 @@ export class OpenVPNManager {
 		this._isConnecting = false;
 
 		if (switching) return;
+		if (tray.state !== "disconnected") tray.notify("Disconnected from VPN", "Ember VPN • Disconnected", "tray");
 		tray.setState("disconnected");
-		if (tray.state !== "disconnected") tray.notify("Disconnected from VPN");
 		this.eventDispatcher.send("openvpn", "disconnecting");
 		
 	}

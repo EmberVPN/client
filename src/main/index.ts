@@ -17,10 +17,11 @@ export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "..
 export let tray: TrayManager;
 export let ovpn: OpenVPNManager;
 export let tbar: TitlebarManager;
-export let ipvm: IPManager;
 export let setm: SettingsManager;
 export let updateManager: UpdateManager;
+
 export const config = new Config();
+export const ipvm = new IPManager;
 
 /**
  * Create the main window
@@ -79,7 +80,6 @@ export function createWindow(subWindow?: string) {
 	tray = new TrayManager(win);
 	tbar = new TitlebarManager(win);
 	ovpn = new OpenVPNManager(win);
-	ipvm = new IPManager(win);
 	setm = new SettingsManager(win);
 	updateManager = new UpdateManager(win);
 	return win;
