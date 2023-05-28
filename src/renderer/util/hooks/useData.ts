@@ -2,7 +2,7 @@ import { useQuery } from "react-query";
 
 interface Endpoints {
 	"/v2/ember/servers": EmberAPI.Servers;
-	"/ember/downloads": EmberAPI.ClientDownloads;
+	"/v2/ember/downloads": EmberAPI.ClientDownloads;
 }
 
 export default function useData<T extends keyof Endpoints>(route: T): { data: REST.APIResponse<Endpoints[T]> | undefined, isLoading: boolean } {

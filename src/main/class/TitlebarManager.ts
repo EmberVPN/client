@@ -41,22 +41,21 @@ export class TitlebarManager {
 
 			// Set mini window
 			if (key === "lock") {
-				win.setResizable(false);
+				mainWindow.setResizable(false);
 				ovpn.disconnect();
 				this.unlocked = false;
 			}
 
 			// Set normal window
 			if (key === "unlock") {
-				if (mainWindow.id !== win.id) return;
-				win.setResizable(true);
-				win.setMinimumSize(600, 400);
-				const size = win.getSize();
-				if (!this.unlocked) win.setSize(800, 600);
+				mainWindow.setResizable(true);
+				mainWindow.setMinimumSize(600, 400);
+				const size = mainWindow.getSize();
+				if (!this.unlocked) mainWindow.setSize(800, 600);
 				const dw = size[0] - 800;
 				const dh = size[1] - 600;
-				const pos = win.getPosition();
-				win.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
+				const pos = mainWindow.getPosition();
+				mainWindow.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
 
 				this.unlocked = true;
 			}

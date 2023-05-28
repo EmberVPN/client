@@ -47,10 +47,10 @@ export default function Titlebar({ children, resizeable = true, minimizeable = t
 			{ ...props }>
 			
 			{/* Left side */}
-			<div className="z-10 flex items-center gap-3 px-2.5">
+			<div className="z-10 flex items-center px-1">
 
 				{/* Icon */}
-				<img className={ classNames("h-5 aspect-square", isMac && "hidden") }
+				<img className={ classNames("h-4 aspect-square mx-2", isMac && "hidden") }
 					src={ favicon } />
 				
 				{/* Title */}

@@ -7,7 +7,7 @@ export default class UpdateManager {
 	private isOpen = false;
 	private win: BrowserWindow | undefined;
 
-	constructor() {
+	constructor(mainWindow: BrowserWindow) {
 
 		// Get current version
 		const version = app.getVersion();
@@ -24,7 +24,10 @@ export default class UpdateManager {
 				const latest = res.version.substring(1);
 
 				// Compare versions
-				if (gt(latest, version)) this.open();
+				if (!gt(latest, version)) return;
+
+				// await for main window to load
+				mainWindow.webContents.on("did-finish-load", () => this.open());
 
 			});
 

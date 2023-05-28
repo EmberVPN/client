@@ -18,7 +18,7 @@ export let ovpn: OpenVPNManager;
 export let tbar: TitlebarManager;
 export let ipvm: IPManager;
 export let setm: SettingsManager;
-export const updateManager = new UpdateManager();
+export let updateManager: UpdateManager;
 
 /**
  * Create the main window
@@ -34,8 +34,8 @@ export function createWindow(subWindow?: string) {
 		title: subWindow ? `${ subWindow } - Ember VPN` : "Ember VPN",
 		titleBarStyle: "hidden",
 		frame: process.platform === "win32",
-		width: 600,
-		height: 400,
+		width: subWindow ? 512 : 600,
+		height: subWindow ? 128 : 400,
 		minWidth: 600,
 		minHeight: 400,
 		autoHideMenuBar: true,
@@ -79,6 +79,7 @@ export function createWindow(subWindow?: string) {
 	ovpn = new OpenVPNManager(win);
 	ipvm = new IPManager(win);
 	setm = new SettingsManager(win);
+	updateManager = new UpdateManager(win);
 	return win;
 	
 }
