@@ -10,7 +10,7 @@ export function useUser() {
 	const { data, isLoading, error } = useQuery("user", async function() {
 
 		// Fetch the user
-		const response = await fetch(`${ APIROOT }/v2/auth/@me`, {
+		const response = await fetch(`https://api.embervpn.org/v2/auth/@me`, {
 			headers: {
 				Authorization: localStorage.getItem("authorization") ?? "",
 			}

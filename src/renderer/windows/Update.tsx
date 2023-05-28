@@ -22,7 +22,7 @@ export function UpdateWindow(): JSX.Element {
 			// Get the latest version
 			if (!data || !data.success) return;
 			const latest = data.version.substring(1);
-			const isLatest = latest === VERSION || gt(VERSION, latest);
+			const isLatest = latest === version || gt(version, latest);
 
 			electron.ipcRenderer.invoke("window-size", 512, isLatest ? 128 : 240);
 
@@ -42,8 +42,8 @@ export function UpdateWindow(): JSX.Element {
 		const latest = data.version.substring(1);
 		
 		// Get some boolean values
-		const isLatest = latest === VERSION;
-		const isPreview = gt(VERSION, latest);
+		const isLatest = latest === version;
+		const isPreview = gt(version, latest);
 		
 		if (isLatest || isPreview) return (
 			<div className="flex flex-col w-full gap-2 select-none">
@@ -51,7 +51,7 @@ export function UpdateWindow(): JSX.Element {
 					<IoMdCheckmarkCircleOutline className="text-2xl shrink-0 text-success" />
 					<h1 className="font-medium">You&apos;re already up to date</h1>
 				</div>
-				<p className="text-sm text-gray-600 grow dark:text-gray-400">You&apos;re running Ember <code className="font-mono bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded-md">v{ VERSION }</code> which is {isLatest ? "the" : "newer then the"} latest version.</p>
+				<p className="text-sm text-gray-600 grow dark:text-gray-400">You&apos;re running Ember <code className="font-mono bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded-md">v{ version }</code> which is {isLatest ? "the" : "newer then the"} latest version.</p>
 			</div>
 		);
 
@@ -62,7 +62,7 @@ export function UpdateWindow(): JSX.Element {
 					<h1 className="font-medium">Update available</h1>
 				</div>
 				<div className="flex flex-col gap-2 text-sm text-gray-600 grow dark:text-gray-400">
-					<p>A newer version of Ember is available. You&apos;re running <code className="font-mono bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded-md">v{VERSION}</code> and the latest version is <code className="font-mono bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded-md">v{latest}</code>.</p>
+					<p>A newer version of Ember is available. You&apos;re running <code className="font-mono bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded-md">v{version}</code> and the latest version is <code className="font-mono bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded-md">v{latest}</code>.</p>
 					<p>Keeping Ember up to date is important for security and stability.</p>
 				</div>
 				<div className="flex items-center justify-end p-4 mt-2 -mx-8 -mb-4 border-t border-gray-200 dark:border-gray-700/50">

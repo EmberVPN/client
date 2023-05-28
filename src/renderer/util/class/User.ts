@@ -7,7 +7,7 @@ export default class User implements Auth.User {
 	 * @param id The user ID
 	 */
 	static getAvatarURL(id: number): string {
-		return `${ APIROOT }/auth/avatar/${ id }`;
+		return `https://api.embervpn.org/auth/avatar/${ id }`;
 	}
 
 	/** ANCHOR: User Properties */

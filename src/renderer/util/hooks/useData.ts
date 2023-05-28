@@ -8,7 +8,7 @@ interface Endpoints {
 export default function useData<T extends keyof Endpoints>(route: T): { data: REST.APIResponse<Endpoints[T]> | undefined, isLoading: boolean } {
 
 	const { isLoading, data } = useQuery(route, async function() {
-		return await fetch(APIROOT + route, {
+		return await fetch(`https://api.embervpn.org${ route }`, {
 			headers: {
 				Authorization: localStorage.getItem("authorization") ?? "",
 			}

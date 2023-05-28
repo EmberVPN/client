@@ -11,7 +11,7 @@ export function SettingsWindow(): JSX.Element {
 			<Titlebar minimizeable={ false }
 				resizeable={ false }>Settings</Titlebar>
 			<div className="flex gap-2 px-8 py-4 select-none grow">
-				
+				lol
 			</div>
 		</div>
 	);

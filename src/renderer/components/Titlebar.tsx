@@ -37,7 +37,7 @@ export default function Titlebar({ children, resizeable = true, minimizeable = t
 	});
 
 	// Is macos
-	const isMac = PLATFORM === "darwin";
+	const isMac = platform === "darwin";
 
 	// Window button class
 	const button = classNames("flex items-center justify-center h-8 text-base bg-opacity-0 select-none no-drag bg-neutral-500 hover:bg-opacity-10 active:hover:bg-opacity-20 last:hover:bg-red-500 last:hover:bg-opacity-100 last:hover:active:bg-opacity-70 last:hover:text-white w-[46px]");
