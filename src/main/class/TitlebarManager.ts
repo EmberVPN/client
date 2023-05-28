@@ -14,7 +14,9 @@ export class TitlebarManager {
 		// Set size of window from renderer
 		ipcMain.handle("window-size", (_, width: number, height: number) => {
 
-			const win = BrowserWindow.getFocusedWindow() || mainWindow;
+			const win = BrowserWindow.getFocusedWindow();
+			if (!win) return;
+			
 			const size = win.getSize();
 			const dw = size[0] - width;
 			const dh = size[1] - height;

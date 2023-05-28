@@ -2,6 +2,7 @@ import Button from "@ui-elements/Button";
 import Card from "@ui-elements/Card";
 import Spinner from "@ui-elements/Spinner";
 import classNames from "classnames";
+import { useMemo } from "react";
 import { MdOutlineTimer } from "react-icons/md";
 import { calculateDistance } from "../../calculateDistance";
 import { useConfigKey } from "../util/hooks/useConfigKey";
@@ -13,9 +14,9 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 	// Get the current IP location
 	const { status, active, ipLocation, setStatus, setActive, lastStateChange } = useConnection();
 
-	// Get the units
+	// Get the config
 	const [ config ] = useConfigKey("units.distance");
-	const imperial = typeof config === "string" ? config === "IMPERIAL" : ipLocation?.country_code === "US";
+	const imperial = useMemo(() => config === undefined ? ipLocation?.country_code === "US" : config === "IMPERIAL", [ config, ipLocation ]);
 
 	// If location is still loading
 	if (!ipLocation) return null;
