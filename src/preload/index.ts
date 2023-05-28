@@ -1,5 +1,4 @@
 import { electronAPI } from "@electron-toolkit/preload";
-import { is } from "@electron-toolkit/utils";
 import { contextBridge } from "electron";
 import { version } from "../../package.json";
 

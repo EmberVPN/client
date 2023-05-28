@@ -2,6 +2,7 @@ import { electronApp, is } from "@electron-toolkit/utils";
 import AutoLaunch from "auto-launch";
 import { BrowserWindow, app, shell } from "electron";
 import { join, resolve } from "path";
+import { Config } from "./class/Config";
 import { IPManager } from "./class/IPManager";
 import { OpenVPNManager } from "./class/OpenVPNManager";
 import SettingsManager from "./class/SettingsManager";
@@ -19,6 +20,7 @@ export let tbar: TitlebarManager;
 export let ipvm: IPManager;
 export let setm: SettingsManager;
 export let updateManager: UpdateManager;
+export const config = new Config();
 
 /**
  * Create the main window
