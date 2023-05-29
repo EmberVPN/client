@@ -78,5 +78,34 @@ export default function Titlebar({ children, resizeable = true, minimizeable = t
 		</div>
 	);
 
-	return null;
+	// Generic titlebar for most other platforms and linux distros
+	return (
+		<div className={ classNames("flex h-9 shrink-0 w-full items-center relative isolate select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag justify-center group", className) }>
+			
+			{/* Window title  */}
+			<p className="flex items-center my-auto font-medium -z-[1]">{children ? `${ children } • Ember VPN` : "Ember VPN"}</p>
+			
+			{/* Window controls */}
+			<div className="flex items-center h-full gap-3 px-2 text-xs z-[2] absolute right-0">
+				{[ {
+					icon: <VscChromeMinimize />,
+					action: "minimize",
+					enabled: minimizeable
+				}, {
+					icon: maximized ? <VscChromeRestore /> : <VscChromeMaximize />,
+					action: "restore",
+					enabled: resizeable
+				}, {
+					icon: <VscChromeClose />,
+					action: "hide"
+				} ].filter(({ enabled }) => enabled !== false).map(({ icon, action }, key) => (
+					<button
+						className="bg-gray bg-opacity-20 hover:bg-opacity-30 active:bg-opacity-40 rounded-full aspect-square h-[22px] flex items-center justify-center no-drag"
+						key={ key }
+						onClick={ () => electron.ipcRenderer.send("titlebar", action) }>{ icon }</button>
+				))}
+			</div>
+
+		</div>
+	);
 }
