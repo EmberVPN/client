@@ -1,60 +1,11 @@
-import { ChildProcess, spawn, spawnSync } from "child_process";
+import admin from "admin-check";
+import { ChildProcess, spawn } from "child_process";
 import { BrowserWindow, ipcMain } from "electron";
-import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
 import { resolve } from "path";
 import EmberVPN, { IPv4, Tray, resources } from "..";
 import { calculateDistance } from "../../calculateDistance";
-
-function getBinary() {
-
-	if (process.platform === "win32") {
-				
-		// Check if openvpn.exe is on path
-		const openvpn = spawnSync("where openvpn", { shell: true });
-		if (openvpn.status === 0) return "openvpn.exe";
-				
-		// Check default location
-		const defaultLocation = resolve(process.env.ProgramFiles || "C:\\Program Files", "OpenVPN/bin/openvpn.exe");
-		if (existsSync(defaultLocation)) return defaultLocation;
-
-		// Check bundled location
-		const bundledLocation = resolve(resources, ".bin/bin/openvpn.exe");
-		if (existsSync(bundledLocation)) return bundledLocation;
-
-		// Install OpenVPN
-		install();
-
-		// Return bundled location
-		return bundledLocation;
-
-	}
-	
-	throw new Error("Unsupported platform");
-
-}
-
-// Install OpenVPN
-function install() {
-
-	if (process.platform === "win32") {
-			
-		// Run the bundled installer
-		return spawnSync([
-			"msiexec",
-			"/i",
-			`"${ resolve(resources, ".bin/OpenVPN-2.6.4-I001-amd64.msi") }"`,
-			`PRODUCTDIR="${ resolve(resources, ".bin") }"`,
-			"ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun",
-			"/passive",
-		].join(" "), {
-			shell: true,
-		});
-	
-	}
-
-	throw new Error("Unsupported platform");
-}
+import { getBinary } from "../vpnutils";
 
 export class OpenVPNManager {
 
@@ -207,14 +158,16 @@ export class OpenVPNManager {
 		// Get binary and config path
 		const binary = await getBinary();
 		const config = resolve(resources, "ember.ovpn");
+
+		// Check elevation status
+		const elevated = await admin.check();
+		if (!elevated) throw new Error("You must run Ember VPN as administrator to connect to the VPN");
 		
 		// Kill existing process
 		if (this.proc !== null) this.disconnect(true);
 		
-		// Spawn openvpn process for windows (requires elevation)
-		if (process.platform === "win32") return this.proc = spawn(binary, [ "--config", config ], { detached: true });
-		
-		throw new Error("Unsupported platform");
+		// Spawn openvpn process (should be the same for all platforms)
+		return this.proc = spawn(binary, [ "--config", config ], { detached: true });
 		
 	}
 
