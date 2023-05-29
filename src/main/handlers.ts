@@ -8,8 +8,6 @@ ipcMain.handle("window-size", (event, width: number, height: number, resizable?:
 	const win = BrowserWindow.fromWebContents(event.sender);
 	if (!win) return;
 
-	console.log(win);
-
 	// Set normal size
 	win.setResizable(resizable === true);
 	win.setMinimumSize(width, height);
