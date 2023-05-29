@@ -37,6 +37,9 @@ class App extends Window {
 		// Await app ready, then create the window
 		app.whenReady().then(() => this.win = this.createWindow());
 
+		// Set app ID
+		app.setAppUserModelId("org.embervpn.client");
+
 		// Listen for authorization token changes
 		ipcMain.on("authorization", async(_, authorization: string | null) => {
 			if (!this.win) throw new Error("Main window not set up");
