@@ -29,6 +29,7 @@ export class Window {
 			resizable: false,
 			title: "Ember VPN",
 			titleBarStyle: "hidden",
+			frame: process.platform === "win32",
 			width: 600,
 			height: 400,
 			minWidth: options?.width || 600,

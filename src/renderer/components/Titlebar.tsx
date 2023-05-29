@@ -43,7 +43,7 @@ export default function Titlebar({ children, resizeable = true, minimizeable = t
 	const button = classNames("flex items-center justify-center h-8 text-base bg-opacity-0 select-none no-drag bg-neutral-500 hover:bg-opacity-10 active:hover:bg-opacity-20 last:hover:bg-red-500 last:hover:bg-opacity-100 last:hover:active:bg-opacity-70 last:hover:text-white w-[46px]");
 
 	return (
-		<div className={ classNames("flex w-full items-center relative select-none text-gray-800 dark:text-gray-200 z-[70] font-windows app-drag text-xs", className, isMac ? "h-7 justify-center" : "h-8 justify-between") }
+		<div className={ classNames("flex w-full items-center relative select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag text-xs", className, isMac ? "h-7 justify-center" : "h-8 justify-between") }
 			{ ...props }>
 			
 			{/* Left side */}
