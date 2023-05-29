@@ -1,5 +1,4 @@
 import favicon from "@assets/icon.svg";
-import classNames from "classnames";
 import React, { HTMLAttributes, useEffect, useState } from "react";
 import { VscChromeClose, VscChromeMaximize, VscChromeMinimize, VscChromeRestore } from "react-icons/vsc";
 
@@ -9,7 +8,7 @@ interface Props {
 	minimizeable?: boolean;
 }
 
-export default function Titlebar({ children, resizeable = true, minimizeable = true, className, ...props }: Props & HTMLAttributes<HTMLDivElement>): JSX.Element {
+export default function Titlebar({ children, resizeable = true, minimizeable = true, className, ...props }: Props & HTMLAttributes<HTMLDivElement>) {
 
 	// Maximize state
 	const [ maximized, setMaximized ] = useState(false);
@@ -36,45 +35,36 @@ export default function Titlebar({ children, resizeable = true, minimizeable = t
 		}
 	});
 
-	// Is macos
-	const isMac = platform === "darwin";
+	// If were on mac, our job is easy
+	if (platform === "darwin") return null;
 
-	// Window button class
-	const button = classNames("flex items-center justify-center h-8 text-base bg-opacity-0 select-none no-drag bg-neutral-500 hover:bg-opacity-10 active:hover:bg-opacity-20 last:hover:bg-red-500 last:hover:bg-opacity-100 last:hover:active:bg-opacity-70 last:hover:text-white w-[46px]");
+	// Somewhat easier on windows
+	if (platform === "win32") return (
+		<div className="flex h-8 shrink-0 w-full items-center relative isolate select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag text-xs justify-between bg-white dark:bg-gray-800">
 
-	return (
-		<div className={ classNames("flex w-full items-center relative select-none text-gray-800 dark:text-gray-200 z-[70] font-windows app-drag text-xs", className, isMac ? "h-7 justify-center" : "h-8 justify-between") }
-			{ ...props }>
-			
 			{/* Left side */}
 			<div className="z-10 flex items-center px-1">
-
-				{/* Icon */}
-				<img className={ classNames("h-4 aspect-square mx-2", isMac && "hidden") }
+				<img className="h-4 mx-2 aspect-square"
 					src={ favicon } />
-				
-				{/* Title */}
-				<span className="flex items-center my-auto h-7">{children ? `${ children } • Ember VPN` : "Ember VPN"}</span>
-				
+				<p className="flex items-center my-auto h-7">{children ? `${ children } • Ember VPN` : "Ember VPN"}</p>
 			</div>
 
-			{/* Window controls (hide for mac) */}
-			<div className={ classNames(isMac ? "hidden" : "flex") }>
-				
-				{/* Minimize */}
-				{ minimizeable && <div className={ button }
-					onClick={ () => electron.ipcRenderer.send("titlebar", "minimize") }>{ <VscChromeMinimize /> }</div>}
-				
-				{/* Maximize/restore */}
-				{ resizeable && <div className={ button }
-					onClick={ () => electron.ipcRenderer.send("titlebar", "restore") }>{maximized ? <VscChromeRestore /> : <VscChromeMaximize />}</div>}
-				
-				{/* Close */}
-				<div className={ button }
-					onClick={ () => electron.ipcRenderer.send("titlebar", "hide") }><VscChromeClose /></div>
-				
+			{/* Window controls */}
+			<div className="flex h-full">
+				{[
+					{ icon: <VscChromeMinimize />, action: "minimize", enabled: minimizeable },
+					{ icon: maximized ? <VscChromeRestore /> : <VscChromeMaximize />, action: "restore", enabled: resizeable },
+					{ icon: <VscChromeClose />, action: "hide" }
+				].filter(({ enabled }) => enabled !== false).map(({ icon, action }, key) => (
+					<button
+						className="flex items-center justify-center bg-opacity-0 select-none no-drag bg-neutral-500 hover:bg-opacity-10 active:hover:bg-opacity-20 last:hover:bg-red-500 last:hover:bg-opacity-100 last:hover:active:bg-opacity-70 last:hover:text-white text-base h-full w-[46px]"
+						key={ key }
+						onClick={ () => electron.ipcRenderer.send("titlebar", action) }>{ icon }</button>
+				))}
 			</div>
 
 		</div>
 	);
+
+	return null;
 }
