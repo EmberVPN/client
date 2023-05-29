@@ -1,5 +1,4 @@
 import favicon from "@assets/icon.svg";
-import classNames from "classnames";
 import React, { HTMLAttributes, useEffect, useState } from "react";
 import { VscChromeClose, VscChromeMaximize, VscChromeMinimize, VscChromeRestore } from "react-icons/vsc";
 
