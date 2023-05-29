@@ -4,7 +4,7 @@ import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
 import { resolve } from "path";
 import { inetLatency } from "systeminformation";
-import { ipvm, resources, tray } from "..";
+import { IPv4, resources, tray } from "..";
 import { calculateDistance } from "../../calculateDistance";
 
 function getBinary() {
@@ -66,7 +66,6 @@ export class OpenVPNManager {
 
 	private proc: ChildProcess | null = null;
 	private eventDispatcher: Electron.WebContents;
-	private authorization: string | null = null;
 	private server: Ember.Server | null = null;
 
 	public async downloadConfig(server: Ember.Server) {
@@ -119,8 +118,8 @@ export class OpenVPNManager {
 		});
 
 		// Await new geolocation
-		const newIp: string = await new Promise(resolve => ipvm.once("change", resolve));
-		const geo = await ipvm.fetchGeo(newIp);
+		const newIp: string = await new Promise(resolve => IPv4.once("change", resolve));
+		const geo = await IPv4.fetchGeo(newIp);
 
 		if (geo.ip !== server.ip) throw new Error("Failed to connect to server");
 		
@@ -143,12 +142,6 @@ export class OpenVPNManager {
 				inetLatency(server.ip)
 			]);
 		});
-
-		// Handle authorization token changes
-		ipcMain.on("authorization", (_, authorization: string) => {
-			this.authorization = authorization;
-			if (!authorization) this.disconnect();
-		});
 		
 		// Listen for openvpn events
 		ipcMain.on("openvpn", async(_, state: string, json) => {
@@ -163,8 +156,7 @@ export class OpenVPNManager {
 			if (state === "connect") {
 
 				// Get authorization
-				const { authorization, server } = JSON.parse(json);
-				this.authorization = authorization;
+				const { server } = JSON.parse(json);
 				this.server = server;
 				
 				// Download server config
@@ -248,7 +240,7 @@ export class OpenVPNManager {
 		if (!servers || !servers.success) throw new Error("Failed to fetch servers");
 		
 		// Fetch geolocation
-		const geo = await ipvm.fetchGeo();
+		const geo = await IPv4.fetchGeo();
 
 		// Get the closest server
 		const server = this.server = Object.values(servers.servers)

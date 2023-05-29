@@ -1,14 +1,14 @@
-import { electronApp, is } from "@electron-toolkit/utils";
-import AutoLaunch from "auto-launch";
-import { BrowserWindow, app, shell } from "electron";
-import { join, resolve } from "path";
+import { is } from "@electron-toolkit/utils";
+import { BrowserWindow, app, ipcMain } from "electron";
+import { resolve } from "path";
+import { inetLatency } from "systeminformation";
 import { Config } from "./class/Config";
 import { IPManager } from "./class/IPManager";
 import { OpenVPNManager } from "./class/OpenVPNManager";
 import SettingsManager from "./class/SettingsManager";
-import { TitlebarManager } from "./class/TitlebarManager";
 import { TrayManager } from "./class/TrayManager";
 import UpdateManager from "./class/UpdateManager";
+import { Window } from "./class/Window";
 
 // Get app resource path
 export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "../resources");
@@ -16,103 +16,118 @@ export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "..
 // Export app state managers
 export let tray: TrayManager;
 export let ovpn: OpenVPNManager;
-export let tbar: TitlebarManager;
 export let setm: SettingsManager;
-export let updateManager: UpdateManager;
 
-export const config = new Config();
-export const ipvm = new IPManager;
+export const updater = new UpdateManager;
+export const config = new Config;
+export const IPv4 = new IPManager;
 
-/**
- * Create the main window
- * @returns void
- */
-export function createWindow(subWindow?: string) {
+class App extends Window {
 
-	// Create the browser window.
-	const win = new BrowserWindow({
-		icon: resolve(resources, "./assets/icon.png"),
-		show: false,
-		resizable: false,
-		title: subWindow ? `${ subWindow } - Ember VPN` : "Ember VPN",
-		titleBarStyle: "hidden",
-		frame: process.platform === "win32",
-		width: subWindow ? 512 : 600,
-		height: subWindow ? 128 : 400,
-		minWidth: 600,
-		minHeight: 400,
-		autoHideMenuBar: true,
-		webPreferences: {
-			preload: join(__dirname, "../preload/index.js"),
-			nodeIntegration: true,
-			sandbox: false,
-			webviewTag: true
-		}
-	});
-	
-	// Open links in external browser
-	win.webContents.setWindowOpenHandler(details => {
-		shell.openExternal(details.url);
-		return { action: "deny" };
-	});
+	private authorization?: string;
 
-	// In development load the react app
-	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) win.loadURL(process.env["ELECTRON_RENDERER_URL"] + (subWindow ? `#${ subWindow }` : ""));
+	constructor() {
+		super();
+
+		// Await app ready
+		app.whenReady().then(() => this.win = this.createWindow());
+
+		// Listen for authorization token changes
+		ipcMain.on("authorization", async(_, authorization: string | null) => {
+			if (!this.win) throw new Error("Main window not set up");
+
+			// If the authorization token is null, disconnect and cleanup
+			if (authorization === null) {
+
+				// Set authorization token
+				this.authorization = undefined;
+
+				// Close all windows that aren't the main window
+				BrowserWindow.getAllWindows()
+					.filter(window => this.is(window))
+					.map(window => window.close());
 		
-	// Otherwise load the index.html file
-	else win.loadFile(join(__dirname, "../renderer/index.html"), { hash: subWindow || undefined });
-    
-	// and load the index.html of the app.
-	win.on("ready-to-show", win.show);
+				// Set locked size
+				this.win.setResizable(false);
 
-	if (subWindow) return win;
+			}
 
-	// Prevent multiple instances
-	const isUnlocked = app.requestSingleInstanceLock();
-	if (!isUnlocked && !is.dev) app.quit();
-	app.on("second-instance", function() {
-		if (!win) return;
-		win.show();
-		win.focus();
-	});
+			if (typeof authorization === "string") {
+				
+				// Set authorization token
+				this.authorization = authorization;
 
-	// Initialize state managers
-	tray = new TrayManager(win);
-	tbar = new TitlebarManager(win);
-	ovpn = new OpenVPNManager(win);
-	setm = new SettingsManager(win);
-	updateManager = new UpdateManager(win);
-	return win;
-	
+				// Set normal size
+				this.win.setResizable(true);
+				this.win.setMinimumSize(600, 400);
+
+				// Center window around the delta
+				const size = this.win.getSize();
+				const dw = size[0] - 600;
+				const dh = size[1] - 400;
+				const pos = this.win.getPosition();
+				this.win.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
+
+			}
+
+		});
+
+	}
+
+	public getAuth() {
+		return this.authorization;
+	}
 }
 
-// Request start on boot
-new AutoLaunch({
-	name: "Ember VPN",
-	path: process.execPath,
-}).enable();
+const _app = new App;
+export default _app;
 
-// When the app loads, create the window
-app.whenReady()
-	.then(function() {
-	
-		// Set app user model id for windows
-		electronApp.setAppUserModelId("org.embervpn");
-	
-		// macOS: Re-create window when dock icon is clicked and there are no other windows open.
-		app.on("activate", function() {
-			if (BrowserWindow.getAllWindows().length === 0) createWindow();
-		});
-	
-		// Quit when all windows are closed.
-		app.on("window-all-closed", () => {
-			if (process.platform !== "darwin") {
-				app.quit();
-			}
-		});
+// Handle window size requests
+ipcMain.handle("window-size", (event, width: number, height: number, resizable?: boolean) => {
 
-	})
+	// Get the window that sent the request
+	const win = BrowserWindow.fromWebContents(event.sender);
+	if (!win) return;
 
-	// Create the window
-	.then(() => createWindow());
+	// Get the current size
+	const size = win.getSize();
 
+	// Calculate the difference
+	const dw = size[0] - width;
+	const dh = size[1] - height;
+
+	// Get the current position
+	const pos = win.getPosition();
+
+	// Set the new position
+	win.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
+
+	// Set the window size
+	win.setResizable(resizable === true);
+	win.setMinimumSize(width, height);
+
+});
+
+// Handle titlebar events
+ipcMain.on("titlebar", (event, key: string, val?: boolean) => {
+
+	// Get the window that sent the request
+	const win = BrowserWindow.fromWebContents(event.sender);
+	if (!win) return;
+
+	// Handle events
+	if (key === "minimize") win.minimize();
+	if (key === "resizeable" && val !== undefined) win.setResizable(val);
+	if (key === "minimizeable" && val !== undefined) win.setMinimizable(val);
+	if (key === "restore") win.isMaximized() ? win.restore() : win.maximize();
+	if (key === "hide") win.close();
+
+});
+
+// Ping server handler
+ipcMain.handle("ping-server", async function(_, server: Ember.Server) {
+	return await Promise.race([
+		new Promise(resolve => setTimeout(() => resolve(-1), 4000)),
+		inetLatency(server.ip)
+	]);
+});

@@ -1,6 +1,6 @@
 import { BrowserWindow, Menu, Notification, Tray, app, ipcMain, nativeImage } from "electron";
 import { resolve } from "path";
-import { ovpn, resources, setm, updateManager } from "..";
+import { ovpn, resources, setm, updater } from "..";
 
 export class TrayManager {
 
@@ -143,7 +143,7 @@ export class TrayManager {
 		// Check for updates
 		this.pushMenuItem({
 			label: "Check for Updates",
-			click: () => updateManager.open(),
+			click: () => updater.open(),
 		});
 
 		this.pushMenuItem({
