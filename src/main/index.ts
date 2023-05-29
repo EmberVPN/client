@@ -1,118 +1,96 @@
-import { electronApp, is } from "@electron-toolkit/utils";
-import AutoLaunch from "auto-launch";
-import { BrowserWindow, app, shell } from "electron";
-import { join, resolve } from "path";
+import { is } from "@electron-toolkit/utils";
+import { BrowserWindow, app, ipcMain } from "electron";
+import { resolve } from "path";
 import { Config } from "./class/Config";
 import { IPManager } from "./class/IPManager";
 import { OpenVPNManager } from "./class/OpenVPNManager";
 import SettingsManager from "./class/SettingsManager";
-import { TitlebarManager } from "./class/TitlebarManager";
 import { TrayManager } from "./class/TrayManager";
 import UpdateManager from "./class/UpdateManager";
+import { Window } from "./class/Window";
+import "./handlers";
 
 // Get app resource path
 export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "../resources");
 
-// Export app state managers
-export let tray: TrayManager;
-export let ovpn: OpenVPNManager;
-export let tbar: TitlebarManager;
-export let ipvm: IPManager;
-export let setm: SettingsManager;
-export let updateManager: UpdateManager;
-export const config = new Config();
+// Popup windows
+export const UpdateWindow = new UpdateManager;
+export const SettingsWindow = new SettingsManager;
 
-/**
- * Create the main window
- * @returns void
- */
-export function createWindow(subWindow?: string) {
+// App state managers
+export const IPv4 = new IPManager;
+export const OpenVPN = new OpenVPNManager;
+export const Tray = new TrayManager;
 
-	// Create the browser window.
-	const win = new BrowserWindow({
-		icon: resolve(resources, "./assets/icon.png"),
-		show: false,
-		resizable: false,
-		title: subWindow ? `${ subWindow } - Ember VPN` : "Ember VPN",
-		titleBarStyle: "hidden",
-		frame: process.platform === "win32",
-		width: subWindow ? 512 : 600,
-		height: subWindow ? 128 : 400,
-		minWidth: 600,
-		minHeight: 400,
-		autoHideMenuBar: true,
-		webPreferences: {
-			preload: join(__dirname, "../preload/index.js"),
-			nodeIntegration: true,
-			sandbox: false,
-			webviewTag: true
-		}
-	});
-	
-	// Open links in external browser
-	win.webContents.setWindowOpenHandler(details => {
-		shell.openExternal(details.url);
-		return { action: "deny" };
-	});
+// Export config manager
+new Config;
 
-	// In development load the react app
-	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) win.loadURL(process.env["ELECTRON_RENDERER_URL"] + (subWindow ? `#${ subWindow }` : ""));
+// Create the app window
+class App extends Window {
+
+	// Authorization token
+	protected authorization?: string;
+
+	constructor() {
+		super();
+
+		// Await app ready
+		app.whenReady().then(() => {
+			
+			// Create the window
+			this.win = this.createWindow();
+
+		});
+
+		// Listen for authorization token changes
+		ipcMain.on("authorization", async(_, authorization: string | null) => {
+			if (!this.win) throw new Error("Main window not set up");
+
+			// If the authorization token is null, disconnect and cleanup
+			if (authorization === null && this.authorization !== undefined) {
+
+				// Set authorization token
+				this.authorization = undefined;
+
+				// Close all windows that aren't the main window
+				BrowserWindow.getAllWindows()
+					.filter(window => !this.is(window))
+					.map(window => window.close());
 		
-	// Otherwise load the index.html file
-	else win.loadFile(join(__dirname, "../renderer/index.html"), { hash: subWindow || undefined });
-    
-	// and load the index.html of the app.
-	win.on("ready-to-show", win.show);
+				// Set locked size
+				this.win.setResizable(false);
 
-	if (subWindow) return win;
+			}
 
-	// Prevent multiple instances
-	const isUnlocked = app.requestSingleInstanceLock();
-	if (!isUnlocked && !is.dev) app.quit();
-	app.on("second-instance", function() {
-		if (!win) return;
-		win.show();
-		win.focus();
-	});
+			if (typeof authorization === "string" && authorization !== this.authorization) {
+				
+				// Set authorization token
+				this.authorization = authorization;
 
-	// Initialize state managers
-	tray = new TrayManager(win);
-	tbar = new TitlebarManager(win);
-	ovpn = new OpenVPNManager(win);
-	ipvm = new IPManager(win);
-	setm = new SettingsManager(win);
-	updateManager = new UpdateManager(win);
-	return win;
+				// Set normal size
+				this.win.setResizable(true);
+				this.win.setMinimumSize(600, 400);
+
+				// Center window around the delta
+				const size = this.win.getSize();
+				this.win.setSize(800, 600);
+				const dw = size[0] - this.win.getSize()[0];
+				const dh = size[1] - this.win.getSize()[1];
+				const pos = this.win.getPosition();
+				this.win.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
+
+			}
+
+		});
+
+	}
+
+	// Get authorization token
+	public getAuthorization() {
+		return this.authorization;
+	}
 	
 }
 
-// Request start on boot
-new AutoLaunch({
-	name: "Ember VPN",
-	path: process.execPath,
-}).enable();
-
-// When the app loads, create the window
-app.whenReady()
-	.then(function() {
-	
-		// Set app user model id for windows
-		electronApp.setAppUserModelId("org.embervpn");
-	
-		// macOS: Re-create window when dock icon is clicked and there are no other windows open.
-		app.on("activate", function() {
-			if (BrowserWindow.getAllWindows().length === 0) createWindow();
-		});
-	
-		// Quit when all windows are closed.
-		app.on("window-all-closed", () => {
-			if (process.platform !== "darwin") {
-				app.quit();
-			}
-		});
-
-	})
-
-	// Create the window
-	.then(() => createWindow());
-
+// Export the app
+export default new App;

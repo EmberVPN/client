@@ -1,4 +1,4 @@
-import electron, { BrowserWindow } from "electron";
+import electron from "electron";
 import EventEmitter from "events";
 
 export interface IpGeo {
@@ -12,7 +12,6 @@ export class IPManager extends EventEmitter {
 
 	private lastIP = "";
 	private lastGeo = {} as IpGeo;
-	private win: BrowserWindow;
 
 	/**
 	 * Fetch the IP address
@@ -33,7 +32,7 @@ export class IPManager extends EventEmitter {
 		].reduce((a, b) => Math.random() > 0.5 ? a : b);
 
 		// Get IP address
-		const ip = await fetch(mirror, {
+		const ip = await fetch(mirror + `?t=${ Date.now().toString(36) }`, {
 			signal: controller.signal
 		})
 			.then(res => res.text())
@@ -48,6 +47,10 @@ export class IPManager extends EventEmitter {
 
 		// Check if IP has changed and it didnt pick up an ipv6 address
 		if (!ip.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)) return await this.fetchAddress();
+
+		// OpenVPN Log IP
+		const wins = electron.BrowserWindow.getAllWindows();
+		wins.map(win => win.webContents.send("openvpn", "log", null, JSON.stringify(this.lastGeo)));
 
 		// Return IP
 		return ip;
@@ -82,33 +85,27 @@ export class IPManager extends EventEmitter {
 		
 	}
 	
-	constructor(win: BrowserWindow) {
+	constructor() {
 		super();
-		this.win = win;
-		
-		// On window contents load
-		win.webContents.once("did-finish-load", async() => {
 
-			// Fetch IP address every second and emit event if it changes
-			setInterval(async() => {
-				const ip = await this.fetchAddress();
+		// Fetch IP address every second and emit event if it changes
+		setInterval(async() => {
+			const ip = await this.fetchAddress();
 				
-				// Observe IP changes
-				if (ip !== this.lastIP) {
-					this.emit("change", ip);
-					this.lastIP = ip;
-					this.lastGeo = await this.fetchGeo(ip);
-				}
+			// Observe IP changes
+			if (ip !== this.lastIP) {
+				this.lastIP = ip;
+				this.emit("change", ip);
+				this.lastGeo = await this.fetchGeo();
+			}
 				
-			}, 1000);
+		}, 1000);
 
-			// Send IP location to renderer
-			setInterval(() => {
-				const wins = electron.BrowserWindow.getAllWindows();
-				wins.map(win => win.webContents.send("iplocation", JSON.stringify(this.lastGeo)));
-			}, 50);
-			
-		});
+		// Send IP location to renderer
+		setInterval(() => {
+			const wins = electron.BrowserWindow.getAllWindows();
+			wins.map(win => win.webContents.send("iplocation", JSON.stringify(this.lastGeo)));
+		}, 50);
 
 	}
 

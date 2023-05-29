@@ -52,7 +52,9 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 		electron.ipcRenderer.on("openvpn", (_event, state: string, hash?: string, message?: string) => {
 			if (hash) lastServerRef.current = hash;
 			switch (state) {
-				
+			case "log":
+				console.log(JSON.parse(message || "{}"));
+				break;
 			case "error":
 				toast.error(message);
 			case "disconnected":
@@ -85,7 +87,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 
 				// If we dont have the IP of one of the servers, set it as disconnected
 				if (!servers || !servers.success) return;
-				if (Object.values(servers.servers).find(server => server.ip === data.ip)) return;
+				if (Object.values(servers.servers).some(server => server.ip === data.ip)) return;
 
 				setStatus("disconnected");
 				setActive(false);

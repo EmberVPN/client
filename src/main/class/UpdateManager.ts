@@ -1,13 +1,11 @@
-import { BrowserWindow, app } from "electron";
+import { app } from "electron";
 import { gt } from "semver";
-import { createWindow } from "..";
+import { Window } from "./Window";
 
-export default class UpdateManager {
+export default class UpdateManager extends Window {
 
-	private isOpen = false;
-	private win: BrowserWindow | undefined;
-
-	constructor(mainWindow: BrowserWindow) {
+	constructor() {
+		super();
 
 		// Get current version
 		const version = app.getVersion();
@@ -27,27 +25,21 @@ export default class UpdateManager {
 				if (!gt(latest, version)) return;
 
 				// await for main window to load
-				mainWindow.webContents.on("did-finish-load", () => this.open());
+				this.open();
 
 			});
 
 	}
 	
-	/**
-	 * Open the settings window
-	 * @returns void
-	 */
 	public open(): void {
 
-		// Prevent multiple instances
-		if (this.isOpen && this.win) return this.win.focus();
-		
-		this.win = createWindow("Check for Updates") || undefined;
-		if (!this.win) return;
-
-		// Prevent multiple instances
-		this.isOpen = true;
-		this.win.on("closed", () => this.isOpen = false);
+		// Create the window
+		this.win = this.createWindow({
+			title: "Check for Updates • Ember VPN",
+			resizable: false,
+			height: 128,
+			width: 512,
+		});
 
 	}
 

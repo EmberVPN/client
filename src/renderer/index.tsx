@@ -53,9 +53,14 @@ export default function Application() {
 
 	// If the URL contains the settings hash, show the settings window
 	switch (decodeURIComponent(window.location.hash.substring(1))) {
-	case "Settings": return <SettingsWindow />;
-	case "Check for Updates": return <UpdateWindow />;
 	default: return <MainWindow />;
+
+		// Check for updates window
+	case "check-for-updates-ember-vpn": return <UpdateWindow />;
+		
+		// Settings window
+	case "settings-ember-vpn": return <SettingsWindow />;
+		
 	}
 
 }
