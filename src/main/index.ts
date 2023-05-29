@@ -34,13 +34,8 @@ class App extends Window {
 	constructor() {
 		super();
 
-		// Await app ready
-		app.whenReady().then(() => {
-			
-			// Create the window
-			this.win = this.createWindow();
-
-		});
+		// Await app ready, then create the window
+		app.whenReady().then(() => this.win = this.createWindow());
 
 		// Listen for authorization token changes
 		ipcMain.on("authorization", async(_, authorization: string | null) => {
