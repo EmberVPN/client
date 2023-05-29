@@ -59,7 +59,7 @@ export default function Application() {
 	case "check-for-updates-ember-vpn": return <UpdateWindow />;
 		
 		// Settings window
-	case "Settings": return <SettingsWindow />;
+	case "settings-ember-vpn": return <SettingsWindow />;
 		
 	}
 

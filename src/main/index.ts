@@ -1,7 +1,6 @@
 import { is } from "@electron-toolkit/utils";
 import { BrowserWindow, app, ipcMain } from "electron";
 import { resolve } from "path";
-import { inetLatency } from "systeminformation";
 import { Config } from "./class/Config";
 import { IPManager } from "./class/IPManager";
 import { OpenVPNManager } from "./class/OpenVPNManager";
@@ -9,42 +8,53 @@ import SettingsManager from "./class/SettingsManager";
 import { TrayManager } from "./class/TrayManager";
 import UpdateManager from "./class/UpdateManager";
 import { Window } from "./class/Window";
+import "./handlers";
 
 // Get app resource path
 export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "../resources");
 
-// Export app state managers
-export let tray: TrayManager;
-export let ovpn: OpenVPNManager;
-export let setm: SettingsManager;
+// Popup windows
+export const UpdateWindow = new UpdateManager;
+export const SettingsWindow = new SettingsManager;
 
-export const updater = new UpdateManager;
-export const config = new Config;
+// App state managers
 export const IPv4 = new IPManager;
+export const OpenVPN = new OpenVPNManager;
+export const Tray = new TrayManager;
 
+// Export config manager
+new Config;
+
+// Create the app window
 class App extends Window {
 
-	private authorization?: string;
+	// Authorization token
+	protected authorization?: string;
 
 	constructor() {
 		super();
 
 		// Await app ready
-		app.whenReady().then(() => this.win = this.createWindow());
+		app.whenReady().then(() => {
+			
+			// Create the window
+			this.win = this.createWindow();
+
+		});
 
 		// Listen for authorization token changes
 		ipcMain.on("authorization", async(_, authorization: string | null) => {
 			if (!this.win) throw new Error("Main window not set up");
 
 			// If the authorization token is null, disconnect and cleanup
-			if (authorization === null) {
+			if (authorization === null && this.authorization !== undefined) {
 
 				// Set authorization token
 				this.authorization = undefined;
 
 				// Close all windows that aren't the main window
 				BrowserWindow.getAllWindows()
-					.filter(window => this.is(window))
+					.filter(window => !this.is(window))
 					.map(window => window.close());
 		
 				// Set locked size
@@ -52,7 +62,7 @@ class App extends Window {
 
 			}
 
-			if (typeof authorization === "string") {
+			if (typeof authorization === "string" && authorization !== this.authorization) {
 				
 				// Set authorization token
 				this.authorization = authorization;
@@ -63,8 +73,9 @@ class App extends Window {
 
 				// Center window around the delta
 				const size = this.win.getSize();
-				const dw = size[0] - 600;
-				const dh = size[1] - 400;
+				this.win.setSize(800, 600);
+				const dw = size[0] - this.win.getSize()[0];
+				const dh = size[1] - this.win.getSize()[1];
 				const pos = this.win.getPosition();
 				this.win.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
 
@@ -74,60 +85,12 @@ class App extends Window {
 
 	}
 
-	public getAuth() {
+	// Get authorization token
+	public getAuthorization() {
 		return this.authorization;
 	}
+	
 }
 
-const _app = new App;
-export default _app;
-
-// Handle window size requests
-ipcMain.handle("window-size", (event, width: number, height: number, resizable?: boolean) => {
-
-	// Get the window that sent the request
-	const win = BrowserWindow.fromWebContents(event.sender);
-	if (!win) return;
-
-	// Get the current size
-	const size = win.getSize();
-
-	// Calculate the difference
-	const dw = size[0] - width;
-	const dh = size[1] - height;
-
-	// Get the current position
-	const pos = win.getPosition();
-
-	// Set the new position
-	win.setPosition(pos[0] + dw / 2, pos[1] + dh / 2);
-
-	// Set the window size
-	win.setResizable(resizable === true);
-	win.setMinimumSize(width, height);
-
-});
-
-// Handle titlebar events
-ipcMain.on("titlebar", (event, key: string, val?: boolean) => {
-
-	// Get the window that sent the request
-	const win = BrowserWindow.fromWebContents(event.sender);
-	if (!win) return;
-
-	// Handle events
-	if (key === "minimize") win.minimize();
-	if (key === "resizeable" && val !== undefined) win.setResizable(val);
-	if (key === "minimizeable" && val !== undefined) win.setMinimizable(val);
-	if (key === "restore") win.isMaximized() ? win.restore() : win.maximize();
-	if (key === "hide") win.close();
-
-});
-
-// Ping server handler
-ipcMain.handle("ping-server", async function(_, server: Ember.Server) {
-	return await Promise.race([
-		new Promise(resolve => setTimeout(() => resolve(-1), 4000)),
-		inetLatency(server.ip)
-	]);
-});
+// Export the app
+export default new App;

@@ -1,18 +1,23 @@
-import { BrowserWindow, ipcMain } from "electron";
-import { createWindow } from "..";
+import { BrowserWindow, app, ipcMain } from "electron";
+import EmberVPN from "..";
+import { Window } from "./Window";
 
-export default class SettingsManager {
+export default class SettingsManager extends Window {
 
-	private isOpen = false;
-	private win: BrowserWindow | undefined;
+	constructor() {
+		super();
 
-	constructor(win: BrowserWindow) {
+		// Wait for app ready
+		app.once("browser-window-created", () => {
 
-		// Observe for control comma
-		win.webContents.on("before-input-event", (event, input) => {
-			if (!input.control || input.key !== ",") return;
-			event.preventDefault();
-			this.open();
+			// For all windows
+			BrowserWindow.getAllWindows()
+				.map(win => win.webContents.on("before-input-event", (event, input) => {
+					if (!input.control || input.key !== "," || !EmberVPN.getAuthorization()) return;
+					event.preventDefault();
+					this.open();
+				}));
+			
 		});
 
 		// Observe for menu click
@@ -20,21 +25,13 @@ export default class SettingsManager {
 
 	}
 	
-	/**
-	 * Open the settings window
-	 * @returns void
-	 */
 	public open(): void {
 
-		// Prevent multiple instances
-		if (this.isOpen && this.win) return this.win.focus();
-		
-		this.win = createWindow("Settings") || undefined;
-		if (!this.win) return;
-
-		// Prevent multiple instances
-		this.isOpen = true;
-		this.win.on("closed", () => this.isOpen = false);
+		// Create the window
+		this.win = this.createWindow({
+			title: "Settings • Ember VPN",
+			resizable: false
+		});
 
 	}
 

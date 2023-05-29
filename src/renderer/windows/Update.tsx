@@ -17,7 +17,7 @@ export function UpdateWindow(): JSX.Element {
 	
 		// On mount, set the window size
 		useEffect(function() {
-			electron.ipcRenderer.invoke("window-size", 512, 128);
+			electron.ipcRenderer.invoke("window-size", 512, 128, false);
 			
 			// Get the latest version
 			if (!data || !data.success) return;
