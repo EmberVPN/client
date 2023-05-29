@@ -32,10 +32,14 @@ ipcMain.on("titlebar", (event, key: string, val?: boolean) => {
 
 	// Handle events
 	if (key === "minimize") win.minimize();
-	if (key === "resizeable" && val !== undefined) win.setResizable(val);
 	if (key === "minimizeable" && val !== undefined) win.setMinimizable(val);
 	if (key === "restore") win.isMaximized() ? win.restore() : win.maximize();
 	if (key === "hide") EmberVPN.is(win) ? win.hide() : win.close();
+
+	if (key === "resizeable" && val !== undefined) {
+		win.setResizable(val);
+		win.setMaximizable(val);
+	}
 
 });
 

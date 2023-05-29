@@ -1,5 +1,5 @@
 import { is } from "@electron-toolkit/utils";
-import { BrowserWindow } from "electron";
+import { BrowserWindow, ipcMain } from "electron";
 import { resolve } from "path";
 import { resources } from "..";
 
@@ -29,6 +29,7 @@ export class Window {
 			resizable: false,
 			title: "Ember VPN",
 			titleBarStyle: "hidden",
+			frame: process.platform === "win32",
 			width: 600,
 			height: 400,
 			minWidth: options?.width || 600,
