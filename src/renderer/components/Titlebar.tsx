@@ -41,7 +41,7 @@ export default function Titlebar({ children, resizeable = true, minimizeable = t
 	// Somewhat easier on windows
 	if (platform === "win32") return (
 		<div className="flex h-8 shrink-0 w-full items-center relative isolate select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag text-xs justify-between bg-white dark:bg-gray-800">
-
+			
 			{/* Left side */}
 			<div className="z-10 flex items-center px-1">
 				<img className="h-4 mx-2 aspect-square"
