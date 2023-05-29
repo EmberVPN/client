@@ -9,7 +9,7 @@ interface Props {
 	minimizeable?: boolean;
 }
 
-export default function Titlebar({ children, resizeable = true, minimizeable = true, className, ...props }: Props & HTMLAttributes<HTMLDivElement>) {
+export default function Titlebar({ children, resizeable = true, minimizeable = true, className }: Props & HTMLAttributes<HTMLDivElement>) {
 
 	// Maximize state
 	const [ maximized, setMaximized ] = useState(false);
