@@ -1,5 +1,5 @@
 import { is } from "@electron-toolkit/utils";
-import { BrowserWindow } from "electron";
+import { BrowserWindow, app, shell } from "electron";
 import { resolve } from "path";
 import { resources } from "..";
 
@@ -14,6 +14,14 @@ export class Window {
 	 * @returns BrowserWindow
 	 */
 	public createWindow(options?: Electron.BrowserWindowConstructorOptions) {
+
+		// Prevent multiple instances
+		const isUnlocked = app.requestSingleInstanceLock();
+		if (!isUnlocked && this.win) {
+			this.win.show();
+			this.win.focus();
+			return this.win;
+		}
 
 		// Prevent multiple instances
 		if (this.win && !this.win.isDestroyed()) {
@@ -60,13 +68,25 @@ export class Window {
 		// Otherwise load the index.html file
 		else this.win.loadFile(resolve(__dirname, "../renderer/index.html"), { hash });
 
+		// Prevent the window from being opened multiple times
+		app.on("second-instance", () => {
+			if (!this.win) return;
+			this.win.show();
+			this.win.focus();
+		});
+
 		// and load the index.html of the app.
 		this.win.on("ready-to-show", this.win.show);
 
 		// Listen for titlebar events
 		this.win.on("maximize", () => this.win?.webContents.send("titlebar", "maximize"));
 		this.win.on("unmaximize", () => this.win?.webContents.send("titlebar", "restore"));
-		this.win.on("closed", () => this.win?.removeAllListeners());
+
+		// Open links in external browser
+		this.win.webContents.setWindowOpenHandler(details => {
+			shell.openExternal(details.url);
+			return { action: "deny" };
+		});
 
 		// Return the window
 		return this.win;

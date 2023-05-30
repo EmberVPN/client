@@ -34,23 +34,27 @@ class App extends Window {
 	constructor() {
 		super();
 
-		// Await app ready, then create the window
-		app.whenReady().then(() => this.win = this.createWindow());
-
 		// Set app ID
 		app.setAppUserModelId("org.embervpn.client");
+		
+		// Await app ready
+		app.whenReady().then(() => {
 
-		// prevent app quit on main window close macos
-		app.on("window-all-closed", () => { });
-
-		// Open the main window when on macOS and the dock icon is clicked
-		app.on("activate", () => this.win = this.createWindow());
-
-		// Prevent multiple instances of the app
-		app.on("second-instance", () => {
-			if (!this.win) return;
-			if (this.win.isMinimized()) this.win.restore();
-			this.win.focus();
+			// then create the window
+			this.win = this.createWindow();
+			
+			// Quit when all windows are closed.
+			app.on("window-all-closed", () => {
+				if (process.platform === "darwin") return;
+				app.quit();
+			});
+	
+			// Open the main window when on macOS and the dock icon is clicked
+			app.on("activate", () => {
+				if (BrowserWindow.getAllWindows().length !== 0) return;
+				this.win = this.createWindow();
+			});
+			
 		});
 
 		// Listen for authorization token changes

@@ -61,7 +61,13 @@ export class TrayManager {
 	}
 
 	constructor() {
-		app.once("ready", () => {
+		
+		// Request single instance lock before the app init
+		const isUnlocked = app.requestSingleInstanceLock();
+		if (!isUnlocked) app.quit();
+			
+		// Await app ready, then create the tray
+		else app.once("ready", () => {
 
 			// Initialize the tray
 			this.tray = new Tray(this.resizeImage("tray"));
