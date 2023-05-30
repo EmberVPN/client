@@ -1,5 +1,5 @@
 import { is } from "@electron-toolkit/utils";
-import { BrowserWindow, ipcMain } from "electron";
+import { BrowserWindow } from "electron";
 import { resolve } from "path";
 import { resources } from "..";
 
