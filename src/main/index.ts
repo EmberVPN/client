@@ -46,6 +46,13 @@ class App extends Window {
 		// Open the main window when on macOS and the dock icon is clicked
 		app.on("activate", () => this.win = this.createWindow());
 
+		// Prevent multiple instances of the app
+		app.on("second-instance", () => {
+			if (!this.win) return;
+			if (this.win.isMinimized()) this.win.restore();
+			this.win.focus();
+		});
+
 		// Listen for authorization token changes
 		ipcMain.on("authorization", async(_, authorization: string | null) => {
 			if (!this.win) throw new Error("Main window not set up");
