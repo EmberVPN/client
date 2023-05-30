@@ -40,6 +40,12 @@ class App extends Window {
 		// Set app ID
 		app.setAppUserModelId("org.embervpn.client");
 
+		// prevent app quit on main window close macos
+		app.on("window-all-closed", () => { });
+
+		// Open the main window when on macOS and the dock icon is clicked
+		app.on("activate", () => this.win = this.createWindow());
+
 		// Listen for authorization token changes
 		ipcMain.on("authorization", async(_, authorization: string | null) => {
 			if (!this.win) throw new Error("Main window not set up");

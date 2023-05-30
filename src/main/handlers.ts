@@ -1,6 +1,5 @@
 import { BrowserWindow, ipcMain } from "electron";
 import { inetLatency } from "systeminformation";
-import EmberVPN from ".";
 
 // Handle window size requests
 ipcMain.handle("window-size", (event, width: number, height: number, resizable?: boolean) => {
@@ -34,7 +33,7 @@ ipcMain.on("titlebar", (event, key: string, val?: boolean) => {
 	if (key === "minimize") win.minimize();
 	if (key === "minimizeable" && val !== undefined) win.setMinimizable(val);
 	if (key === "restore") win.isMaximized() ? win.restore() : win.maximize();
-	if (key === "hide") EmberVPN.is(win) ? win.hide() : win.close();
+	if (key === "hide") win.hide();
 
 	if (key === "resizeable" && val !== undefined) {
 		win.setResizable(val);
