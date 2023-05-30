@@ -17,7 +17,7 @@ export class Window {
 
 		// Prevent multiple instances
 		const isUnlocked = app.requestSingleInstanceLock();
-		if (!isUnlocked && this.win) {
+		if (!isUnlocked && this.win && !this.win.isDestroyed()) {
 			this.win.show();
 			this.win.focus();
 			return this.win;
