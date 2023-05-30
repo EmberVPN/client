@@ -69,7 +69,7 @@ export default function Titlebar({ children, resizeable = true, minimizeable = t
 					action: "hide"
 				} ].filter(({ enabled }) => enabled !== false).map(({ icon, action }, key) => (
 					<button
-						className="flex items-center justify-center bg-opacity-0 select-none no-drag bg-neutral-500 hover:bg-opacity-10 active:hover:bg-opacity-20 last:hover:bg-red-500 last:hover:bg-opacity-100 last:hover:active:bg-opacity-70 last:hover:text-white text-base h-full w-[46px]"
+						className="flex items-center justify-center bg-opacity-0 select-none no-drag bg-neutral-500 hover:bg-opacity-10 active:hover:bg-opacity-20 last:hover:bg-error-600 last:hover:bg-opacity-100 last:hover:active:bg-opacity-70 last:hover:text-white text-base h-full w-[46px]"
 						key={ key }
 						onClick={ () => electron.ipcRenderer.send("titlebar", action) }>{ icon }</button>
 				))}
