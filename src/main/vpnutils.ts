@@ -5,16 +5,15 @@ import { resolve } from "path";
 import { promisify } from "util";
 import { resources } from ".";
 
+// Install OpenVPN using the bundled installer
+export const BUNDLED_WIN32_INSTALLER = "OpenVPN-2.6.4-I001-amd64.msi";
+
 // Promisify exec with util.promisify
 const exec = (command: string) => promisify(oldExec)(command);
 
 export async function getBinary() {
 
 	if (process.platform === "win32") {
-
-		// Check if openvpn.exe is on path
-		const openvpn = await exec("where openvpn");
-		if (openvpn.stdout) return openvpn.stdout.toString().trim();
 
 		// Check default location
 		const defaultLocation = resolve(process.env.ProgramFiles || "C:\\Program Files", "OpenVPN/bin/openvpn.exe");
@@ -24,9 +23,8 @@ export async function getBinary() {
 		const bundledLocation = resolve(resources, ".bin/bin/openvpn.exe");
 		if (existsSync(bundledLocation)) return bundledLocation;
 
-		// Install OpenVPN using the bundled installer
-		const BUNDLED_INSTALLER = "OpenVPN-2.6.4-I001-amd64.msi";
-		await exec(`msiexec /i "${ resolve(resources, ".bin", BUNDLED_INSTALLER) }" PRODUCTDIR="${ resolve(resources, ".bin") }" ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun /passive`);
+		// Set state to installing and install
+		await exec(`msiexec /i "${ resolve(resources, ".bin", BUNDLED_WIN32_INSTALLER) }" PRODUCTDIR="${ resolve(resources, ".bin") }" ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun /passive`);
 
 		// Return bundled location
 		return bundledLocation;
