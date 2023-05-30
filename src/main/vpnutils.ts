@@ -1,16 +1,20 @@
-import admin from "admin-check";
-import { spawnSync } from "child_process";
+import { exec as oldExec } from "child_process";
 import { existsSync } from "fs";
+import { installPackage, isPackageInstalled } from "linux-package-manager";
 import { resolve } from "path";
+import { promisify } from "util";
 import { resources } from ".";
+
+// Promisify exec with util.promisify
+const exec = (command: string) => promisify(oldExec)(command);
 
 export async function getBinary() {
 
 	if (process.platform === "win32") {
 
 		// Check if openvpn.exe is on path
-		const openvpn = spawnSync("where openvpn", { shell: true });
-		if (openvpn.status === 0) return "openvpn.exe";
+		const openvpn = await exec("where openvpn");
+		if (openvpn.stdout) return openvpn.stdout.toString().trim();
 
 		// Check default location
 		const defaultLocation = resolve(process.env.ProgramFiles || "C:\\Program Files", "OpenVPN/bin/openvpn.exe");
@@ -20,39 +24,29 @@ export async function getBinary() {
 		const bundledLocation = resolve(resources, ".bin/bin/openvpn.exe");
 		if (existsSync(bundledLocation)) return bundledLocation;
 
-		// Install OpenVPN
-		await install();
+		// Install OpenVPN using the bundled installer
+		const BUNDLED_INSTALLER = "OpenVPN-2.6.4-I001-amd64.msi";
+		await exec(`msiexec /i "${ resolve(resources, ".bin", BUNDLED_INSTALLER) }" PRODUCTDIR="${ resolve(resources, ".bin") }" ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun /passive`);
 
 		// Return bundled location
 		return bundledLocation;
 
 	}
 
-	throw new Error("Unsupported platform");
+	if (process.platform === "linux") {
 
-}
+		// Check if openvpn is on path
+		const openvpn = await exec("which openvpn");
+		if (openvpn.stdout) return openvpn.stdout.toString().trim();
 
-// Install OpenVPN
-async function install() {
+		// Install OpenVPN if its not installed
+		if (!(await isPackageInstalled("openvpn"))) await installPackage("openvpn");
 
-	// Check elevation status
-	const elevated = await admin.check();
-	if (!elevated) throw new Error("You must run Ember VPN as administrator to connect to the VPN");
-
-	// Install with the bundled installer on windows
-	if (process.platform === "win32") {
-
-		// Run the bundled installer
-		return spawnSync([
-			"msiexec",
-			"/i",
-			`"${ resolve(resources, ".bin/OpenVPN-2.6.4-I001-amd64.msi") }"`,
-			`PRODUCTDIR="${ resolve(resources, ".bin") }"`,
-			"ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun",
-			"/passive",
-		].join(" "), { shell: true });
+		// Return openvpn
+		return "openvpn";
 
 	}
 
 	throw new Error("Unsupported platform");
+
 }

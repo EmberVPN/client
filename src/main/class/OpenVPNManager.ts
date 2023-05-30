@@ -159,6 +159,8 @@ export class OpenVPNManager {
 		const binary = await getBinary();
 		const config = resolve(resources, "ember.ovpn");
 
+		console.log(binary);
+
 		// Check elevation status
 		const elevated = await admin.check();
 		if (!elevated) throw new Error("You must run Ember VPN as administrator to connect to the VPN");
