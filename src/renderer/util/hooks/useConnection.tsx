@@ -52,25 +52,25 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 		electron.ipcRenderer.on("openvpn", (_event, state: string, hash?: string, message?: string) => {
 			if (hash) lastServerRef.current = hash;
 			switch (state) {
-			case "log":
-				console.log(JSON.parse(message || "{}"));
-				break;
-			case "error":
-				toast.error(message);
-			case "disconnected":
-				setStatus("disconnected");
-				setActive(false);
+				case "log":
+					console.log(JSON.parse(message || "{}"));
+					break;
+				case "error":
+					toast.error(message);
+				case "disconnected":
+					setStatus("disconnected");
+					setActive(false);
 				
-				break;
+					break;
 					
-			case "connected":
-				setLastStateChange(Date.now());
-			case "will-connect":
-			case "connecting":
-				setActive(hash || false);
-			case "disconnecting":
-				setStatus(state);
-				break;
+				case "connected":
+					setLastStateChange(Date.now());
+				case "will-connect":
+				case "connecting":
+					setActive(hash || false);
+				case "disconnecting":
+					setStatus(state);
+					break;
 				
 			}
 		});

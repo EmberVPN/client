@@ -27,12 +27,12 @@ export default function Titlebar({ children, resizeable = true, minimizeable = t
 	// Listen for maximize/restore events
 	electron.ipcRenderer.on("titlebar", (_, action: string) => {
 		switch (action) {
-		case "maximize":
-			setMaximized(true);
-			break;
-		case "restore":
-			setMaximized(false);
-			break;
+			case "maximize":
+				setMaximized(true);
+				break;
+			case "restore":
+				setMaximized(false);
+				break;
 		}
 	});
 
