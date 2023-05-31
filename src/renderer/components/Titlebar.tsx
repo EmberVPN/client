@@ -9,7 +9,7 @@ interface Props {
 	minimizeable?: boolean;
 }
 
-export default function Titlebar({ children, resizeable = true, minimizeable = true, className, ...props }: Props & HTMLAttributes<HTMLDivElement>): JSX.Element {
+export default function Titlebar({ children, resizeable = true, minimizeable = true, className }: Props & HTMLAttributes<HTMLDivElement>) {
 
 	// Maximize state
 	const [ maximized, setMaximized ] = useState(false);
@@ -27,52 +27,83 @@ export default function Titlebar({ children, resizeable = true, minimizeable = t
 	// Listen for maximize/restore events
 	electron.ipcRenderer.on("titlebar", (_, action: string) => {
 		switch (action) {
-		case "maximize":
-			setMaximized(true);
-			break;
-		case "restore":
-			setMaximized(false);
-			break;
+			case "maximize":
+				setMaximized(true);
+				break;
+			case "restore":
+				setMaximized(false);
+				break;
 		}
 	});
 
-	// Is macos
-	const isMac = platform === "darwin";
+	// If were on mac, our job is easy
+	if (platform === "darwin") return (
+		<div className={ classNames("flex h-7 shrink-0 w-full items-center relative isolate select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag text-xs justify-center", className) }>
+			<p className="flex items-center my-auto">{children ? `${ children } • Ember VPN` : "Ember VPN"}</p>
+		</div>
+	);
 
-	// Window button class
-	const button = classNames("flex items-center justify-center h-8 text-base bg-opacity-0 select-none no-drag bg-neutral-500 hover:bg-opacity-10 active:hover:bg-opacity-20 last:hover:bg-red-500 last:hover:bg-opacity-100 last:hover:active:bg-opacity-70 last:hover:text-white w-[46px]");
-
-	return (
-		<div className={ classNames("flex w-full items-center relative select-none text-gray-800 dark:text-gray-200 z-[70] font-windows app-drag text-xs", className, isMac ? "h-7 justify-center" : "h-8 justify-between") }
-			{ ...props }>
+	// Somewhat easier on windows
+	if (platform === "win32") return (
+		<div className={ classNames("flex h-8 shrink-0 w-full items-center relative isolate select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag text-xs justify-between", className) }>
 			
 			{/* Left side */}
 			<div className="z-10 flex items-center px-1">
-
-				{/* Icon */}
-				<img className={ classNames("h-4 aspect-square mx-2", isMac && "hidden") }
+				<img className="h-4 mx-2 aspect-square"
 					src={ favicon } />
-				
-				{/* Title */}
-				<span className="flex items-center my-auto h-7">{children ? `${ children } • Ember VPN` : "Ember VPN"}</span>
-				
+				<p className="flex items-center my-auto">{children ? `${ children } • Ember VPN` : "Ember VPN"}</p>
 			</div>
 
-			{/* Window controls (hide for mac) */}
-			<div className={ classNames(isMac ? "hidden" : "flex") }>
-				
-				{/* Minimize */}
-				{ minimizeable && <div className={ button }
-					onClick={ () => electron.ipcRenderer.send("titlebar", "minimize") }>{ <VscChromeMinimize /> }</div>}
-				
-				{/* Maximize/restore */}
-				{ resizeable && <div className={ button }
-					onClick={ () => electron.ipcRenderer.send("titlebar", "restore") }>{maximized ? <VscChromeRestore /> : <VscChromeMaximize />}</div>}
-				
-				{/* Close */}
-				<div className={ button }
-					onClick={ () => electron.ipcRenderer.send("titlebar", "hide") }><VscChromeClose /></div>
-				
+			{/* Window controls */}
+			<div className="flex h-full">
+				{[ {
+					icon: <VscChromeMinimize />,
+					action: "minimize",
+					enabled: minimizeable
+				}, {
+					icon: maximized ? <VscChromeRestore /> : <VscChromeMaximize />,
+					action: "restore",
+					enabled: resizeable
+				}, {
+					icon: <VscChromeClose />,
+					action: "hide"
+				} ].filter(({ enabled }) => enabled !== false).map(({ icon, action }, key) => (
+					<button
+						className="flex items-center justify-center bg-opacity-0 select-none no-drag bg-neutral-500 hover:bg-opacity-10 active:hover:bg-opacity-20 last:hover:bg-error-600 last:hover:bg-opacity-100 last:hover:active:bg-opacity-70 last:hover:text-white text-base h-full w-[46px]"
+						key={ key }
+						onClick={ () => electron.ipcRenderer.send("titlebar", action) }>{ icon }</button>
+				))}
+			</div>
+
+		</div>
+	);
+
+	// Generic titlebar for most other platforms and linux distros
+	return (
+		<div className={ classNames("flex h-9 shrink-0 w-full items-center relative isolate select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag justify-center group", className) }>
+			
+			{/* Window title  */}
+			<p className="flex items-center my-auto font-medium -z-[1]">{children ? `${ children } • Ember VPN` : "Ember VPN"}</p>
+			
+			{/* Window controls */}
+			<div className="flex items-center h-full gap-3 px-2 text-xs z-[2] absolute right-0">
+				{[ {
+					icon: <VscChromeMinimize />,
+					action: "minimize",
+					enabled: minimizeable
+				}, {
+					icon: maximized ? <VscChromeRestore /> : <VscChromeMaximize />,
+					action: "restore",
+					enabled: resizeable
+				}, {
+					icon: <VscChromeClose />,
+					action: "hide"
+				} ].filter(({ enabled }) => enabled !== false).map(({ icon, action }, key) => (
+					<button
+						className="bg-gray bg-opacity-20 hover:bg-opacity-30 active:bg-opacity-40 rounded-full aspect-square h-[22px] flex items-center justify-center no-drag"
+						key={ key }
+						onClick={ () => electron.ipcRenderer.send("titlebar", action) }>{ icon }</button>
+				))}
 			</div>
 
 		</div>

@@ -3,7 +3,7 @@
 [![Continuous Deployment](https://github.com/EmberVPN/client/actions/workflows/cd.yml/badge.svg)](https://github.com/EmberVPN/client/actions/workflows/cd.yml)
 
 ```
-git clone --recurse-submodules https://github.com/EmberVPN/client.git embervpn-client
+git clone -b next --recurse-submodules https://github.com/EmberVPN/client.git embervpn-client
 ```
 
 ## Building

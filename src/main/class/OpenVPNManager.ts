@@ -1,60 +1,12 @@
-import { ChildProcess, spawn, spawnSync } from "child_process";
+import admin from "admin-check";
+import { ChildProcess, spawn } from "child_process";
 import { BrowserWindow, ipcMain } from "electron";
-import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
 import { resolve } from "path";
-import EmberVPN, { IPv4, Tray, resources } from "..";
+import { IPv4, Tray, resources } from "..";
 import { calculateDistance } from "../../calculateDistance";
-
-function getBinary() {
-
-	if (process.platform === "win32") {
-				
-		// Check if openvpn.exe is on path
-		const openvpn = spawnSync("where openvpn", { shell: true });
-		if (openvpn.status === 0) return "openvpn.exe";
-				
-		// Check default location
-		const defaultLocation = resolve(process.env.ProgramFiles || "C:\\Program Files", "OpenVPN/bin/openvpn.exe");
-		if (existsSync(defaultLocation)) return defaultLocation;
-
-		// Check bundled location
-		const bundledLocation = resolve(resources, ".bin/bin/openvpn.exe");
-		if (existsSync(bundledLocation)) return bundledLocation;
-
-		// Install OpenVPN
-		install();
-
-		// Return bundled location
-		return bundledLocation;
-
-	}
-	
-	throw new Error("Unsupported platform");
-
-}
-
-// Install OpenVPN
-function install() {
-
-	if (process.platform === "win32") {
-			
-		// Run the bundled installer
-		return spawnSync([
-			"msiexec",
-			"/i",
-			`"${ resolve(resources, ".bin/OpenVPN-2.6.4-I001-amd64.msi") }"`,
-			`PRODUCTDIR="${ resolve(resources, ".bin") }"`,
-			"ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun",
-			"/passive",
-		].join(" "), {
-			shell: true,
-		});
-	
-	}
-
-	throw new Error("Unsupported platform");
-}
+import { getBinary } from "../vpnutils";
+import { AuthMan } from "./AuthMan";
 
 export class OpenVPNManager {
 
@@ -68,10 +20,10 @@ export class OpenVPNManager {
 
 	public async downloadConfig(server: Ember.Server) {
 		this._isConnecting = true;
-		Tray.refreshMenu();
+		await Tray.refreshMenu();
 
 		// Ensure authorization is set
-		const auth = EmberVPN.getAuthorization();
+		const auth = AuthMan.getAuthorization();
 		if (!auth) throw new Error("Authorization not set");
 
 		// Download config
@@ -125,7 +77,7 @@ export class OpenVPNManager {
 		if (geo.ip !== server.ip) throw new Error("Failed to connect to server");
 		
 		// Set connected
-		Tray.setState("connected");
+		await Tray.setState("connected");
 		Tray.notify(`Connected to ${ geo.country_code }`);
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "connected", server.hash));
@@ -182,10 +134,28 @@ export class OpenVPNManager {
 		this._isConnecting = false;
 
 		if (switching) return;
-		if (Tray.state !== "disconnected") Tray.notify("Disconnected from VPN", "Ember VPN • Disconnected", "tray");
-		Tray.setState("disconnected");
+		
+		// Notify the UI that we are disconnecting
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "disconnecting"));
+		await Tray.setState("connecting");
+
+		// Await new IP
+		IPv4.dropCache();
+		await new Promise(resolve => IPv4.once("change", resolve));
+
+		// Set disconnected state
+		if (Tray.state !== "disconnected") Tray.notify("Disconnected from VPN", "Ember VPN • Disconnected", "tray");
+		Tray.setState("disconnected");
+
+		const newGeo = await IPv4.fetchGeo();
+
+		// Notify the UI that we are disconnecting
+		BrowserWindow.getAllWindows()
+			.map(win => {
+				win.webContents.send("openvpn", "disconnected");
+				win.webContents.send("iplocation", JSON.stringify(newGeo));
+			});
 		
 	}
 
@@ -200,34 +170,38 @@ export class OpenVPNManager {
 		if (!this.server) throw new Error("Server not set");
 		
 		// Set connecting state
-		Tray.setState("connecting");
+		await Tray.setState("connecting");
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "connecting", this.server?.hash));
 		
 		// Get binary and config path
 		const binary = await getBinary();
 		const config = resolve(resources, "ember.ovpn");
+
+		console.log(binary);
+
+		// Check elevation status
+		const elevated = await admin.check();
+		if (!elevated) throw new Error("You must run Ember VPN as administrator to connect to the VPN");
 		
 		// Kill existing process
 		if (this.proc !== null) this.disconnect(true);
 		
-		// Spawn openvpn process for windows (requires elevation)
-		if (process.platform === "win32") return this.proc = spawn(binary, [ "--config", config ], { detached: true });
-		
-		throw new Error("Unsupported platform");
+		// Spawn openvpn process (should be the same for all platforms)
+		return this.proc = spawn(binary, [ "--config", config ], { detached: true });
 		
 	}
 
 	public async quickConnect() {
 
 		// Ensure authorization is set
-		const auth = EmberVPN.getAuthorization();
+		const auth = AuthMan.getAuthorization();
 		if (!auth) throw new Error("Authorization not set");
 		
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "will-connect"));
 		this._isConnecting = true;
-		Tray.refreshMenu();
+		await Tray.refreshMenu();
 		
 		// Get servers
 		const servers = await fetch("https://api.embervpn.org/v2/ember/servers", {

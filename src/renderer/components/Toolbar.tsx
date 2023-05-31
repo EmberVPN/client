@@ -7,7 +7,7 @@ import { MyAccount } from "./MyAccount";
 export default function Toolbar() {
 
 	// Get the user
-	const { user } = useUser();
+	const user = useUser();
 
 	return (
 		<ToolbarElement htmlFor="entrypoint">
@@ -19,7 +19,7 @@ export default function Toolbar() {
 			<div className="flex items-center ml-auto">
 
 				{/* Spinner if loading */}
-				{!user && <Spinner className="mx-3 w-9" />}
+				{!user && <Spinner className="w-9" />}
 
 				{/* Menu button */}
 				{user && <MyAccount user={ user } />}

@@ -1,5 +1,5 @@
 import { is } from "@electron-toolkit/utils";
-import { BrowserWindow } from "electron";
+import { BrowserWindow, app, shell } from "electron";
 import { resolve } from "path";
 import { resources } from "..";
 
@@ -13,7 +13,15 @@ export class Window {
 	 * @param options BrowserWindowConstructorOptions
 	 * @returns BrowserWindow
 	 */
-	public createWindow(options?: Electron.BrowserWindowConstructorOptions) {
+	public createWindow(options?: Electron.BrowserWindowConstructorOptions & { immediate?: boolean }) {
+
+		// Prevent multiple instances
+		const isUnlocked = app.requestSingleInstanceLock();
+		if (!isUnlocked && this.win && !this.win.isDestroyed()) {
+			this.win.show();
+			this.win.focus();
+			return this.win;
+		}
 
 		// Prevent multiple instances
 		if (this.win && !this.win.isDestroyed()) {
@@ -25,10 +33,10 @@ export class Window {
 		// Create the window
 		this.win = new BrowserWindow({
 			icon: resolve(resources, "./assets/icon.png"),
-			show: false,
 			resizable: false,
 			title: "Ember VPN",
 			titleBarStyle: "hidden",
+			frame: process.platform === "win32",
 			width: 600,
 			height: 400,
 			minWidth: options?.width || 600,
@@ -40,7 +48,8 @@ export class Window {
 				sandbox: false,
 				webviewTag: true
 			},
-			...options
+			...options,
+			show: false,
 		});
 
 		// Get a slug from the title
@@ -59,13 +68,25 @@ export class Window {
 		// Otherwise load the index.html file
 		else this.win.loadFile(resolve(__dirname, "../renderer/index.html"), { hash });
 
-		// and load the index.html of the app.
-		this.win.on("ready-to-show", this.win.show);
+		// Prevent the window from being opened multiple times
+		app.on("second-instance", () => {
+			if (!this.win) return;
+			this.win.show();
+			this.win.focus();
+		});
+		
+		// Show when ready
+		this.win.once("ready-to-show", () => setTimeout(() => this.win?.show(), options?.immediate ? 50 : 500));
 
 		// Listen for titlebar events
 		this.win.on("maximize", () => this.win?.webContents.send("titlebar", "maximize"));
 		this.win.on("unmaximize", () => this.win?.webContents.send("titlebar", "restore"));
-		this.win.on("closed", () => this.win?.removeAllListeners());
+
+		// Open links in external browser
+		this.win.webContents.setWindowOpenHandler(details => {
+			shell.openExternal(details.url);
+			return { action: "deny" };
+		});
 
 		// Return the window
 		return this.win;

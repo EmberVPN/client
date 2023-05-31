@@ -7,12 +7,11 @@ import { useEffect, useRef, useState } from "react";
 import { IoMdSettings } from "react-icons/io";
 import { MdExitToApp, MdManageAccounts } from "react-icons/md";
 import User from "../util/class/User";
-import { signout } from "../util/signout";
 
 export let open = () => { };
 export let close = () => { };
 
-export function MyAccount({ user }: { user: User }): JSX.Element {
+export function MyAccount({ user }: { user: Auth.User }): JSX.Element {
 
 	const ref = useRef<HTMLButtonElement>(null);
 	const [ _open, setOpen ] = useState(false);
@@ -36,7 +35,7 @@ export function MyAccount({ user }: { user: User }): JSX.Element {
 	);
 }
 
-export function PopupWindow({ user }: { user: User }): JSX.Element {
+export function PopupWindow({ user }: { user: Auth.User }): JSX.Element {
 
 	useEffect(() => {
 
@@ -80,7 +79,7 @@ export function PopupWindow({ user }: { user: User }): JSX.Element {
 				</DrawerItem>
 				
 				<DrawerItem icon={ MdExitToApp }
-					onClick={ () => [ close(), signout() ] }
+					onClick={ () => [ close(), electron.ipcRenderer.send("authorization", null) ] }
 					size="dense">
 					Sign out
 				</DrawerItem>

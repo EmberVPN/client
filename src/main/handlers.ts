@@ -1,5 +1,6 @@
 import { BrowserWindow, ipcMain } from "electron";
 import { inetLatency } from "systeminformation";
+import { Main } from "./window/Main";
 
 // Handle window size requests
 ipcMain.handle("window-size", (event, width: number, height: number, resizable?: boolean) => {
@@ -7,8 +8,6 @@ ipcMain.handle("window-size", (event, width: number, height: number, resizable?:
 	// Get the window that sent the request
 	const win = BrowserWindow.fromWebContents(event.sender);
 	if (!win) return;
-
-	console.log(win);
 
 	// Set normal size
 	win.setResizable(resizable === true);
@@ -33,10 +32,14 @@ ipcMain.on("titlebar", (event, key: string, val?: boolean) => {
 
 	// Handle events
 	if (key === "minimize") win.minimize();
-	if (key === "resizeable" && val !== undefined) win.setResizable(val);
 	if (key === "minimizeable" && val !== undefined) win.setMinimizable(val);
 	if (key === "restore") win.isMaximized() ? win.restore() : win.maximize();
-	if (key === "hide") win.close();
+	if (key === "hide") Main.is(win) ? win.hide() : win.close();
+
+	if (key === "resizeable" && val !== undefined) {
+		win.setResizable(val);
+		win.setMaximizable(val);
+	}
 
 });
 

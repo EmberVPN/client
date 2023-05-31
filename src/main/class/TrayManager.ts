@@ -1,6 +1,10 @@
-import { BrowserWindow, Menu, Notification, Tray, app, ipcMain, nativeImage } from "electron";
+import { BrowserWindow, Menu, Notification, Tray, app, nativeImage } from "electron";
 import { resolve } from "path";
-import EmberVPN, { OpenVPN, SettingsWindow, UpdateWindow, resources } from "..";
+import { OpenVPN, resources } from "..";
+import { Main } from "../window/Main";
+import { Settings } from "../window/Settings";
+import { Update } from "../window/Update";
+import { AuthMan } from "./AuthMan";
 
 export class TrayManager {
 
@@ -9,8 +13,6 @@ export class TrayManager {
 
 	// Initialize the tray state
 	private _state: "connected" | "disconnected" | "connecting" = "disconnected";
-
-	private authorization: string | null = null;
 
 	get state() {
 		return this._state;
@@ -61,28 +63,32 @@ export class TrayManager {
 	}
 
 	constructor() {
-		app.once("ready", () => {
+		
+		// Request single instance lock before the app init
+		const isUnlocked = app.requestSingleInstanceLock();
+		if (!isUnlocked) app.quit();
+			
+		// Await app ready, then create the tray
+		else app.once("ready", async() => {
 
 			// Initialize the tray
 			this.tray = new Tray(this.resizeImage("tray"));
 
 			// Open the window when the tray is clicked
-			this.tray.on("click", () => {
-				BrowserWindow.getAllWindows()
-					.filter(window => EmberVPN.is(window))
-					.map(window => window.show());
+			this.tray.on("click", function() {
+			
+				// Sort so main window with Main.is is first
+				BrowserWindow.getAllWindows().sort((a, b) => {
+					if (Main.is(a)) return -1;
+					if (Main.is(b)) return 1;
+					return 0;
+				}).at(0)?.show();
+				
 			});
 
 			// Set the default state
-			this.setState(this._state);
-			this.refreshMenu();
-
-			// Handle authorization token changes
-			ipcMain.on("authorization", (_, authorization: string) => {
-				this.authorization = authorization;
-				this.refreshMenu();
-				if (!authorization) this.setState("disconnected");
-			});
+			await this.setState(this._state);
+			await this.refreshMenu();
 			
 		});
 	}
@@ -92,7 +98,7 @@ export class TrayManager {
 		this.tray?.setToolTip(this.tooltip);
 	}
 
-	public refreshMenu() {
+	public async refreshMenu() {
 
 		const label = [ "Ember VPN", `v${ app.getVersion() }` ].join(Array(8).fill(" ").join(""));
 
@@ -119,7 +125,7 @@ export class TrayManager {
 			label: "settings-sep"
 		});
 		
-		this.addMenuItems();
+		await this.addMenuItems();
 
 		this.pushMenuItem({
 			type: "separator",
@@ -135,13 +141,16 @@ export class TrayManager {
 
 	}
 	
-	private addMenuItems() {
+	private async addMenuItems() {
+
+		// Check if we're authorized
+		const authorized = await AuthMan.isAuthorized();
 
 		// Add settings button
-		if (this.authorization) {
+		if (authorized) {
 			this.pushMenuItem({
 				label: "Settings",
-				click: () => SettingsWindow.open(),
+				click: () => Settings.open(),
 				
 			});
 		}
@@ -149,7 +158,7 @@ export class TrayManager {
 		// Check for updates
 		this.pushMenuItem({
 			label: "Check for Updates",
-			click: () => UpdateWindow.open(),
+			click: () => Update.open(),
 		});
 
 		this.pushMenuItem({
@@ -165,14 +174,14 @@ export class TrayManager {
 		});
 
 		// Add the quick connect button if we're disconnected
-		else if (this.authorization) this.pushMenuItem({
+		else if (authorized) this.pushMenuItem({
 			label: "Quick Connect",
 			click: () => OpenVPN.quickConnect(),
 			enabled: this._state === "disconnected" && !OpenVPN.isConnecting()
 		});
 	}
 
-	public setState(state: typeof this._state) {
+	public async setState(state: typeof this._state) {
 
 		// Set the state
 		this._state = state;
@@ -184,7 +193,7 @@ export class TrayManager {
 		this.setToolTip(this._state.replace(/^\w/, c => c.toUpperCase()));
 
 		// Reload the menu
-		this.refreshMenu();
+		await this.refreshMenu();
 
 	}
 

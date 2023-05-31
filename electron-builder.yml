@@ -1,20 +1,20 @@
-appId: org.embervpn.app
+appId: org.embervpn.client
+artifactName: EmberVPN-v${version}_${platform}.${ext}
 productName: Ember VPN
 directories:
   buildResources: assets
 files:
-  - '!**/.vscode/*'
-  - '!src/*'
-  - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
-  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
-  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - "!**/.vscode/*"
+  - "!src/*"
+  - "!electron.vite.config.{js,ts,mjs,cjs}"
+  - "!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}"
+  - "!{.env,.env.*,.npmrc,pnpm-lock.yaml}"
+  - "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}"
 extraResources:
-  - '.bin/**/*'
-  - 'assets/**/*'
+  - ".bin/**/*"
+  - "assets/**/*"
 win:
   executableName: embervpn
-  artifactName: EmberVPN-v${version}_${platform}.${ext}
   requestedExecutionLevel: "requireAdministrator"
   target:
     - nsis
@@ -26,16 +26,3 @@ nsis:
   installerSidebar: assets/sidebar.bmp
   uninstallerSidebar: assets/sidebar.bmp
   license: license.txt
-linux:
-  maintainer: embervpn.org
-  category: Utility
-  artifactName: EmberVPN-v${version}_${platform}.${ext}
-  icon: assets/icon.png
-  target:
-    - deb
-    - snap
-    - AppImage
-    - tar.gz
-    - zip
-dmg:
-  artifactName: EmberVPN-v${version}_${platform}.${ext}
