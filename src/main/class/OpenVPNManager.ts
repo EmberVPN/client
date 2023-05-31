@@ -137,7 +137,7 @@ export class OpenVPNManager {
 		if (Tray.state !== "disconnected") Tray.notify("Disconnected from VPN", "Ember VPN • Disconnected", "tray");
 		await Tray.setState("disconnected");
 		BrowserWindow.getAllWindows()
-			.map(win => win.webContents.send("openvpn", "disconnecting"));
+			.map(win => win.webContents.send("openvpn", "disconnected"));
 		
 	}
 

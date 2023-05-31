@@ -48,10 +48,6 @@ export class IPManager extends EventEmitter {
 		// Check if IP has changed and it didnt pick up an ipv6 address
 		if (!ip.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)) return await this.fetchAddress();
 
-		// OpenVPN Log IP
-		const wins = electron.BrowserWindow.getAllWindows();
-		wins.map(win => win.webContents.send("openvpn", "log", null, JSON.stringify(this.lastGeo)));
-
 		// Return IP
 		return ip;
 		
