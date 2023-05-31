@@ -1,4 +1,4 @@
-import { Menu, Notification, Tray, app, ipcMain, nativeImage } from "electron";
+import { BrowserWindow, Menu, Notification, Tray, app, ipcMain, nativeImage } from "electron";
 import { resolve } from "path";
 import { OpenVPN, resources } from "..";
 import { Main } from "../window/Main";
@@ -76,7 +76,16 @@ export class TrayManager {
 			this.tray = new Tray(this.resizeImage("tray"));
 
 			// Open the window when the tray is clicked
-			this.tray.on("click", () => Main.get()?.show());
+			this.tray.on("click", function() {
+			
+				// Sort so main window with Main.is is first
+				BrowserWindow.getAllWindows().sort((a, b) => {
+					if (Main.is(a)) return -1;
+					if (Main.is(b)) return 1;
+					return 0;
+				}).at(0)?.show();
+				
+			});
 
 			// Set the default state
 			this.setState(this._state);
