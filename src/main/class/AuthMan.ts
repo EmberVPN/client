@@ -1,4 +1,5 @@
 import { BrowserWindow, ipcMain } from "electron";
+import { OpenVPN, Tray } from "..";
 import { Authorize } from "../window/Authorize";
 import { Main } from "../window/Main";
 import { Config } from "./Config";
@@ -27,6 +28,9 @@ export class AuthMan {
 			// Fetch user
 			await AuthMan.fetchUser();
 
+			// Refresh the tray menu
+			await Tray.refreshMenu();
+
 		});
 	}
 
@@ -43,6 +47,9 @@ export class AuthMan {
 		
 		// Open login window
 		Authorize.open();
+
+		// Disconnect from OpenVPN
+		OpenVPN.disconnect();
 		
 	}
 

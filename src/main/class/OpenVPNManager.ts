@@ -20,7 +20,7 @@ export class OpenVPNManager {
 
 	public async downloadConfig(server: Ember.Server) {
 		this._isConnecting = true;
-		Tray.refreshMenu();
+		await Tray.refreshMenu();
 
 		// Ensure authorization is set
 		const auth = AuthMan.getAuthorization();
@@ -77,7 +77,7 @@ export class OpenVPNManager {
 		if (geo.ip !== server.ip) throw new Error("Failed to connect to server");
 		
 		// Set connected
-		Tray.setState("connected");
+		await Tray.setState("connected");
 		Tray.notify(`Connected to ${ geo.country_code }`);
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "connected", server.hash));
@@ -135,7 +135,7 @@ export class OpenVPNManager {
 
 		if (switching) return;
 		if (Tray.state !== "disconnected") Tray.notify("Disconnected from VPN", "Ember VPN • Disconnected", "tray");
-		Tray.setState("disconnected");
+		await Tray.setState("disconnected");
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "disconnecting"));
 		
@@ -152,7 +152,7 @@ export class OpenVPNManager {
 		if (!this.server) throw new Error("Server not set");
 		
 		// Set connecting state
-		Tray.setState("connecting");
+		await Tray.setState("connecting");
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "connecting", this.server?.hash));
 		
@@ -183,7 +183,7 @@ export class OpenVPNManager {
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "will-connect"));
 		this._isConnecting = true;
-		Tray.refreshMenu();
+		await Tray.refreshMenu();
 		
 		// Get servers
 		const servers = await fetch("https://api.embervpn.org/v2/ember/servers", {
