@@ -11,7 +11,7 @@ export interface IpGeo {
 export class IPManager extends EventEmitter {
 
 	private lastIP = "";
-	private lastGeo = {} as IpGeo;
+	private geoCache: Record<string, IpGeo> = {};
 
 	/**
 	 * Fetch the IP address
@@ -53,6 +53,10 @@ export class IPManager extends EventEmitter {
 		
 	}
 
+	public dropCache() {
+		this.lastIP = "";
+	}
+
 	public async fetchGeo(ip = this.lastIP): Promise<IpGeo> {
 		
 		const controller = new AbortController();
@@ -64,7 +68,7 @@ export class IPManager extends EventEmitter {
 		].reduce((a, b) => Math.random() > 0.5 ? a : b);
 
 		// Send request
-		const res = await fetch(mirror, {
+		const res = await fetch(mirror + `?t=${ Date.now().toString(36) }`, {
 			signal: controller.signal
 		})
 			.then(res => res.json() as Promise<IpGeo & { success: boolean }>)
@@ -77,7 +81,7 @@ export class IPManager extends EventEmitter {
 		if (!res.success) return await this.fetchGeo(ip);
 		if (res.hasOwnProperty("error")) return await this.fetchGeo(ip);
 
-		return res;
+		return this.geoCache[ip] = res;
 		
 	}
 	
@@ -92,15 +96,18 @@ export class IPManager extends EventEmitter {
 			if (ip !== this.lastIP) {
 				this.lastIP = ip;
 				this.emit("change", ip);
-				this.lastGeo = await this.fetchGeo();
+				await this.fetchGeo();
 			}
 				
 		}, 1000);
 
 		// Send IP location to renderer
 		setInterval(() => {
-			const wins = electron.BrowserWindow.getAllWindows();
-			wins.map(win => win.webContents.send("iplocation", JSON.stringify(this.lastGeo)));
+
+			// Send IP location to renderer
+			if (!this.geoCache[this.lastIP]) return;
+			electron.BrowserWindow.getAllWindows()
+				.map(win => win.webContents.send("iplocation", JSON.stringify(this.geoCache[this.lastIP])));
 		}, 50);
 
 	}

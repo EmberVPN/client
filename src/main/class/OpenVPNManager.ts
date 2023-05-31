@@ -134,10 +134,28 @@ export class OpenVPNManager {
 		this._isConnecting = false;
 
 		if (switching) return;
-		if (Tray.state !== "disconnected") Tray.notify("Disconnected from VPN", "Ember VPN • Disconnected", "tray");
-		await Tray.setState("disconnected");
+		
+		// Notify the UI that we are disconnecting
 		BrowserWindow.getAllWindows()
-			.map(win => win.webContents.send("openvpn", "disconnected"));
+			.map(win => win.webContents.send("openvpn", "disconnecting"));
+		await Tray.setState("connecting");
+
+		// Await new IP
+		IPv4.dropCache();
+		await new Promise(resolve => IPv4.once("change", resolve));
+
+		// Set disconnected state
+		if (Tray.state !== "disconnected") Tray.notify("Disconnected from VPN", "Ember VPN • Disconnected", "tray");
+		Tray.setState("disconnected");
+
+		const newGeo = await IPv4.fetchGeo();
+
+		// Notify the UI that we are disconnecting
+		BrowserWindow.getAllWindows()
+			.map(win => {
+				win.webContents.send("openvpn", "disconnected");
+				win.webContents.send("iplocation", JSON.stringify(newGeo));
+			});
 		
 	}
 
