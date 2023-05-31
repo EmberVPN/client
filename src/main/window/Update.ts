@@ -2,9 +2,9 @@ import { app } from "electron";
 import { gt } from "semver";
 import { Window } from "../class/Window";
 
-export class Update extends Window {
-	public static open() {
-		Update.win = this.createWindow({
+class $Update extends Window {
+	public open() {
+		this.createWindow({
 			title: "Check for Updates • Ember VPN",
 			height: 128,
 			width: 512,
@@ -33,10 +33,12 @@ export class Update extends Window {
 				if (!gt(latest, version)) return;
 
 				// await for main window to load
-				app.once("ready", () => Update.open());
+				app.once("ready", () => this.open());
 				
 			});
 			
 	}
 
 }
+
+export const Update = new $Update;

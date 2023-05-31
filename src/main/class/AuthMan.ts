@@ -3,7 +3,7 @@ import { Authorize } from "../window/Authorize";
 import { Main } from "../window/Main";
 import { Config } from "./Config";
 
-export const AuthMan = new class AuthMan {
+export class AuthMan {
 
 	// The current authorization token
 	private static authorization?: string = Config.get("authorization");
@@ -11,8 +11,7 @@ export const AuthMan = new class AuthMan {
 	// The current user
 	private static user?: Auth.User;
 
-	// Attach events to manage lifecycle
-	constructor() {
+	static {
 
 		// Listen for authorization token changes
 		ipcMain.on("authorization", async(_, authorization: string | null) => {
@@ -21,7 +20,7 @@ export const AuthMan = new class AuthMan {
 			if (authorization === AuthMan.authorization) return;
 			
 			// If were signing out, handle that
-			if (!authorization) return await AuthMan.destroy();
+			if (authorization === null) return await AuthMan.destroy();
 
 			// Set authorization token
 			AuthMan.authorization = authorization;
@@ -37,6 +36,9 @@ export const AuthMan = new class AuthMan {
 	protected static async destroy() {
 		AuthMan.authorization = undefined;
 		AuthMan.user = undefined;
+
+		// Remove authorization token from config
+		Config.set("authorization", undefined);
 
 		// Close all windows
 		BrowserWindow.getAllWindows().map(win => win.close());
@@ -66,20 +68,18 @@ export const AuthMan = new class AuthMan {
 		// Set authorization token
 		Config.set("authorization", authorization);
 
-		// Close login window and open main window
-		BrowserWindow.getAllWindows()
-			.filter(win => !Main.is(win))
-			.map(win => win.close());
-		
-		// Open main window
-		Main.open();
+		// If login window is open, close it and open the main window
+		if (BrowserWindow.getAllWindows().find(win => Authorize.is(win))) {
+			Authorize.close();
+			Main.open();
+		}
 		
 		// Return the user
 		return AuthMan.user = resp.user;
 
 	}
 
-	public async isAuthorized() {
+	public static async isAuthorized() {
 		try {
 			return AuthMan.authorization !== undefined && ((AuthMan.user || await AuthMan.fetchUser())?.id || -1) > 0;
 		} catch (e) {
@@ -87,8 +87,8 @@ export const AuthMan = new class AuthMan {
 		}
 	}
 
-	public getAuthorization() {
+	public static getAuthorization() {
 		return AuthMan.authorization;
 	}
 
-};
+}

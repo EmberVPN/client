@@ -1,13 +1,13 @@
 import { Window } from "../class/Window";
 
-export class Main extends Window {
-	public static open() {
+class $Main extends Window {
+	public open() {
 
 		// Attempt to open a hidden window first
-		// if (Main.win && !Main.win.isDestroyed()) {
-		// 	Main.win.show();
-		// 	return;
-		// }
+		if (Main.win && !Main.win.isDestroyed()) {
+			Main.win.show();
+			return;
+		}
 
 		// Otherwise, open a new window
 		Main.win = this.createWindow({
@@ -15,7 +15,11 @@ export class Main extends Window {
 			resizable: true,
 			height: 600,
 			width: 800,
+			minWidth: 600,
+			minHeight: 400,
 		});
 
 	}
 }
+
+export const Main = new $Main;

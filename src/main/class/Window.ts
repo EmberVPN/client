@@ -6,14 +6,14 @@ import { resources } from "..";
 export class Window {
 
 	// The window
-	protected static win: BrowserWindow | undefined;
+	protected win: BrowserWindow | undefined;
 
 	/**
 	 * Create a new window but prevent multiple instances
 	 * @param options BrowserWindowConstructorOptions
 	 * @returns BrowserWindow
 	 */
-	public static createWindow(options?: Electron.BrowserWindowConstructorOptions) {
+	public createWindow(options?: Electron.BrowserWindowConstructorOptions & { immediate?: boolean }) {
 
 		// Prevent multiple instances
 		const isUnlocked = app.requestSingleInstanceLock();
@@ -74,6 +74,9 @@ export class Window {
 			this.win.show();
 			this.win.focus();
 		});
+		
+		// Show when ready
+		this.win.once("ready-to-show", () => setTimeout(() => this.win?.show(), options?.immediate ? 50 : 500));
 
 		// Listen for titlebar events
 		this.win.on("maximize", () => this.win?.webContents.send("titlebar", "maximize"));
@@ -90,11 +93,11 @@ export class Window {
 
 	}
 
-	public static is(win: BrowserWindow) {
+	public is(win: BrowserWindow) {
 		return this.win?.id === win.id;
 	}
 
-	public static get() {
+	public get() {
 		return this.win;
 	}
 

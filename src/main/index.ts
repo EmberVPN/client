@@ -3,11 +3,19 @@ import { app } from "electron";
 import { resolve } from "path";
 import { AuthMan } from "./class/AuthMan";
 import "./class/Config";
+import { IPManager } from "./class/IPManager";
+import { OpenVPNManager } from "./class/OpenVPNManager";
+import { TrayManager } from "./class/TrayManager";
 import "./handlers";
 import { Authorize } from "./window/Authorize";
 import { Main } from "./window/Main";
 import "./window/Settings";
 import "./window/Update";
+
+// Export app state managers
+export const Tray = new TrayManager;
+export const OpenVPN = new OpenVPNManager;
+export const IPv4 = new IPManager;
 
 // Get app resource path
 export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "../resources");
@@ -25,7 +33,7 @@ app.once("ready", async function() {
 	// If the user is not authorized, open the login window
 	if (!isAuth) return Authorize.open();
 
-	// Otherwise, open the main window
-	// return Main.open();
+	// Open main window
+	Main.open();
 	
 });

@@ -2,10 +2,11 @@ import { BrowserWindow, app, ipcMain } from "electron";
 import { AuthMan } from "../class/AuthMan";
 import { Window } from "../class/Window";
 
-export class Settings extends Window {
-	public static open() {
-		this.win = this.createWindow({
-			title: "Settings • Ember VPN"
+class $Settings extends Window {
+	public open() {
+		this.createWindow({
+			title: "Settings • Ember VPN",
+			immediate: true,
 		});
 	}
 
@@ -13,7 +14,7 @@ export class Settings extends Window {
 		super();
 
 		// Wait for app ready
-		app.once("browser-window-created", () => {
+		app.on("browser-window-created", () => {
 
 			// Get all windows
 			BrowserWindow.getAllWindows()
@@ -31,13 +32,15 @@ export class Settings extends Window {
 						event.preventDefault();
 
 						// Open the settings window
-						Settings.open();
+						this.open();
 
 					}));
 		});
 
 		// Observe for menu click
-		ipcMain.on("open-settings", () => Settings.open());
+		ipcMain.on("open-settings", () => this.open());
 
 	}
 }
+
+export const Settings = new $Settings;

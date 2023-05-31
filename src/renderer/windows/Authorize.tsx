@@ -11,27 +11,35 @@ export function AuthorizeWindow() {
 	useEffect(function() {
 		if (!ref.current) return;
 		const webview = ref.current as HTMLWebViewElement & Electron.WebviewTag;
+		
+		let iv: NodeJS.Timer;
 
-		// Set the user's authorization token
-		const auth = "";
-
-		// Steel the authorization from the webview
-		async function authorize() {
-
-			const wanted = webview.src.includes("/authorize/login") ? 370 : 506;
-			if (window.innerHeight !== wanted) await electron.ipcRenderer.invoke("window-size", 600, wanted);
-
-			// Wait for authorization to exist
-			const authorization: string = await webview.executeJavaScript("localStorage.getItem(\"authorization\");");
-			if (auth === authorization) return;
+		// Wait for the webview to load
+		webview.addEventListener("dom-ready", function() {
 			
-			// Send the authorization to the main process
-			electron.ipcRenderer.send("authorization", authorization);
+			// Drop the old authorization state if it exists
+			webview.executeJavaScript("localStorage.setItem(\"authorization\", \"\");");
 
-		}
+			// Set the user's authorization token
+			const auth = "";
+	
+			// Steel the authorization from the webview
+			iv = setInterval(async function authorize() {
+	
+				const wanted = webview.src.includes("/authorize/login") ? 370 : 506;
+				if (window.innerHeight !== wanted) await electron.ipcRenderer.invoke("window-size", 600, wanted);
+	
+				// Wait for authorization to exist
+				const authorization: string = await webview.executeJavaScript("localStorage.getItem(\"authorization\");");
+				if (auth === authorization) return;
+				
+				// Send the authorization to the main process
+				electron.ipcRenderer.send("authorization", authorization);
+	
+			}, 10);
 
-		// This is easier then listening
-		const iv = setInterval(authorize, 10);
+		});
+
 		return () => clearInterval(iv);
 
 	}, [ ref ]);

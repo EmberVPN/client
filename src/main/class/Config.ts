@@ -27,7 +27,8 @@ export const Config = new class Config {
 	}
 
 	public set(key: string, value: any) {
-		Config.store.set(key, value);
+		if (value === undefined) Config.store.delete(key);
+		else Config.store.set(key, value);
 		const wins = electron.BrowserWindow.getAllWindows();
 		wins.map(win => win.webContents.send("config-updated", key, value));
 	}

@@ -3,7 +3,7 @@ import { resolve } from "path";
 import { OpenVPN, resources } from "..";
 import { Main } from "../window/Main";
 import { Settings } from "../window/Settings";
-import { Update as Updater } from "../window/Update";
+import { Update } from "../window/Update";
 
 export class TrayManager {
 
@@ -154,7 +154,7 @@ export class TrayManager {
 		// Check for updates
 		this.pushMenuItem({
 			label: "Check for Updates",
-			click: () => Updater.open(),
+			click: () => Update.open(),
 		});
 
 		this.pushMenuItem({
