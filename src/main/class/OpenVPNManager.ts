@@ -3,9 +3,10 @@ import { ChildProcess, spawn } from "child_process";
 import { BrowserWindow, ipcMain } from "electron";
 import { writeFile } from "fs/promises";
 import { resolve } from "path";
-import EmberVPN, { IPv4, Tray, resources } from "..";
+import { IPv4, Tray, resources } from "..";
 import { calculateDistance } from "../../calculateDistance";
 import { getBinary } from "../vpnutils";
+import { AuthMan } from "./AuthMan";
 
 export class OpenVPNManager {
 
@@ -19,10 +20,10 @@ export class OpenVPNManager {
 
 	public async downloadConfig(server: Ember.Server) {
 		this._isConnecting = true;
-		Tray.refreshMenu();
+		await Tray.refreshMenu();
 
 		// Ensure authorization is set
-		const auth = EmberVPN.getAuthorization();
+		const auth = AuthMan.getAuthorization();
 		if (!auth) throw new Error("Authorization not set");
 
 		// Download config
@@ -76,7 +77,7 @@ export class OpenVPNManager {
 		if (geo.ip !== server.ip) throw new Error("Failed to connect to server");
 		
 		// Set connected
-		Tray.setState("connected");
+		await Tray.setState("connected");
 		Tray.notify(`Connected to ${ geo.country_code }`);
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "connected", server.hash));
@@ -133,10 +134,28 @@ export class OpenVPNManager {
 		this._isConnecting = false;
 
 		if (switching) return;
-		if (Tray.state !== "disconnected") Tray.notify("Disconnected from VPN", "Ember VPN • Disconnected", "tray");
-		Tray.setState("disconnected");
+		
+		// Notify the UI that we are disconnecting
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "disconnecting"));
+		await Tray.setState("connecting");
+
+		// Await new IP
+		IPv4.dropCache();
+		await new Promise(resolve => IPv4.once("change", resolve));
+
+		// Set disconnected state
+		if (Tray.state !== "disconnected") Tray.notify("Disconnected from VPN", "Ember VPN • Disconnected", "tray");
+		Tray.setState("disconnected");
+
+		const newGeo = await IPv4.fetchGeo();
+
+		// Notify the UI that we are disconnecting
+		BrowserWindow.getAllWindows()
+			.map(win => {
+				win.webContents.send("openvpn", "disconnected");
+				win.webContents.send("iplocation", JSON.stringify(newGeo));
+			});
 		
 	}
 
@@ -151,7 +170,7 @@ export class OpenVPNManager {
 		if (!this.server) throw new Error("Server not set");
 		
 		// Set connecting state
-		Tray.setState("connecting");
+		await Tray.setState("connecting");
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "connecting", this.server?.hash));
 		
@@ -176,13 +195,13 @@ export class OpenVPNManager {
 	public async quickConnect() {
 
 		// Ensure authorization is set
-		const auth = EmberVPN.getAuthorization();
+		const auth = AuthMan.getAuthorization();
 		if (!auth) throw new Error("Authorization not set");
 		
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "will-connect"));
 		this._isConnecting = true;
-		Tray.refreshMenu();
+		await Tray.refreshMenu();
 		
 		// Get servers
 		const servers = await fetch("https://api.embervpn.org/v2/ember/servers", {

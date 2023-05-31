@@ -13,7 +13,7 @@ export class Window {
 	 * @param options BrowserWindowConstructorOptions
 	 * @returns BrowserWindow
 	 */
-	public createWindow(options?: Electron.BrowserWindowConstructorOptions) {
+	public createWindow(options?: Electron.BrowserWindowConstructorOptions & { immediate?: boolean }) {
 
 		// Prevent multiple instances
 		const isUnlocked = app.requestSingleInstanceLock();
@@ -33,7 +33,6 @@ export class Window {
 		// Create the window
 		this.win = new BrowserWindow({
 			icon: resolve(resources, "./assets/icon.png"),
-			show: false,
 			resizable: false,
 			title: "Ember VPN",
 			titleBarStyle: "hidden",
@@ -49,7 +48,8 @@ export class Window {
 				sandbox: false,
 				webviewTag: true
 			},
-			...options
+			...options,
+			show: false,
 		});
 
 		// Get a slug from the title
@@ -74,9 +74,9 @@ export class Window {
 			this.win.show();
 			this.win.focus();
 		});
-
-		// and load the index.html of the app.
-		this.win.on("ready-to-show", this.win.show);
+		
+		// Show when ready
+		this.win.once("ready-to-show", () => setTimeout(() => this.win?.show(), options?.immediate ? 50 : 500));
 
 		// Listen for titlebar events
 		this.win.on("maximize", () => this.win?.webContents.send("titlebar", "maximize"));

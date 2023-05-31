@@ -17,95 +17,96 @@ settings:
   react:
     version: detect
 ignorePatterns:
-  - '**/node_modules/**'
-  - '**/dist/**'
-  - '**/lib/**'
-  - '**/public_html/**'
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/lib/**"
+  - "**/public_html/**"
 
 rules:
   indent:
-  - warn
-  - tab
+    - warn
+    - tab
+    - { "SwitchCase": 1 }
   array-bracket-spacing:
-  - warn
-  - always
+    - warn
+    - always
   quotes:
-  - warn
-  - double
+    - warn
+    - double
   object-curly-spacing:
-  - warn
-  - always
-  - objectsInObjects: false
-    arraysInObjects: false
+    - warn
+    - always
+    - objectsInObjects: false
+      arraysInObjects: false
   semi: warn
   comma-dangle:
-  - warn
-  - only-multiline
+    - warn
+    - only-multiline
   array-bracket-newline:
-  - warn
-  - consistent
+    - warn
+    - consistent
   comma-spacing: warn
   template-curly-spacing:
-  - warn
-  - always
+    - warn
+    - always
   eqeqeq:
-  - warn
-  - always
+    - warn
+    - always
   semi-spacing: warn
   max-statements-per-line: warn
   space-in-parens: warn
   space-infix-ops: warn
   keyword-spacing: warn
   space-before-function-paren:
-  - warn
-  - never
+    - warn
+    - never
   key-spacing: warn
   no-trailing-spaces:
-  - warn
-  - ignoreComments: true
-    skipBlankLines: true
+    - warn
+    - ignoreComments: true
+      skipBlankLines: true
   arrow-parens:
-  - warn
-  - as-needed
+    - warn
+    - as-needed
   func-call-spacing: warn
   no-mixed-spaces-and-tabs:
-  - warn
+    - warn
   no-multiple-empty-lines:
-  - warn
-  - max: 1
-    maxBOF: 0
+    - warn
+    - max: 1
+      maxBOF: 0
   no-regex-spaces: warn
   no-multi-spaces: warn
   space-unary-ops: warn
   lines-around-comment:
-  - warn
-  - beforeBlockComment: true
-    beforeLineComment: true
-    afterBlockComment: false
-    afterLineComment: false
-    allowBlockStart: false
-    allowBlockEnd: false
+    - warn
+    - beforeBlockComment: true
+      beforeLineComment: true
+      afterBlockComment: false
+      afterLineComment: false
+      allowBlockStart: false
+      allowBlockEnd: false
   no-whitespace-before-property: warn
   spaced-comment:
-  - warn
-  - always
-  - line:
-      markers:
-      - "/"
-      exceptions:
-      - "-"
-      - "+"
-    block:
-      markers:
-      - "!"
-      exceptions:
-      - "*"
-      balanced: true
+    - warn
+    - always
+    - line:
+        markers:
+          - "/"
+        exceptions:
+          - "-"
+          - "+"
+      block:
+        markers:
+          - "!"
+        exceptions:
+          - "*"
+        balanced: true
   computed-property-spacing: warn
   rest-spread-spacing: warn
   function-call-argument-newline:
-  - warn
-  - consistent
+    - warn
+    - consistent
   nonblock-statement-body-position: warn
   space-before-blocks: warn
   no-dupe-args: warn
@@ -113,34 +114,34 @@ rules:
   brace-style: warn
   react/react-in-jsx-scope: off
   react/jsx-curly-spacing:
-  - warn
-  - when: always
-    spacing:
-      objectLiterals: never
-    allowMultiline: false
+    - warn
+    - when: always
+      spacing:
+        objectLiterals: never
+      allowMultiline: false
   react/jsx-indent-props:
-  - warn
-  - tab
+    - warn
+    - tab
   react/jsx-sort-props: warn
   react/self-closing-comp: off
   react/jsx-props-no-multi-spaces: warn
   react/jsx-equals-spacing: warn
   react/jsx-max-props-per-line:
-  - warn
-  - maximum: 1
+    - warn
+    - maximum: 1
   react/jsx-no-useless-fragment: warn
   react/jsx-tag-spacing:
-  - warn
-  - closingSlash: never
-    beforeSelfClosing: always
-    afterOpening: never
-    beforeClosing: never
+    - warn
+    - closingSlash: never
+      beforeSelfClosing: always
+      afterOpening: never
+      beforeClosing: never
   no-undef: off
   no-prototype-builtins: off
   no-unused-vars: off
   "@typescript-eslint/no-unused-vars":
-  - warn
-  - varsIgnorePattern: "^_.*"
+    - warn
+    - varsIgnorePattern: "^_.*"
   no-empty: off
   "@typescript-eslint/no-empty-function": off
   react/display-name: off

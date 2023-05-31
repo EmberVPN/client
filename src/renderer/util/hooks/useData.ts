@@ -1,4 +1,5 @@
 import { useQuery } from "react-query";
+import { useConfigKey } from "./useConfigKey";
 
 interface Endpoints {
 	"/v2/ember/servers": EmberAPI.Servers;
@@ -7,11 +8,12 @@ interface Endpoints {
 
 export default function useData<T extends keyof Endpoints>(route: T): { data: REST.APIResponse<Endpoints[T]> | undefined, isLoading: boolean } {
 
+	// Get authorization token
+	const [ authorization ] = useConfigKey<string>("authorization");
+
 	const { isLoading, data } = useQuery(route, async function() {
 		return await fetch(`https://api.embervpn.org${ route }`, {
-			headers: {
-				Authorization: localStorage.getItem("authorization") ?? "",
-			}
+			headers: { authorization }
 		})
 			.then(res => res.json());
 	});
