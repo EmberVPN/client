@@ -6,6 +6,7 @@ export class Config {
 
 	private static store = new Store({
 		accessPropertiesByDotNotation: false,
+		clearInvalidConfig: true,
 		encryptionKey: is.dev ? undefined : "embervpn"
 	});
 	
