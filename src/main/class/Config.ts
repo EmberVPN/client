@@ -24,7 +24,7 @@ export class Config {
 
 	}
 
-	public static set(key: string, value: any) {
+	public static set(key: string, value: unknown) {
 		if (value === undefined) Config.store.delete(key);
 		else Config.store.set(key, value);
 		const wins = electron.BrowserWindow.getAllWindows();
