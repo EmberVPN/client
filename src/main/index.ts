@@ -25,6 +25,7 @@ app.setAppUserModelId("org.embervpn.client");
 app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
 app.on("activate", () => Main.open());
 
+// App lifecycle
 app.once("ready", async function() {
 
 	// Await for us to know if the user is authorized
