@@ -31,10 +31,7 @@ root.render(
 			theme="colored"
 		/>
 		<ConnectionProvider>
-
-			{/* Application entry point */}
 			<Application />
-		
 		</ConnectionProvider>
 	</QueryClientProvider>
 );
@@ -53,6 +50,8 @@ export default function Application() {
 
 	// If the URL contains the settings hash, show the settings window
 	switch (decodeURIComponent(window.location.hash.substring(1)).split("-ember-vpn")[0]) {
+
+		// Main window
 		default: return <MainWindow />;
 
 		// Check for updates window

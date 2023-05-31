@@ -11,9 +11,8 @@ export class AuthMan {
 	// The current user
 	private static user?: Auth.User;
 
+	// Listen for authorization token changes
 	static {
-
-		// Listen for authorization token changes
 		ipcMain.on("authorization", async(_, authorization: string | null) => {
 			
 			// Ignore if the authorization token is the same
@@ -29,7 +28,6 @@ export class AuthMan {
 			await AuthMan.fetchUser();
 
 		});
-		
 	}
 
 	// Destroy the current authorization session
