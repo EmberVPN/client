@@ -1,52 +1,37 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import User from "../class/User";
+import { useConfigKey } from "./useConfigKey";
 
 export function useUser() {
 
-	const [ isAuthorized, setIsAuthorized ] = useState<boolean>(false);
-	const [ user, setUser ] = useState<User | false | undefined>();
+	// Get authorization token
+	const [ authorization ] = useConfigKey<string | undefined>("authorization");
 
-	const { data, isLoading, error } = useQuery("user", async function() {
-
-		// Fetch the user
-		const response = await fetch("https://api.embervpn.org/v2/auth/@me", {
-			headers: {
-				Authorization: localStorage.getItem("authorization") ?? "",
-			}
-		});
-
-		// Check if the user is authorized
-		if (!response.ok) return { success: false };
-
-		// Parse the user
-		return await response.json() as REST.APIResponse<{ user: Auth.User }>;
-
-	}, { staleTime: 5000 });
-
-	// Check if the user is authorized
+	// Initialize user state
+	const [ user, setUser ] = useState<Auth.User | undefined>();
+	
+	// On authorization token change
 	useEffect(function() {
 		
-		// Check if the user is authorized
-		if (data && data.success && "user" in data) {
-			electron.ipcRenderer.send("authorization", localStorage.getItem("authorization"));
-			setIsAuthorized(true);
-			localStorage.setItem("last_user", data.user.email);
-			setUser(new User(data.user));
-			return;
-		} else {
-			electron.ipcRenderer.send("authorization", null);
-		}
-		
-		if (data && !data.success) {
-			if (isAuthorized) electron.ipcRenderer.send("authorization", null);
-			setIsAuthorized(false);
-			setUser(false);
-			return;
-		}
-		
-	}, [ data, error, isAuthorized ]);
+		// If we don't have an authorization token, set user to undefined
+		if (!authorization) return setUser(undefined);
 
-	return { isLoading, isAuthorized, user };
+		// Otherwise, fetch user
+		fetch("https://api.embervpn.org/v2/auth/@me", { headers: { authorization }})
+			.then(a => a.json() as Promise<REST.APIResponse<{ user: Auth.User }>>)
+			.then(function(response) {
+				
+				// Ensure success
+				if (!response.success) throw new Error(response.readable || response.description || response.error);
+
+				// Set user
+				setUser(response.user);
+
+			})
+			.catch(() => setUser(undefined));
+
+	}, [ authorization ]);
+	
+	// Return user
+	return user;
 
 }

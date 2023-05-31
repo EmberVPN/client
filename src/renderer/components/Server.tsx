@@ -13,6 +13,7 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 
 	// Get the current IP location
 	const { status, active, ipLocation, setStatus, setActive, lastStateChange } = useConnection();
+	const [ authorization ] = useConfigKey("authorization");
 
 	// Get the config
 	const [ config ] = useConfigKey("units.distance");
@@ -26,7 +27,6 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 	const isActive = active === server.hash;
 	const willConnect = (status.endsWith("ing") || status === "will-connect");
 	const isLoading = isActive && willConnect;
-	const authorization = localStorage.getItem("authorization");
 
 	// Connect to the server
 	async function connect() {

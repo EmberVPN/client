@@ -1,9 +1,14 @@
+import { is } from "@electron-toolkit/utils";
 import electron, { ipcMain } from "electron";
 import Store from "electron-store";
 
-export class Config {
+export const Config = new class Config {
 
-	private store = new Store;
+	private static store = new Store({
+		accessPropertiesByDotNotation: false,
+		encryptionKey: is.dev ? undefined : "embervpn"
+
+	});
 
 	constructor() {
 
@@ -22,13 +27,13 @@ export class Config {
 	}
 
 	public set(key: string, value: any) {
-		this.store.set(key, value);
+		Config.store.set(key, value);
 		const wins = electron.BrowserWindow.getAllWindows();
 		wins.map(win => win.webContents.send("config-updated", key, value));
 	}
 
-	public get(key: string) {
-		return this.store.get(key);
+	public get<T = string | unknown>(key: string) {
+		return Config.store.get(key) as T;
 	}
 	
-}
+};

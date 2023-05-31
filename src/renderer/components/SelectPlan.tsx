@@ -1,8 +1,12 @@
 import Spinner from "@ui-elements/Spinner";
 import { useEffect, useRef } from "react";
+import { useConfigKey } from "../util/hooks/useConfigKey";
 import queryClient from "../util/queryClient";
 
 export default function SelectPlan() {
+
+	// Get the user's authorization token
+	const [ authorization ] = useConfigKey<string>("authorization");
 
 	// Create a reference to the webview
 	const ref = useRef<HTMLWebViewElement>(null);
@@ -13,7 +17,7 @@ export default function SelectPlan() {
 		const webview = ref.current as HTMLWebViewElement & Electron.WebviewTag;
 
 		// Set the user's authorization token
-		webview.addEventListener("dom-ready", () => webview.executeJavaScript(`localStorage.setItem("authorization", "${ localStorage.getItem("authorization") }");`));
+		webview.addEventListener("dom-ready", () => webview.executeJavaScript(`localStorage.setItem("authorization", "${ authorization }");`));
 		
 		// On new history state, refetch servers
 		webview.addEventListener("did-navigate-in-page", async function() {
@@ -21,7 +25,7 @@ export default function SelectPlan() {
 			if (servers && servers.success) queryClient.setQueryData("/v2/ember/servers", servers);
 		});
 
-	}, []);
+	}, [ authorization ]);
 
 	return (
 		<div className="flex flex-col w-full h-screen bg-gray-100 dark:bg-gray-900 isolate">

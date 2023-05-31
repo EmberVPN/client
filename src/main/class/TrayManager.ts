@@ -1,6 +1,9 @@
-import { BrowserWindow, Menu, Notification, Tray, app, ipcMain, nativeImage } from "electron";
+import { Menu, Notification, Tray, app, ipcMain, nativeImage } from "electron";
 import { resolve } from "path";
-import EmberVPN, { OpenVPN, SettingsWindow, UpdateWindow, resources } from "..";
+import { OpenVPN, resources } from "..";
+import { Main } from "../window/Main";
+import { Settings } from "../window/Settings";
+import { Update as Updater } from "../window/Update";
 
 export class TrayManager {
 
@@ -73,11 +76,7 @@ export class TrayManager {
 			this.tray = new Tray(this.resizeImage("tray"));
 
 			// Open the window when the tray is clicked
-			this.tray.on("click", () => {
-				BrowserWindow.getAllWindows()
-					.filter(window => EmberVPN.is(window))
-					.map(window => window.show());
-			});
+			this.tray.on("click", () => Main.get()?.show());
 
 			// Set the default state
 			this.setState(this._state);
@@ -147,7 +146,7 @@ export class TrayManager {
 		if (this.authorization) {
 			this.pushMenuItem({
 				label: "Settings",
-				click: () => SettingsWindow.open(),
+				click: () => Settings.open(),
 				
 			});
 		}
@@ -155,7 +154,7 @@ export class TrayManager {
 		// Check for updates
 		this.pushMenuItem({
 			label: "Check for Updates",
-			click: () => UpdateWindow.open(),
+			click: () => Updater.open(),
 		});
 
 		this.pushMenuItem({

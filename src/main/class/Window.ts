@@ -6,14 +6,14 @@ import { resources } from "..";
 export class Window {
 
 	// The window
-	protected win: BrowserWindow | undefined;
+	protected static win: BrowserWindow | undefined;
 
 	/**
 	 * Create a new window but prevent multiple instances
 	 * @param options BrowserWindowConstructorOptions
 	 * @returns BrowserWindow
 	 */
-	public createWindow(options?: Electron.BrowserWindowConstructorOptions) {
+	public static createWindow(options?: Electron.BrowserWindowConstructorOptions) {
 
 		// Prevent multiple instances
 		const isUnlocked = app.requestSingleInstanceLock();
@@ -33,7 +33,6 @@ export class Window {
 		// Create the window
 		this.win = new BrowserWindow({
 			icon: resolve(resources, "./assets/icon.png"),
-			show: false,
 			resizable: false,
 			title: "Ember VPN",
 			titleBarStyle: "hidden",
@@ -49,7 +48,8 @@ export class Window {
 				sandbox: false,
 				webviewTag: true
 			},
-			...options
+			...options,
+			show: false,
 		});
 
 		// Get a slug from the title
@@ -75,9 +75,6 @@ export class Window {
 			this.win.focus();
 		});
 
-		// and load the index.html of the app.
-		this.win.on("ready-to-show", this.win.show);
-
 		// Listen for titlebar events
 		this.win.on("maximize", () => this.win?.webContents.send("titlebar", "maximize"));
 		this.win.on("unmaximize", () => this.win?.webContents.send("titlebar", "restore"));
@@ -93,11 +90,11 @@ export class Window {
 
 	}
 
-	public is(win: BrowserWindow) {
+	public static is(win: BrowserWindow) {
 		return this.win?.id === win.id;
 	}
 
-	public get() {
+	public static get() {
 		return this.win;
 	}
 

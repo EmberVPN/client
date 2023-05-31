@@ -3,9 +3,10 @@ import { ChildProcess, spawn } from "child_process";
 import { BrowserWindow, ipcMain } from "electron";
 import { writeFile } from "fs/promises";
 import { resolve } from "path";
-import EmberVPN, { IPv4, Tray, resources } from "..";
+import { IPv4, Tray, resources } from "..";
 import { calculateDistance } from "../../calculateDistance";
 import { getBinary } from "../vpnutils";
+import { AuthMan } from "./AuthMan";
 
 export class OpenVPNManager {
 
@@ -22,7 +23,7 @@ export class OpenVPNManager {
 		Tray.refreshMenu();
 
 		// Ensure authorization is set
-		const auth = EmberVPN.getAuthorization();
+		const auth = AuthMan.getAuthorization();
 		if (!auth) throw new Error("Authorization not set");
 
 		// Download config
@@ -176,7 +177,7 @@ export class OpenVPNManager {
 	public async quickConnect() {
 
 		// Ensure authorization is set
-		const auth = EmberVPN.getAuthorization();
+		const auth = AuthMan.getAuthorization();
 		if (!auth) throw new Error("Authorization not set");
 		
 		BrowserWindow.getAllWindows()

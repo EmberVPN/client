@@ -7,6 +7,7 @@ import "./styles/index.less";
 import { useConfigKey } from "./util/hooks/useConfigKey";
 import { ConnectionProvider } from "./util/hooks/useConnection";
 import queryClient from "./util/queryClient";
+import { AuthorizeWindow } from "./windows/Authorize";
 import { MainWindow } from "./windows/Main";
 import { SettingsWindow } from "./windows/Settings";
 import { UpdateWindow } from "./windows/Update";
@@ -41,25 +42,27 @@ root.render(
 // Export the application
 export default function Application() {
 
+	// Theme provider from config
 	const [ theme ] = useConfigKey("theme");
 	useEffect(function() {
-		
 		if (theme === "DARK") return document.documentElement.classList.add("dark");
 		if (theme === "LIGHT") return document.documentElement.classList.remove("dark");
 		if (window.matchMedia("(prefers-color-scheme: dark)").matches) return document.documentElement.classList.add("dark");
 		document.documentElement.classList.remove("dark");
-
 	}, [ theme ]);
 
 	// If the URL contains the settings hash, show the settings window
-	switch (decodeURIComponent(window.location.hash.substring(1))) {
-	default: return <MainWindow />;
+	switch (decodeURIComponent(window.location.hash.substring(1)).split("-ember-vpn")[0]) {
+		default: return <MainWindow />;
 
 		// Check for updates window
-	case "check-for-updates-ember-vpn": return <UpdateWindow />;
+		case "check-for-updates": return <UpdateWindow />;
 		
 		// Settings window
-	case "settings-ember-vpn": return <SettingsWindow />;
+		case "settings": return <SettingsWindow />;
+		
+		// Sign in window
+		case "sign-in": return <AuthorizeWindow />;
 		
 	}
 

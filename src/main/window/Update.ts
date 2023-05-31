@@ -1,9 +1,17 @@
 import { app } from "electron";
 import { gt } from "semver";
-import { Window } from "./Window";
+import { Window } from "../class/Window";
 
-export default class UpdateManager extends Window {
+export class Update extends Window {
+	public static open() {
+		Update.win = this.createWindow({
+			title: "Check for Updates • Ember VPN",
+			height: 128,
+			width: 512,
+		});
+	}
 
+	// On init
 	constructor() {
 		super();
 
@@ -25,22 +33,10 @@ export default class UpdateManager extends Window {
 				if (!gt(latest, version)) return;
 
 				// await for main window to load
-				this.open();
-
+				app.once("ready", () => Update.open());
+				
 			});
-
-	}
-	
-	public open(): void {
-
-		// Create the window
-		this.win = this.createWindow({
-			title: "Check for Updates • Ember VPN",
-			resizable: false,
-			height: 128,
-			width: 512,
-		});
-
+			
 	}
 
 }

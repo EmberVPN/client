@@ -1,9 +1,8 @@
 import Spinner from "@ui-elements/Spinner";
 import { useEffect, useRef } from "react";
-import queryClient from "src/renderer/util/queryClient";
-import Titlebar from "./Titlebar";
+import Titlebar from "../components/Titlebar";
 
-export default function Authorize() {
+export function AuthorizeWindow() {
 
 	// Create a reference to the webview
 	const ref = useRef<HTMLWebViewElement>(null);
@@ -19,30 +18,20 @@ export default function Authorize() {
 		// Steel the authorization from the webview
 		async function authorize() {
 
-			const includes = webview.src.includes("/authorize/login");
-			await electron.ipcRenderer.invoke("window-size", 600, includes ? 370 : 506);
+			const wanted = webview.src.includes("/authorize/login") ? 370 : 506;
+			if (window.innerHeight !== wanted) await electron.ipcRenderer.invoke("window-size", 600, wanted);
 
 			// Wait for authorization to exist
 			const authorization: string = await webview.executeJavaScript("localStorage.getItem(\"authorization\");");
 			if (auth === authorization) return;
 			
-			// Set the user's authorization token
-			localStorage.setItem("authorization", authorization);
-
-			// Refetch with the new authorization
-			const [ user, servers ] = await Promise.all([
-				queryClient.fetchQuery<REST.APIResponse<Auth.User>>("user"),
-				queryClient.fetchQuery<REST.APIResponse<EmberAPI.Servers>>("/v2/ember/servers")
-			]);
-
-			// If we have the data, set it
-			if (user && user.success) queryClient.setQueryData("user", user);
-			if (servers && servers.success) queryClient.setQueryData("/v2/ember/servers", servers);
+			// Send the authorization to the main process
+			electron.ipcRenderer.send("authorization", authorization);
 
 		}
 
 		// This is easier then listening
-		const iv = setInterval(authorize, 100);
+		const iv = setInterval(authorize, 10);
 		return () => clearInterval(iv);
 
 	}, [ ref ]);
