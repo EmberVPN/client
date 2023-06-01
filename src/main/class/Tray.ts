@@ -1,48 +1,49 @@
-import { BrowserWindow, Menu, Notification, Tray, app, nativeImage } from "electron";
+import { BrowserWindow, Tray as ElectronTray, Menu, Notification, app, nativeImage } from "electron";
 import { resolve } from "path";
-import { OpenVPN, resources } from "..";
+import { resources } from "..";
 import { Main } from "../window/Main";
 import { Settings } from "../window/Settings";
 import { Update } from "../window/Update";
-import { AuthMan } from "./AuthMan";
+import { Auth } from "./Auth";
+import { OpenVPN } from "./OpenVPN";
 
-export class TrayManager {
+export class Tray {
 
 	// Initialize the actual tray
-	private tray?: Tray;
+	private static tray?: ElectronTray;
 
 	// Initialize the tray state
-	private _state: "connected" | "disconnected" | "connecting" = "disconnected";
+	private static _state: "connected" | "disconnected" | "connecting" = "disconnected";
 
-	get state() {
+	static get state() {
 		return this._state;
 	}
 
 	// Initialize the tray tooltip
-	private tooltip = "Ember VPN";
+	private static tooltip = "Ember VPN";
 
 	// Initialize the tray images
-	private imagesByState = {
+	private static imagesByState = {
 		"connected": "tray-connected",
 		"disconnected": "tray",
 		"connecting": "tray-pending"
 	} satisfies Record<typeof this._state, string>;
 
 	// Initialize the tray menu
-	private menu: Record<string, Electron.MenuItemConstructorOptions> = {};
+	private static menu: Record<string, Electron.MenuItemConstructorOptions> = {};
 
 	// Takes a name and optional size and returns a resized image for the tray
-	private resizeImage(name: string, size = 16) {
+	private static resizeImage(name: string, size = 16) {
 		return nativeImage.createFromPath(resolve(resources, `./assets/${ name }.png`)).resize({ width: size, height: size });
 	}
 
 	// Sets the tray menu
-	private setMenu(menu: Electron.MenuItemConstructorOptions[]) {
+	private static setMenu(menu: Electron.MenuItemConstructorOptions[]) {
 		this.tray?.setContextMenu(Menu.buildFromTemplate(menu));
 	}
 
 	// Pushes a menu item to the tray menu
-	private pushMenuItem(item: Electron.MenuItemConstructorOptions) {
+	private static pushMenuItem(item: Electron.MenuItemConstructorOptions) {
 
 		// Get the item label
 		const label = item.label || JSON.stringify(item);
@@ -56,13 +57,13 @@ export class TrayManager {
 	}
 
 	// Removes a menu item from the tray menu
-	private removeMenuItem(item: string | Electron.MenuItemConstructorOptions) {
+	private static removeMenuItem(item: string | Electron.MenuItemConstructorOptions) {
 		if (typeof item === "string") delete this.menu[item];
 		else delete this.menu[JSON.stringify(item)];
 		this.setMenu(Object.values(this.menu));
 	}
 
-	constructor() {
+	static {
 		
 		// Request single instance lock before the app init
 		const isUnlocked = app.requestSingleInstanceLock();
@@ -72,7 +73,7 @@ export class TrayManager {
 		else app.once("ready", async() => {
 
 			// Initialize the tray
-			this.tray = new Tray(this.resizeImage("tray"));
+			this.tray = new ElectronTray(this.resizeImage("tray"));
 
 			// Open the window when the tray is clicked
 			this.tray.on("click", function() {
@@ -93,12 +94,12 @@ export class TrayManager {
 		});
 	}
 
-	private setToolTip(tooltip?: string) {
+	private static setToolTip(tooltip?: string) {
 		this.tooltip = tooltip ? `Ember VPN • ${ tooltip }` : "Ember VPN";
 		this.tray?.setToolTip(this.tooltip);
 	}
 
-	public async refreshMenu() {
+	public static async refreshMenu() {
 
 		const label = [ "Ember VPN", `v${ app.getVersion() }` ].join(Array(8).fill(" ").join(""));
 
@@ -141,10 +142,10 @@ export class TrayManager {
 
 	}
 	
-	private async addMenuItems() {
+	private static async addMenuItems() {
 
 		// Check if we're authorized
-		const authorized = await AuthMan.isAuthorized();
+		const authorized = await Auth.isAuthorized();
 
 		// Add settings button
 		if (authorized) {
@@ -181,7 +182,7 @@ export class TrayManager {
 		});
 	}
 
-	public async setState(state: typeof this._state) {
+	public static async setState(state: typeof this._state) {
 
 		// Set the state
 		this._state = state;
@@ -197,7 +198,7 @@ export class TrayManager {
 
 	}
 
-	public notify(body: string, title = this.tooltip, icon = this.imagesByState[this._state]) {
+	public static notify(body: string, title = this.tooltip, icon = this.imagesByState[this._state]) {
 		new Notification({
 			body,
 			title,

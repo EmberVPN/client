@@ -94,6 +94,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 
 				setStatus("disconnected");
 				setActive(false);
+				return;
 
 			}
 
@@ -102,7 +103,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 			const server = Object.values(servers.servers).find(server => server.ip === data.ip);
 
 			// If we have a server, set the status to connected
-			if (server && ![ "will-connect", "disconnecting" ].includes(status) && data.ip === lastServerRef.current) {
+			if (server && ![ "will-connect", "disconnecting" ].includes(status)) {
 				setStatus("connected");
 				setActive(server.hash);
 				return;

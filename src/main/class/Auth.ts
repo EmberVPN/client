@@ -1,10 +1,11 @@
 import { BrowserWindow, ipcMain } from "electron";
-import { OpenVPN, Tray } from "..";
 import { Authorize } from "../window/Authorize";
 import { Main } from "../window/Main";
 import { Config } from "./Config";
+import { OpenVPN } from "./OpenVPN";
+import { Tray } from "./Tray";
 
-export class AuthMan {
+export class Auth {
 
 	// The current authorization token
 	private static authorization?: string = Config.get("authorization");
@@ -17,16 +18,16 @@ export class AuthMan {
 		ipcMain.on("authorization", async(_, authorization: string | null) => {
 			
 			// Ignore if the authorization token is the same
-			if (authorization === AuthMan.authorization) return;
+			if (authorization === Auth.authorization) return;
 			
 			// If were signing out, handle that
-			if (authorization === null) return await AuthMan.destroy();
+			if (authorization === null) return await Auth.destroy();
 
 			// Set authorization token
-			AuthMan.authorization = authorization;
+			Auth.authorization = authorization;
 
 			// Fetch user
-			await AuthMan.fetchUser();
+			await Auth.fetchUser();
 
 			// Refresh the tray menu
 			await Tray.refreshMenu();
@@ -36,8 +37,8 @@ export class AuthMan {
 
 	// Destroy the current authorization session
 	protected static async destroy() {
-		AuthMan.authorization = undefined;
-		AuthMan.user = undefined;
+		Auth.authorization = undefined;
+		Auth.user = undefined;
 
 		// Remove authorization token from config
 		Config.set("authorization", undefined);
@@ -54,7 +55,7 @@ export class AuthMan {
 	}
 
 	// Fetch user from authorization token
-	public static async fetchUser(token = AuthMan.authorization) {
+	public static async fetchUser(token = Auth.authorization) {
 
 		// Get authorization token
 		const authorization = token;
@@ -80,20 +81,20 @@ export class AuthMan {
 		}
 		
 		// Return the user
-		return AuthMan.user = resp.user;
+		return Auth.user = resp.user;
 
 	}
 
 	public static async isAuthorized() {
 		try {
-			return AuthMan.authorization !== undefined && ((AuthMan.user || await AuthMan.fetchUser())?.id || -1) > 0;
+			return Auth.authorization !== undefined && ((Auth.user || await Auth.fetchUser())?.id || -1) > 0;
 		} catch (e) {
 			return false;
 		}
 	}
 
 	public static getAuthorization() {
-		return AuthMan.authorization;
+		return Auth.authorization;
 	}
 
 }

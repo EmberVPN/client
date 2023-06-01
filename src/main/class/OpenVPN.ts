@@ -3,27 +3,29 @@ import { ChildProcess, spawn } from "child_process";
 import { BrowserWindow, ipcMain } from "electron";
 import { writeFile } from "fs/promises";
 import { resolve } from "path";
-import { IPv4, Tray, resources } from "..";
+import { resources } from "..";
 import { calculateDistance } from "../../calculateDistance";
 import { getBinary } from "../vpnutils";
-import { AuthMan } from "./AuthMan";
+import { Auth } from "./Auth";
+import { IPManager } from "./IPManager";
+import { Tray } from "./Tray";
 
-export class OpenVPNManager {
+export class OpenVPN {
 
-	private _isConnecting = false;
-	public isConnecting() {
+	private static _isConnecting = false;
+	public static isConnecting() {
 		return this._isConnecting;
 	}
 
-	private proc: ChildProcess | null = null;
-	private server: Ember.Server | null = null;
+	private static proc: ChildProcess | null = null;
+	private static server: Ember.Server | null = null;
 
-	public async downloadConfig(server: Ember.Server) {
+	public static async downloadConfig(server: Ember.Server) {
 		this._isConnecting = true;
 		await Tray.refreshMenu();
 
 		// Ensure authorization is set
-		const auth = AuthMan.getAuthorization();
+		const auth = Auth.getAuthorization();
 		if (!auth) throw new Error("Authorization not set");
 
 		// Download config
@@ -44,7 +46,7 @@ export class OpenVPNManager {
 
 	}
 
-	private async confirmConnection(server: Ember.Server) {
+	private static async confirmConnection(server: Ember.Server) {
 		this._isConnecting = false;
 		if (!this.proc) throw new Error("Process not started");
 		
@@ -71,8 +73,8 @@ export class OpenVPNManager {
 		});
 
 		// Await new geolocation
-		const newIp: string = await new Promise(resolve => IPv4.once("change", resolve));
-		const geo = await IPv4.fetchGeo(newIp);
+		const newIp: string = await new Promise(resolve => IPManager.once("change", resolve));
+		const geo = await IPManager.fetchGeo(newIp);
 
 		if (geo.ip !== server.ip) throw new Error("Failed to connect to server");
 		
@@ -84,7 +86,7 @@ export class OpenVPNManager {
 		
 	}
 	
-	constructor() {
+	static {
 		
 		// Listen for openvpn events
 		ipcMain.on("openvpn", async(_, state: string, json) => {
@@ -126,7 +128,7 @@ export class OpenVPNManager {
 	* Disconnect from the VPN
 	* @returns void
 	 */
-	public async disconnect(switching = false) {
+	public static async disconnect(switching = false) {
 
 		let notify = false;
 
@@ -146,14 +148,14 @@ export class OpenVPNManager {
 		await Tray.setState("connecting");
 
 		// Await new IP
-		IPv4.dropCache();
-		await new Promise(resolve => IPv4.once("change", resolve));
+		IPManager.dropCache();
+		await new Promise(resolve => IPManager.once("change", resolve));
 
 		// Set disconnected state
 		if (Tray.state !== "disconnected" || notify) Tray.notify("Disconnected from VPN", "Ember VPN • Disconnected", "tray");
 		Tray.setState("disconnected");
 
-		const newGeo = await IPv4.fetchGeo();
+		const newGeo = await IPManager.fetchGeo();
 
 		// Notify the UI that we are disconnecting
 		BrowserWindow.getAllWindows()
@@ -169,7 +171,7 @@ export class OpenVPNManager {
 	* @param server The server to connect to
 	* @returns void
 	*/
-	private async connect() {
+	private static async connect() {
 
 		// Ensure we have a server to connect to
 		if (!this.server) throw new Error("Server not set");
@@ -195,10 +197,10 @@ export class OpenVPNManager {
 		
 	}
 
-	public async quickConnect() {
+	public static async quickConnect() {
 
 		// Ensure authorization is set
-		const auth = AuthMan.getAuthorization();
+		const auth = Auth.getAuthorization();
 		if (!auth) throw new Error("Authorization not set");
 		
 		BrowserWindow.getAllWindows()
@@ -215,7 +217,7 @@ export class OpenVPNManager {
 		if (!servers || !servers.success) throw new Error("Failed to fetch servers");
 		
 		// Fetch geolocation
-		const geo = await IPv4.fetchGeo();
+		const geo = await IPManager.fetchGeo();
 
 		// Get the closest server
 		const server = this.server = Object.values(servers.servers)

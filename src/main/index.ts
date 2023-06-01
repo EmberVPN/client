@@ -1,21 +1,22 @@
 import { is } from "@electron-toolkit/utils";
 import { app } from "electron";
 import { resolve } from "path";
-import { AuthMan } from "./class/AuthMan";
+
+// Import state managers
+import { Auth } from "./class/Auth";
 import "./class/Config";
-import { IPManager } from "./class/IPManager";
-import { OpenVPNManager } from "./class/OpenVPNManager";
-import { TrayManager } from "./class/TrayManager";
+import "./class/IPManager";
+import "./class/OpenVPN";
+import "./class/Tray";
+
+// Handle events from the renderer
 import "./handlers";
+
+// Import windows
 import { Authorize } from "./window/Authorize";
 import { Main } from "./window/Main";
 import "./window/Settings";
 import "./window/Update";
-
-// Export app state managers
-export const Tray = new TrayManager;
-export const OpenVPN = new OpenVPNManager;
-export const IPv4 = new IPManager;
 
 // Get app resource path
 export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "../resources");
@@ -29,7 +30,7 @@ app.on("activate", () => Main.open());
 app.once("ready", async function() {
 
 	// Await for us to know if the user is authorized
-	const isAuth = await AuthMan.isAuthorized();
+	const isAuth = await Auth.isAuthorized();
 
 	// If the user is not authorized, open the login window
 	if (!isAuth) return Authorize.open();
