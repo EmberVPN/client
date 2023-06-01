@@ -169,16 +169,14 @@ export class OpenVPNManager {
 		// Ensure we have a server to connect to
 		if (!this.server) throw new Error("Server not set");
 		
+		// Get binary and config path
+		const binary = await getBinary();
+		const config = resolve(resources, "ember.ovpn");
+		
 		// Set connecting state
 		await Tray.setState("connecting");
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "connecting", this.server?.hash));
-		
-		// Get binary and config path
-		const binary = await getBinary();
-		const config = resolve(resources, "ember.ovpn");
-
-		console.log(binary);
 
 		// Check elevation status
 		const elevated = await admin.check();

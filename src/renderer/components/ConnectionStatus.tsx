@@ -21,8 +21,8 @@ export default function ConnectionStatus(): JSX.Element | null {
 		<div className="flex items-center justify-center h-12 gap-2 px-5 transition-colors border rounded-full border-warn/25 bg-warn/10">
 			<Spinner className="w-6 -ml-2 mr-0.5 !stroke-warn shrink-0" />
 			<div className="flex flex-col justify-center w-full pr-2 font-medium whitespace-nowrap">
-				<h1 className={ classNames("text-warn", (status === "will-connect" || status === "connecting") && "-mb-1") }>{status === "installing" ? "Updating" : status === "will-connect" ? "Pending" : status.includes("ing") ? status[0].toUpperCase() + status.substring(1) : "Loading"}</h1>
-				{(status === "will-connect" || status === "connecting") && <p className="text-xs">{status === "will-connect" ? "Generating keypair" : "Obtaining IP"}</p>}
+				<h1 className={ classNames("text-warn", (status === "will-connect" || status === "connecting" || status === "installing") && "-mb-1") }>{status === "installing" ? "Installing" : status === "will-connect" ? "Pending" : status.includes("ing") ? status[0].toUpperCase() + status.substring(1) : "Loading"}</h1>
+				{(status === "will-connect" || status === "connecting" || status === "installing") && <p className="text-xs">{status === "installing" ? "OpenVPN Core" : status === "will-connect" ? "Generating keypair" : "Obtaining IP"}</p>}
 			</div>
 		</div>
 	);
