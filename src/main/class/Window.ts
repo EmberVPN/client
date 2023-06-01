@@ -101,4 +101,8 @@ export class Window {
 		return this.win;
 	}
 
+	public close() {
+		this.win?.close();
+	}
+
 }
