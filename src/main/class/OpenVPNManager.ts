@@ -128,8 +128,13 @@ export class OpenVPNManager {
 	 */
 	public async disconnect(switching = false) {
 
+		let notify = false;
+
 		// Kill process
-		if (this.proc) this.proc.kill();
+		if (this.proc) {
+			this.proc.kill();
+			notify = true;
+		}
 		this.proc = null;
 		this._isConnecting = false;
 
@@ -145,7 +150,7 @@ export class OpenVPNManager {
 		await new Promise(resolve => IPv4.once("change", resolve));
 
 		// Set disconnected state
-		if (Tray.state !== "disconnected") Tray.notify("Disconnected from VPN", "Ember VPN • Disconnected", "tray");
+		if (Tray.state !== "disconnected" || notify) Tray.notify("Disconnected from VPN", "Ember VPN • Disconnected", "tray");
 		Tray.setState("disconnected");
 
 		const newGeo = await IPv4.fetchGeo();
