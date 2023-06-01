@@ -11,8 +11,9 @@ files:
   - "!{.env,.env.*,.npmrc,pnpm-lock.yaml}"
   - "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}"
 extraResources:
-  - ".bin/**/*"
   - "assets/**/*"
+
+# Windows build settings
 win:
   executableName: embervpn
   requestedExecutionLevel: "requireAdministrator"
