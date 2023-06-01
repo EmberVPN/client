@@ -5,9 +5,6 @@ import { writeFile } from "fs/promises";
 import os from "os";
 import { dirname, resolve } from "path";
 
-// Install OpenVPN using the bundled installer
-export const BUNDLED_WIN32_INSTALLER = "OpenVPN-2.6.4-I001-amd64.msi";
-
 // Promisify sudo-prompt & exec
 // const sudo = (cmd: string) => new Promise<string | Buffer | undefined>((resolve, reject) => sudoPrompt.exec(cmd, { name: "Ember VPN" }, (error, stdout) => error ? reject(error) : resolve(stdout)));
 const exec = (cmd: string) => new Promise<string | Buffer | undefined>((resolve, reject) => child_process.exec(cmd, (error, stdout) => error ? reject(error) : resolve(stdout)));
