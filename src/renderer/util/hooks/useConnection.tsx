@@ -8,6 +8,7 @@ type State =| "connected"
 			| "reconnecting"
 			| "disconnecting"
 			| "error"
+			| "installing"
 			| "will-connect";
 
 interface GeoLocation {
@@ -52,15 +53,16 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 		electron.ipcRenderer.on("openvpn", (_event, state: string, hash?: string, message?: string) => {
 			if (hash) lastServerRef.current = hash;
 			switch (state) {
+
 				case "log":
 					console.log(JSON.parse(message || "{}"));
 					break;
+				
 				case "error":
 					toast.error(message);
 				case "disconnected":
 					setStatus("disconnected");
 					setActive(false);
-				
 					break;
 					
 				case "connected":
@@ -69,6 +71,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 				case "connecting":
 					setActive(hash || false);
 				case "disconnecting":
+				case "installing":
 					setStatus(state);
 					break;
 				

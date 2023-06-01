@@ -1,5 +1,6 @@
 import admin from "admin-check";
 import child_process from "child_process";
+import { BrowserWindow } from "electron";
 import { existsSync } from "fs";
 import { resolve } from "path";
 import sudoPrompt from "sudo-prompt";
@@ -33,6 +34,10 @@ export async function getBinary(): Promise<string> {
 		const bundledLocation = resolve(resources, ".bin/bin/openvpn.exe");
 		if (existsSync(bundledLocation)) return bundledLocation;
 
+		// Set state to installing
+		BrowserWindow.getAllWindows()
+			.map(win => win.webContents.send("openvpn", "installing"));
+
 		// Check elevation status
 		const elevated = await admin.check();
 
@@ -45,7 +50,7 @@ export async function getBinary(): Promise<string> {
 		// If we are elevated, run the command
 		else await exec(cmd);
 
-		// // Return bundled location
+		// Return bundled location
 		return await getBinary();
 
 	}
