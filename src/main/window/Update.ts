@@ -15,6 +15,27 @@ class $Update extends Window {
 	constructor() {
 		super();
 
+		// Check for updates when a new window is created
+		app.once("browser-window-created", () => this.checkForUpdates());
+
+		// Check for updates every hour
+		setInterval(() => this.checkForUpdates(), 1000 * 60 * 60);
+		
+		// Listen for update events
+		ipcMain.on("update", async(_event, data: string[]) => {
+			
+			if (data.includes("openvpn")) await install();
+			if (data.includes("embervpn")) await update();
+
+			// Send update complete event
+			BrowserWindow.getAllWindows()
+				.map(win => win.webContents.send("update-finished"));
+		});
+			
+	}
+
+	public async checkForUpdates() {
+
 		// Get current version
 		const version = app.getVersion();
 		
@@ -33,21 +54,10 @@ class $Update extends Window {
 				if (!gt(latest, version)) return;
 
 				// await for main window to load
-				app.once("browser-window-created", () => setTimeout(() => this.open(), 1000));
+				this.open();
 				
 			});
 		
-		// Listen for update events
-		ipcMain.on("update", async(_event, data: string[]) => {
-			
-			if (data.includes("openvpn")) await install();
-			if (data.includes("embervpn")) await update();
-
-			// Send update complete event
-			BrowserWindow.getAllWindows()
-				.map(win => win.webContents.send("update-finished"));
-		});
-			
 	}
 
 }
