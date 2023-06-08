@@ -44,7 +44,7 @@ export function UpdateWindow(): JSX.Element {
 		);
 
 		// Get the latest version
-		const latest = data.version.substring(1) + 0;
+		const latest = data.version.substring(1);
 		const isLatest = latest === version || gt(version, latest);
 
 		// Get the latest OpenVPN version
