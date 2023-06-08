@@ -19,7 +19,7 @@ class $Update extends Window {
 		app.once("browser-window-created", () => this.checkForUpdates());
 
 		// Check for updates every hour
-		setInterval(() => this.checkForUpdates(), 1000 * 60 * 60);
+		setInterval(() => this.checkForUpdates(), 1000 * 60 * 60 * 24);
 		
 		// Listen for update events
 		ipcMain.on("update", async(_event, data: string[]) => {
