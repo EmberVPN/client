@@ -116,7 +116,7 @@ export function UpdateWindow(): JSX.Element {
 
 				{/* Update button */}
 				<div className="flex justify-end w-full gap-4 p-2 mt-4">
-					<Button className={ classNames(outdated.length === 0 && "hidden") }
+					<Button className={ classNames(outdated.length === 0 && "opacity-0 pointer-events-none") }
 						color="warn"
 						loading={ loading }
 						onClick={ update }
