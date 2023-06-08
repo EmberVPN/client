@@ -31,11 +31,10 @@ export async function update() {
 			.then(buf => writeFile(join(app.getPath("sessionData"), binary.name), Buffer.from(buf)))
 			.then(() => join(app.getPath("sessionData"), binary.name));
 		
-		console.log(installer);
-		
 		// Run the installer
 		await new Promise<void>((resolve, reject) => {
-			exec(installer)
+			if (!useExe) setTimeout(() => app.quit(), 1000);
+			exec([ installer ].join(" "))
 				.on("error", reject)
 				.on("close", resolve);
 		});
