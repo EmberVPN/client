@@ -1,11 +1,8 @@
-import { BrowserWindow, app, ipcMain, shell } from "electron";
+import { BrowserWindow, app, ipcMain } from "electron";
 import { gt } from "semver";
 import { Window } from "../class/Window";
+import { update } from "../updater";
 import { install } from "../vpnutils";
-
-function update() {
-	shell.openExternal("https://embervpn.org/downloads");
-}
 
 class $Update extends Window {
 	public open() {
