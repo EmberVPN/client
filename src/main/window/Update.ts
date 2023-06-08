@@ -1,13 +1,16 @@
-import { app } from "electron";
+import { BrowserWindow, app, ipcMain, shell } from "electron";
 import { gt } from "semver";
 import { Window } from "../class/Window";
+import { install } from "../vpnutils";
+
+function update() {
+	shell.openExternal("https://embervpn.org/downloads");
+}
 
 class $Update extends Window {
 	public open() {
 		this.createWindow({
-			title: "Check for Updates • Ember VPN",
-			height: 128,
-			width: 512,
+			title: "Check for Updates • Ember VPN"
 		});
 	}
 
@@ -36,6 +39,17 @@ class $Update extends Window {
 				app.once("ready", () => this.open());
 				
 			});
+		
+		// Listen for update events
+		ipcMain.on("update", async(_event, data: string[]) => {
+			
+			if (data.includes("openvpn")) await install();
+			if (data.includes("embervpn")) await update();
+
+			// Send update complete event
+			BrowserWindow.getAllWindows()
+				.map(win => win.webContents.send("update-finished"));
+		});
 			
 	}
 

@@ -1,87 +1,139 @@
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Button from "@ui-elements/Button";
 import Spinner from "@ui-elements/Spinner";
-import { useEffect } from "react";
+import classNames from "classnames";
+import { useState } from "react";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import { MdBrowserUpdated } from "react-icons/md";
+import { MdBrowserUpdated, MdErrorOutline } from "react-icons/md";
 import { gt } from "semver";
 import Titlebar from "../components/Titlebar";
 import useData from "../util/hooks/useData";
+import { usePromise } from "../util/hooks/usePromise";
 
 export function UpdateWindow(): JSX.Element {
+
+	// Use auto animate
+	const [ ref ] = useAutoAnimate();
+	const [ loading, setLoading ] = useState(false);
 	
 	// Render the content
 	function Content() {
 
 		// Fetch the downloads
 		const { data } = useData("/v2/ember/downloads");
+		const ovpnVersion = usePromise(electron.ipcRenderer.invoke("openvpn", "version"));
 	
-		// On mount, set the window size
-		useEffect(function() {
-			electron.ipcRenderer.invoke("window-size", 512, 128, false);
-			
-			// Get the latest version
-			if (!data || !data.success) return;
-			const latest = data.version.substring(1);
-			const isLatest = latest === version || gt(version, latest);
-
-			electron.ipcRenderer.invoke("window-size", 512, isLatest ? 128 : 240);
-
-		}, [ data ]);
-
 		// Show the loading spinner if there is no data
-		if (!data || !data.success) return (
-			<div className="flex items-center w-full gap-8">
+		if (!data || !ovpnVersion) return (
+			<div className="flex items-center justify-center w-full"
+				key="spinner">
 				<Spinner />
-				<div className="grow">
-					<h1 className="font-medium">Checking for updates...</h1>
+			</div>
+		);
+
+		// If failed, show the error message
+		if (!data.success) return (
+			<div className="flex flex-col items-center justify-center w-full grow"
+				key="error">
+				<div className="flex flex-col items-center gap-2 px-4 m-auto">
+					<MdErrorOutline className="text-6xl shrink-0 text-error" />
+					<h1 className="text-2xl font-medium">Failed to check for updates</h1>
+					<p className="mb-2 text-sm font-medium dark:font-normal opacity-60">{ data.readable ?? data.description ?? data.error ?? "We were unable to check for updates. Please try again later."}</p>
 				</div>
 			</div>
 		);
 
 		// Get the latest version
-		const latest = data.version.substring(1);
-		
-		// Get some boolean values
-		const isLatest = latest === version;
-		const isPreview = gt(version, latest);
-		
-		if (isLatest || isPreview) return (
-			<div className="flex flex-col w-full gap-2 select-none">
-				<div className="flex items-center gap-4">
-					<IoMdCheckmarkCircleOutline className="text-2xl shrink-0 text-success" />
-					<h1 className="font-medium">You&apos;re already up to date</h1>
-				</div>
-				<p className="text-sm text-gray-600 grow dark:text-gray-400">You&apos;re running Ember <code className="font-mono bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded-md">v{ version }</code> which is {isLatest ? "the" : "newer then the"} latest version.</p>
-			</div>
-		);
+		const latest = data.version.substring(1) + 0;
+		const isLatest = latest === version || gt(version, latest);
 
+		// Get the latest OpenVPN version
+		const ovpnLatest = data.openvpn.substring(1);
+		const isOvpnLatest = ovpnLatest === ovpnVersion || gt(ovpnVersion, ovpnLatest);
+
+		// Get the versions to display
+		const versions = [ {
+			name: "Ember VPN",
+			version: latest,
+			isLatest,
+		}, {
+			name: "OpenVPN Core",
+			subtitle: "Required by Ember VPN",
+			isLatest: isOvpnLatest,
+			version: ovpnLatest
+		} ];
+
+		const outdated: string[] = [];
+		if (!isLatest) outdated.push("embervpn");
+		if (!isOvpnLatest) outdated.push("openvpn");
+
+		// Update the application
+		async function update() {
+			setLoading(true);
+			electron.ipcRenderer.send("update", outdated);
+
+			// Wait for the update to finish
+			await new Promise(resolve => electron.ipcRenderer.once("update-finished", resolve));
+			setLoading(false);
+
+		}
+
+		// If the version is the latest, show the message
 		return (
-			<div className="flex flex-col w-full gap-2 select-none">
-				<div className="flex items-center gap-4">
-					<MdBrowserUpdated className="text-2xl shrink-0 text-warn" />
-					<h1 className="font-medium">Update available</h1>
+			<div className="flex flex-col items-center justify-around w-full grow"
+				key="result">
+				<div className="flex flex-col items-center gap-2 px-4 m-auto">
+					
+					{/* Update status */}
+					<MdBrowserUpdated className={ classNames("text-6xl shrink-0", outdated.length === 0 ? "text-success" : "text-warn") } />
+					<h1 className="text-2xl font-medium">{outdated.length === 0 ? "You're' up to date" : "Update found"}</h1>
+					<p className="mb-2 text-sm font-medium dark:font-normal opacity-60">
+						{outdated.length === 0 ? "You're running the latest version of Ember VPN." : "Updates found. Updating"}
+					</p>
 				</div>
-				<div className="flex flex-col gap-2 text-sm text-gray-600 grow dark:text-gray-400">
-					<p>A newer version of Ember is available. You&apos;re running <code className="font-mono bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded-md">v{version}</code> and the latest version is <code className="font-mono bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded-md">v{latest}</code>.</p>
-					<p>Keeping Ember up to date is important for security and stability.</p>
+					
+				{/* Dependencies */}
+				<ul className="w-full max-w-xs divide-y divide-gray-200 dark:divide-gray-700/50">
+					{versions.map((item, key) => (
+						<li className="flex items-center h-12 gap-2"
+							key={ key }>
+								
+							{/* Dependency icon */}
+							{ item.isLatest ? <IoMdCheckmarkCircleOutline className="text-2xl text-success shrink-0" /> : <MdErrorOutline className="text-2xl text-warn shrink-0" />}
+								
+							{/* Dependency name */}
+							<div className="flex flex-col">
+								<strong>{item.name}</strong>
+								{item.subtitle && <span className="-mt-1 text-xs font-medium text-gray-500 dark:text-gray-400">{item.subtitle}</span>}
+							</div>
+
+							{/* Dependency version */}
+							<code className={ classNames("px-1.5 py-0.5 ml-auto font-mono text-sm rounded-md border", item.isLatest ? "text-gray-600 bg-gray-200 dark:text-gray-400 dark:bg-gray-800/50 border-gray/10" : "text-warn-800 dark:text-warn-300 border-warn-700/50 dark:border-warn-400/50 bg-warn/10") }>v{item.version}</code>
+								
+						</li>
+					))}
+				</ul>
+
+				{/* Update button */}
+				<div className="flex justify-end w-full gap-4 p-2 mt-4">
+					<Button className={ classNames(outdated.length === 0 && "hidden") }
+						color="warn"
+						loading={ loading }
+						onClick={ update }
+						variant="outlined">install update</Button>
 				</div>
-				<div className="flex items-center justify-end p-4 mt-2 -mx-8 -mb-4 border-t border-gray-200 dark:border-gray-700/50">
-					<a href="https://www.embervpn.org/downloads/"
-						rel="noreferrer"
-						target="_blank">
-						<Button>Download</Button>
-					</a>
-				</div>
+				
 			</div>
 		);
 
 	}
 
 	return (
-		<div className="flex flex-col w-screen h-screen overflow-hidden bg-gray-100 dark:bg-gray-850">
+		<div className="flex flex-col w-screen h-screen overflow-hidden bg-gray-100 dark:bg-gray-900">
 			<Titlebar minimizeable={ false }
 				resizeable={ false }>Check for Updates</Titlebar>
-			<div className="flex gap-2 px-8 py-4 select-none grow">
+			<div className="flex justify-center gap-2 px-4 py-4 select-none grow"
+				ref={ ref }>
 				<Content />
 			</div>
 		</div>

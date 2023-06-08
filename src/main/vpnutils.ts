@@ -34,6 +34,24 @@ export async function getBinary(): Promise<string> {
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "installing"));
 			
+		// Install OpenVPN
+		await install();
+
+		// Return bundled location
+		return await getBinary();
+
+	}
+	
+	// Throw an error if the platform is not supported *yet*
+	throw new Error("Unsupported platform");
+
+}
+
+export async function install() {
+
+	// Check platform
+	if (process.platform === "win32") {
+
 		// Get architecture
 		const arch = [ "arm64", "ppc64", "x64", "s390x" ].includes(os.arch()) ? "amd64" : "x86";
 		
@@ -47,12 +65,10 @@ export async function getBinary(): Promise<string> {
 
 		// Install openvpn
 		await exec(`msiexec /i "${ SAVE_PATH }" PRODUCTDIR="${ dirname(app.getPath("exe")) }" ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun /passive`);
-
-		// Return bundled location
-		return await getBinary();
+		return;
 
 	}
-	
+
 	// Throw an error if the platform is not supported *yet*
 	throw new Error("Unsupported platform");
 

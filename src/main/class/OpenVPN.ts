@@ -122,6 +122,12 @@ export class OpenVPN {
 				
 		});
 
+		// Handle openvpn version request
+		ipcMain.handle("openvpn", async(_, mode: string) => {
+			if (mode !== "version") return;
+			return await this.getVersion();
+		});
+
 	}
 
 	/**
@@ -241,6 +247,24 @@ export class OpenVPN {
 				this.disconnect();
 			});
 
+	}
+
+	private static _version: string | null = null;
+	public static async getVersion(): Promise<string> {
+		if (this._version) return this._version;
+		const binary = await getBinary();
+		return this._version = await new Promise<string>(resolve => {
+
+			// Spawn openvpn process (should be the same for all platforms)
+			const proc = spawn(binary, [ "--version" ], { detached: true });
+			
+			// Listen for data
+			proc.stdout.on("data", data => {
+				const version = data.toString().split("\n")[0].split(" ")[1];
+				resolve(version);
+			});
+
+		});
 	}
 
 }

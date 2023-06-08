@@ -13,6 +13,7 @@ body {
 	font-family: 'Roboto', sans-serif;
 }
 
+// Electron window controls
 .app-drag {
 	-webkit-app-region: drag;
 	.no-drag {
@@ -20,16 +21,19 @@ body {
 	}
 }
 
+// Prevent dragging images
+img { -webkit-user-drag: none }
+
 .container {
 	@apply max-w-7xl mx-auto w-full px-4 flex flex-col gap-8 py-4 lg:gap-12 xl:gap-16;
 }
 
-img {
-  	-webkit-user-drag: none;
-}
-
 .font-system {
 	font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.font-mono {
+	font-family: 'Roboto Mono', monospace;
 }
 
 .font-manrope {
