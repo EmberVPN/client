@@ -1,5 +1,5 @@
 import { BrowserWindow, app, ipcMain } from "electron";
-import { AuthMan } from "../class/AuthMan";
+import { Auth } from "../class/Auth";
 import { Window } from "../class/Window";
 
 class $Settings extends Window {
@@ -23,7 +23,7 @@ class $Settings extends Window {
 					.on("before-input-event", async(event, input) => {
 
 						// Make sure the user is authorized
-						if (!await AuthMan.isAuthorized()) return;
+						if (!await Auth.isAuthorized()) return;
 
 						// Make sure the user is pressing control and comma
 						if (!input.control || input.key !== ",") return;

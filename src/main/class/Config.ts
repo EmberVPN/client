@@ -1,4 +1,3 @@
-import { is } from "@electron-toolkit/utils";
 import electron, { ipcMain } from "electron";
 import Store from "electron-store";
 
@@ -7,7 +6,7 @@ export class Config {
 	private static store = new Store({
 		accessPropertiesByDotNotation: false,
 		clearInvalidConfig: true,
-		encryptionKey: is.dev ? undefined : "embervpn"
+		encryptionKey: "embervpn"
 	});
 	
 	// Listen for config events

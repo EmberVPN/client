@@ -8,16 +8,17 @@ export interface IpGeo {
 	longitude: number;
 }
 
-export class IPManager extends EventEmitter {
+export class IPManager {
 
-	private lastIP = "";
-	private geoCache: Record<string, IpGeo> = {};
+	private static lastIP = "";
+	private static geoCache: Record<string, IpGeo> = {};
+	private static emitter = new EventEmitter();
 
 	/**
 	 * Fetch the IP address
 	 * @returns string
 	 */
-	public async fetchAddress() {
+	public static async fetchAddress() {
 
 		// Abort if IP times out
 		const controller = new AbortController();
@@ -53,11 +54,11 @@ export class IPManager extends EventEmitter {
 		
 	}
 
-	public dropCache() {
+	public static dropCache() {
 		this.lastIP = "";
 	}
 
-	public async fetchGeo(ip = this.lastIP): Promise<IpGeo> {
+	public static async fetchGeo(ip = this.lastIP): Promise<IpGeo> {
 		
 		const controller = new AbortController();
 		const id = setTimeout(() => controller.abort(), 1000);
@@ -85,8 +86,7 @@ export class IPManager extends EventEmitter {
 		
 	}
 	
-	constructor() {
-		super();
+	static {
 
 		// Fetch IP address every second and emit event if it changes
 		setInterval(async() => {
@@ -95,7 +95,7 @@ export class IPManager extends EventEmitter {
 			// Observe IP changes
 			if (ip !== this.lastIP) {
 				this.lastIP = ip;
-				this.emit("change", ip);
+				this.emitter.emit("change", ip);
 				await this.fetchGeo();
 			}
 				
@@ -110,6 +110,14 @@ export class IPManager extends EventEmitter {
 				.map(win => win.webContents.send("iplocation", JSON.stringify(this.geoCache[this.lastIP])));
 		}, 50);
 
+	}
+
+	public static on(event: "change", listener: (ip: string) => void) {
+		this.emitter.on(event, listener);
+	}
+
+	public static once(event: "change", listener: (ip: string) => void) {
+		this.emitter.once(event, listener);
 	}
 
 }
