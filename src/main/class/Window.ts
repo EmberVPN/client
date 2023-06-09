@@ -5,15 +5,17 @@ import { resources } from "..";
 
 export class Window {
 
-	// The window
+	/**
+	 * The window instance
+	 */
 	protected static instance: BrowserWindow | undefined;
 
 	/**
-	 * Create a new window but prevent multiple instances
+	 * Configure the window
 	 * @param options BrowserWindowConstructorOptions
 	 * @returns BrowserWindow
 	 */
-	public static createWindow(options?: Electron.BrowserWindowConstructorOptions & { immediate?: boolean }) {
+	protected static configure(options?: Electron.BrowserWindowConstructorOptions & { delayed?: boolean }) {
 
 		// Prevent multiple instances
 		const isUnlocked = app.requestSingleInstanceLock();
@@ -76,7 +78,7 @@ export class Window {
 		});
 		
 		// Show when ready
-		this.instance.once("ready-to-show", () => setTimeout(() => this.instance?.show(), options?.immediate ? 50 : 500));
+		this.instance.once("ready-to-show", () => setTimeout(() => this.instance?.show(), options?.delayed ? 500 : 50));
 
 		// Listen for titlebar events
 		this.instance.on("maximize", () => this.instance?.webContents.send("titlebar", "maximize"));
@@ -93,14 +95,26 @@ export class Window {
 
 	}
 
+	/**
+	 * Check if the window is the current window
+	 * @param win BrowserWindow
+	 * @returns boolean
+	 */
 	public static is(win: BrowserWindow) {
 		return this.instance?.id === win.id;
 	}
 
+	/**
+	 * Get the current window
+	 * @returns BrowserWindow
+	 */
 	public static get() {
 		return this.instance;
 	}
 
+	/**
+	 * Close the current window
+	 */
 	public static close() {
 		this.instance?.close();
 	}

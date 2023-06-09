@@ -2,18 +2,18 @@ import { ipcMain } from "electron";
 import { Window } from "../class/Window";
 
 export class Settings extends Window {
-	
-	public static open() {
-		this.createWindow({
-			title: "Settings • Ember VPN",
-			immediate: true,
+
+	// Attach event listeners
+	static {
+		ipcMain.on("open", (_event, state: string) => {
+			if (state === "settings") this.open();
 		});
 	}
 
-	static {
-
-		// Observe for menu click
-		ipcMain.on("open-settings", () => this.open());
-
+	// Open the window
+	public static open() {
+		this.configure({
+			title: "Settings • Ember VPN"
+		});
 	}
 }
