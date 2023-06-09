@@ -101,14 +101,12 @@ export class Tray {
 
 	public static async refreshMenu() {
 
-		const label = [ "Ember VPN", `v${ app.getVersion() }` ].join(Array(8).fill(" ").join(""));
-
 		// Reset the tray menu
 		this.removeMenuItem("Disconnect");
 		this.removeMenuItem("Quick Connect");
 		this.removeMenuItem("Settings");
 		this.removeMenuItem("settings-sep");
-		this.removeMenuItem(label);
+		this.removeMenuItem("Ember VPN");
 		this.removeMenuItem("title-sep");
 		this.removeMenuItem("Exit");
 		this.removeMenuItem("Check for Updates");
@@ -118,6 +116,7 @@ export class Tray {
 		this.pushMenuItem({
 			label: "Exit",
 			role: "quit",
+			accelerator: "Alt+F4",
 			click: () => process.exit()
 		});
 
@@ -135,7 +134,8 @@ export class Tray {
 
 		// Add the tray title
 		this.pushMenuItem({
-			label,
+			label: "Ember VPN",
+			accelerator: `v${ app.getVersion() }`,
 			enabled: false,
 			icon: this.resizeImage("icon", 16),
 		});
@@ -152,7 +152,7 @@ export class Tray {
 			this.pushMenuItem({
 				label: "Settings",
 				click: () => Settings.open(),
-				
+				accelerator: "CmdOrCtrl+,"
 			});
 		}
 

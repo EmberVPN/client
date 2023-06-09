@@ -6,6 +6,7 @@ import { resolve } from "path";
 import { Auth } from "./class/Auth";
 import "./class/Config";
 import "./class/IPManager";
+import "./class/KeybindManager";
 import "./class/OpenVPN";
 import "./class/Tray";
 
