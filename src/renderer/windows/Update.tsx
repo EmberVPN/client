@@ -54,7 +54,7 @@ export function UpdateWindow(): JSX.Element {
 		// Get the versions to display
 		const versions = [ {
 			name: "Ember VPN",
-			version: latest,
+			version,
 			isLatest,
 		}, {
 			name: "OpenVPN Core",
