@@ -33,7 +33,7 @@ export async function update() {
 		
 		// Run the installer
 		await new Promise<void>((resolve, reject) => {
-			if (!useExe) setTimeout(() => app.quit(), 1000);
+			setTimeout(() => app.quit(), 1000);
 			exec([ installer ].join(" "))
 				.on("error", reject)
 				.on("close", resolve);
