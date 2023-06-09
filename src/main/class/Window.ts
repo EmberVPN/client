@@ -5,33 +5,35 @@ import { resources } from "..";
 
 export class Window {
 
-	// The window
-	protected win: BrowserWindow | undefined;
+	/**
+	 * The window instance
+	 */
+	protected static instance: BrowserWindow | undefined;
 
 	/**
-	 * Create a new window but prevent multiple instances
+	 * Configure the window
 	 * @param options BrowserWindowConstructorOptions
 	 * @returns BrowserWindow
 	 */
-	public createWindow(options?: Electron.BrowserWindowConstructorOptions & { immediate?: boolean }) {
+	protected static configure(options?: Electron.BrowserWindowConstructorOptions & { delayed?: boolean }) {
 
 		// Prevent multiple instances
 		const isUnlocked = app.requestSingleInstanceLock();
-		if (!isUnlocked && this.win && !this.win.isDestroyed()) {
-			this.win.show();
-			this.win.focus();
-			return this.win;
+		if (!isUnlocked && this.instance && !this.instance.isDestroyed()) {
+			this.instance.show();
+			this.instance.focus();
+			return this.instance;
 		}
 
 		// Prevent multiple instances
-		if (this.win && !this.win.isDestroyed()) {
-			this.win.show();
-			this.win.focus();
-			return this.win;
+		if (this.instance && !this.instance.isDestroyed()) {
+			this.instance.show();
+			this.instance.focus();
+			return this.instance;
 		}
 
 		// Create the window
-		this.win = new BrowserWindow({
+		this.instance = new BrowserWindow({
 			icon: resolve(resources, "./assets/icon.png"),
 			resizable: false,
 			title: "Ember VPN",
@@ -53,56 +55,68 @@ export class Window {
 		});
 
 		// Get a slug from the title
-		const hash = this.win.title
+		const hash = this.instance.title
 			.toLowerCase()
 			.replace(/[^a-z0-9]/g, "-")
 			.replace(/-+/g, "-")
 			.replace(/^-|-$/g, "");
 
 		// In development load the react app
-		if (is.dev && process.env["ELECTRON_RENDERER_URL"]) this.win.loadURL([
+		if (is.dev && process.env["ELECTRON_RENDERER_URL"]) this.instance.loadURL([
 			process.env["ELECTRON_RENDERER_URL"],
 			hash
 		].join("#"));
 
 		// Otherwise load the index.html file
-		else this.win.loadFile(resolve(__dirname, "../renderer/index.html"), { hash });
+		else this.instance.loadFile(resolve(__dirname, "../renderer/index.html"), { hash });
 
 		// Prevent the window from being opened multiple times
 		app.on("second-instance", () => {
-			if (!this.win) return;
-			this.win.show();
-			this.win.focus();
+			if (!this.instance) return;
+			this.instance.show();
+			this.instance.focus();
 		});
 		
 		// Show when ready
-		this.win.once("ready-to-show", () => setTimeout(() => this.win?.show(), options?.immediate ? 50 : 500));
+		this.instance.once("ready-to-show", () => setTimeout(() => this.instance?.show(), options?.delayed ? 500 : 50));
 
 		// Listen for titlebar events
-		this.win.on("maximize", () => this.win?.webContents.send("titlebar", "maximize"));
-		this.win.on("unmaximize", () => this.win?.webContents.send("titlebar", "restore"));
+		this.instance.on("maximize", () => this.instance?.webContents.send("titlebar", "maximize"));
+		this.instance.on("unmaximize", () => this.instance?.webContents.send("titlebar", "restore"));
 
 		// Open links in external browser
-		this.win.webContents.setWindowOpenHandler(details => {
+		this.instance.webContents.setWindowOpenHandler(details => {
 			shell.openExternal(details.url);
 			return { action: "deny" };
 		});
 
 		// Return the window
-		return this.win;
+		return this.instance;
 
 	}
 
-	public is(win: BrowserWindow) {
-		return this.win?.id === win.id;
+	/**
+	 * Check if the window is the current window
+	 * @param win BrowserWindow
+	 * @returns boolean
+	 */
+	public static is(win: BrowserWindow) {
+		return this.instance?.id === win.id;
 	}
 
-	public get() {
-		return this.win;
+	/**
+	 * Get the current window
+	 * @returns BrowserWindow
+	 */
+	public static get() {
+		return this.instance;
 	}
 
-	public close() {
-		this.win?.close();
+	/**
+	 * Close the current window
+	 */
+	public static close() {
+		this.instance?.close();
 	}
 
 }

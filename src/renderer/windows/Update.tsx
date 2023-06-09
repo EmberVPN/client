@@ -14,12 +14,12 @@ export function UpdateWindow(): JSX.Element {
 
 	// Use auto animate
 	const [ ref ] = useAutoAnimate();
-	const [ loading, setLoading ] = useState(false);
 	
 	// Render the content
 	function Content() {
-
+		
 		// Fetch the downloads
+		const [ loading, setLoading ] = useState(false);
 		const { data } = useData("/v2/ember/downloads");
 		const ovpnVersion = usePromise(electron.ipcRenderer.invoke("openvpn", "version"));
 	
@@ -54,7 +54,7 @@ export function UpdateWindow(): JSX.Element {
 		// Get the versions to display
 		const versions = [ {
 			name: "Ember VPN",
-			version: latest,
+			version,
 			isLatest,
 		}, {
 			name: "OpenVPN Core",
@@ -71,11 +71,8 @@ export function UpdateWindow(): JSX.Element {
 		async function update() {
 			setLoading(true);
 			electron.ipcRenderer.send("update", outdated);
-
-			// Wait for the update to finish
 			await new Promise(resolve => electron.ipcRenderer.once("update-finished", resolve));
 			setLoading(false);
-
 		}
 
 		// If the version is the latest, show the message
@@ -85,7 +82,7 @@ export function UpdateWindow(): JSX.Element {
 				<div className="flex flex-col items-center gap-2 px-4 m-auto">
 					
 					{/* Update status */}
-					<MdBrowserUpdated className={ classNames("text-6xl shrink-0", outdated.length === 0 ? "text-success" : "text-warn") } />
+					<MdBrowserUpdated className={ classNames("text-6xl shrink-0 mt-10", outdated.length === 0 ? "text-success" : "text-warn") } />
 					<h1 className="text-2xl font-medium">{outdated.length === 0 ? "You're' up to date" : "Update found"}</h1>
 					<p className="mb-2 text-sm font-medium text-center dark:font-normal opacity-60">
 						{outdated.length === 0 ? "You're running the latest version of Ember VPN." : "Stay up to date with the latest features and enhancements by updating your EmberVPN client now." }
@@ -116,6 +113,11 @@ export function UpdateWindow(): JSX.Element {
 
 				{/* Update button */}
 				<div className="flex justify-end w-full gap-4 p-2 mt-4">
+					<Button className={ classNames(outdated.length === 0 && "opacity-0 pointer-events-none") }
+						color="gray"
+						disabled={ loading }
+						onClick={ () => electron.ipcRenderer.send("update", []) }
+						variant="outlined">maybe later</Button>
 					<Button className={ classNames(outdated.length === 0 && "opacity-0 pointer-events-none") }
 						color="warn"
 						loading={ loading }

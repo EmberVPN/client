@@ -1,28 +1,27 @@
 import { BrowserWindow, app, ipcMain } from "electron";
 import { gt } from "semver";
+import { Auth } from "../class/Auth";
+import { Config } from "../class/Config";
 import { Window } from "../class/Window";
 import { update } from "../updater";
 import { install } from "../vpnutils";
 
-class $Update extends Window {
-	public open() {
-		this.createWindow({
-			title: "Check for Updates • Ember VPN"
-		});
-	}
-
-	// On init
-	constructor() {
-		super();
+export class Update extends Window {
+	
+	// Attach event listeners
+	static {
 
 		// Check for updates when a new window is created
 		app.once("browser-window-created", () => this.checkForUpdates());
 
 		// Check for updates every hour
-		setInterval(() => this.checkForUpdates(), 1000 * 60 * 60 * 24);
+		setInterval(() => this.checkForUpdates(), 1000 * 60 * 60);
 		
-		// Listen for update events
+		// Install updates when requested
 		ipcMain.on("update", async(_event, data: string[]) => {
+			
+			// If the array is empty, remind the user later
+			if (data.length === 0) return Config.set("last-update-procrastinate", Date.now());
 			
 			if (data.includes("openvpn")) await install();
 			if (data.includes("embervpn")) await update();
@@ -31,10 +30,30 @@ class $Update extends Window {
 			BrowserWindow.getAllWindows()
 				.map(win => win.webContents.send("update-finished"));
 		});
+
+		// Observe for menu click
+		ipcMain.on("open", (_event, state: string) => {
+			if (state === "updater") this.open();
+		});
 			
 	}
+	
+	// Open the window
+	public static open() {
+		this.configure({
+			title: "Check for Updates • Ember VPN"
+		});
+	}
 
-	public async checkForUpdates() {
+	// Check for updates
+	public static async checkForUpdates() {
+
+		// Get last procrastination
+		const procrastinate = Config.get<number>("last-update-procrastinate") || 0;
+		if (Date.now() - procrastinate < 1000 * 60 * 60 * 24) return;
+
+		// Make sure the user is authorized
+		if (!await Auth.isAuthorized()) return;
 
 		// Get current version
 		const version = app.getVersion();
@@ -61,5 +80,3 @@ class $Update extends Window {
 	}
 
 }
-
-export const Update = new $Update;
