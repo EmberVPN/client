@@ -82,7 +82,7 @@ export function UpdateWindow(): JSX.Element {
 				<div className="flex flex-col items-center gap-2 px-4 m-auto">
 					
 					{/* Update status */}
-					<MdBrowserUpdated className={ classNames("text-6xl shrink-0", outdated.length === 0 ? "text-success" : "text-warn") } />
+					<MdBrowserUpdated className={ classNames("text-6xl shrink-0 mt-10", outdated.length === 0 ? "text-success" : "text-warn") } />
 					<h1 className="text-2xl font-medium">{outdated.length === 0 ? "You're' up to date" : "Update found"}</h1>
 					<p className="mb-2 text-sm font-medium text-center dark:font-normal opacity-60">
 						{outdated.length === 0 ? "You're running the latest version of Ember VPN." : "Stay up to date with the latest features and enhancements by updating your EmberVPN client now." }
