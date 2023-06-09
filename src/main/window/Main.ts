@@ -1,16 +1,16 @@
 import { Window } from "../class/Window";
 
-class $Main extends Window {
-	public open() {
+export class Main extends Window {
+	public static open() {
 
 		// Attempt to open a hidden window first
-		if (Main.win && !Main.win.isDestroyed()) {
-			Main.win.show();
+		if (this.instance && !this.instance.isDestroyed()) {
+			this.instance.show();
 			return;
 		}
 
 		// Otherwise, open a new window
-		Main.win = this.createWindow({
+		this.instance = this.createWindow({
 			title: "Ember VPN",
 			resizable: true,
 			height: 600,
@@ -21,5 +21,3 @@ class $Main extends Window {
 
 	}
 }
-
-export const Main = new $Main;

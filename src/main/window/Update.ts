@@ -4,16 +4,8 @@ import { Window } from "../class/Window";
 import { update } from "../updater";
 import { install } from "../vpnutils";
 
-class $Update extends Window {
-	public open() {
-		this.createWindow({
-			title: "Check for Updates • Ember VPN"
-		});
-	}
-
-	// On init
-	constructor() {
-		super();
+export class Update extends Window {
+	static {
 
 		// Check for updates when a new window is created
 		app.once("browser-window-created", () => this.checkForUpdates());
@@ -36,8 +28,14 @@ class $Update extends Window {
 		ipcMain.on("open-updater", () => this.open());
 			
 	}
+	
+	public static open() {
+		this.createWindow({
+			title: "Check for Updates • Ember VPN"
+		});
+	}
 
-	public async checkForUpdates() {
+	public static async checkForUpdates() {
 
 		// Get current version
 		const version = app.getVersion();
@@ -64,5 +62,3 @@ class $Update extends Window {
 	}
 
 }
-
-export const Update = new $Update;
