@@ -6,6 +6,7 @@ export interface ConfigType {
 	"updater.last-remind-me-later": number;
 	"settings.units.distance": "IMPERIAL" | "METRIC";
 	"settings.appearance.theme": "SYSTEM (DEFAULT)" | "LIGHT" | "DARK";
+	"settings.security.use-ssh": boolean;
 }
 
 export class Config {

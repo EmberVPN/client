@@ -16,14 +16,14 @@ export function SettingsWindow() {
 	useMounted(() => electron.ipcRenderer.invoke("window-size", 600, 400));
 
 	// Get the distance units
-	const [ units, setUnits ] = useConfigKey<string>("units.distance");
+	const [ units, setUnits ] = useConfigKey("settings.units.distance");
 	const imperial = units === undefined ? ipLocation?.country_code === "US" : units === "IMPERIAL";
 
 	// Get the theme
-	const [ theme, setTheme ] = useConfigKey<string>("theme");
+	const [ theme, setTheme ] = useConfigKey("settings.appearance.theme");
 	
 	// Use looparound
-	const [ looparound, setLooparound ] = useConfigKey<boolean>("looparound");
+	const [ useSSH, setUseSSH ] = useConfigKey("settings.security.use-ssh");
 
 	// If location is still loading
 	if (!ipLocation) return null;
@@ -66,7 +66,7 @@ export function SettingsWindow() {
 							<DropDown
 								defaultValue={ [ "LIGHT", "DARK" ].includes(theme) ? theme.toLowerCase().replace(/^[a-z]/, letter => letter.toUpperCase()) : "System (default)" }
 								label="App theme"
-								onChange={ (event: ChangeEvent<HTMLInputElement>) => setTheme(event.target.value.toUpperCase()) }
+								onChange={ (event: ChangeEvent<HTMLInputElement>) => setTheme(event.target.value.toUpperCase() as typeof theme) }
 								options={ [
 									"System (default)",
 									"Light",
@@ -88,10 +88,10 @@ export function SettingsWindow() {
 							<p className="text-sm font-medium dark:font-normal opacity-60">Add an extra layer of encryption via SSH tunneling.</p>
 						</div>
 						<div className="pt-3 my-auto">
-							<Checkbox defaultChecked={ looparound }
+							<Checkbox defaultChecked={ useSSH }
 								disabled={ status === "connecting" || status === "connected" || status === "disconnecting" || status === "will-connect" || status === "installing" }
 								id="opt_looparound"
-								onChange={ e => setLooparound(e.target.checked) } />
+								onChange={ e => setUseSSH(e.target.checked) } />
 						</div>
 					</label>
 
