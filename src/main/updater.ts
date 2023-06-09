@@ -3,6 +3,7 @@ import { exec } from "child_process";
 import { app } from "electron";
 import { writeFile } from "fs/promises";
 import { basename, dirname, extname, join } from "path";
+import { Config } from "./class/Config";
 
 export async function update() {
 	
@@ -15,6 +16,9 @@ export async function update() {
 
 	// Get latest version
 	const builds = res.assets.filter(a => a.platform === process.platform);
+
+	// Clear procrastination
+	Config.set("last-update-procrastinate", 0);
 
 	// Check platform
 	if (process.platform === "win32") {
