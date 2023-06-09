@@ -4,6 +4,7 @@ import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
 import os from "os";
 import { dirname, resolve } from "path";
+import { Config } from "./class/Config";
 
 // Promisify sudo-prompt & exec
 // const sudo = (cmd: string) => new Promise<string | Buffer | undefined>((resolve, reject) => sudoPrompt.exec(cmd, { name: "Ember VPN" }, (error, stdout) => error ? reject(error) : resolve(stdout)));
@@ -48,6 +49,9 @@ export async function getBinary(): Promise<string> {
 }
 
 export async function install() {
+
+	// Clear procrastination
+	Config.set("last-update-procrastinate", 0);
 
 	// Check platform
 	if (process.platform === "win32") {
