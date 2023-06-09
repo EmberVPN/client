@@ -14,12 +14,12 @@ export function UpdateWindow(): JSX.Element {
 
 	// Use auto animate
 	const [ ref ] = useAutoAnimate();
-	const [ loading, setLoading ] = useState(false);
 	
 	// Render the content
 	function Content() {
-
+		
 		// Fetch the downloads
+		const [ loading, setLoading ] = useState(false);
 		const { data } = useData("/v2/ember/downloads");
 		const ovpnVersion = usePromise(electron.ipcRenderer.invoke("openvpn", "version"));
 	
@@ -71,11 +71,8 @@ export function UpdateWindow(): JSX.Element {
 		async function update() {
 			setLoading(true);
 			electron.ipcRenderer.send("update", outdated);
-
-			// Wait for the update to finish
 			await new Promise(resolve => electron.ipcRenderer.once("update-finished", resolve));
 			setLoading(false);
-
 		}
 
 		// If the version is the latest, show the message
