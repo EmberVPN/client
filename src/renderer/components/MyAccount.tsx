@@ -21,7 +21,7 @@ export function MyAccount({ user }: { user: Auth.User }): JSX.Element {
 
 	return (
 		<div className={ classNames("group relative", _open && "is-open") }>
-			<button className="flex mx-3 -my-1 text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip"
+			<button className="flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip"
 				onClick={ open }
 				ref={ ref }>
 				<img
