@@ -101,15 +101,22 @@ export function UpdateWindow(): JSX.Element {
 							{ item.isLatest ? <IoMdCheckmarkCircleOutline className="text-2xl text-success shrink-0" /> : <MdErrorOutline className="text-2xl text-warn shrink-0" />}
 								
 							{/* Dependency name */}
-							<div className="flex flex-col">
+							<div className="flex flex-col grow">
 								<strong>{item.name}</strong>
 								{item.subtitle && <span className="-mt-1 text-xs font-medium text-gray-500 dark:text-gray-400">{item.subtitle}</span>}
 							</div>
 
 							{/* Dependency version */}
-							<code className={ classNames("px-1.5 py-0.5 ml-auto font-mono text-sm rounded-md border", item.isLatest ? "text-gray-600 bg-gray-200 dark:text-gray-400 dark:bg-gray-800/50 border-gray/10" : "text-warn-800 dark:text-warn-300 border-warn-700/50 dark:border-warn-400/50 bg-warn/10") }>{item.version}</code>
-							<MdArrowRight className={ classNames("-mx-2.5 text-xl shrink-0", item.isLatest && "hidden") } />
-							<code className={ classNames("px-1.5 py-0.5 font-mono text-sm rounded-md border", item.isLatest ? "hidden" : "text-success-800 dark:text-success-300 border-success-700/50 dark:border-success-400/50 bg-success/10") }>{item.latest}</code>
+							<p className={ classNames("font-medium text-sm uppercase h-6 flex items-center px-2 rounded-md", {
+								"bg-gray-200 dark:bg-gray-700/50 text-gray-900 dark:text-gray-400": item.isLatest,
+								"bg-warn-200 dark:bg-warn-700/50 text-warn-900 dark:text-warn-400": !item.isLatest,
+							}) }>{item.version}</p>
+
+							{/* Latest version */}
+							{!item.isLatest && (<>
+								<MdArrowRight className="-mx-2.5 text-xl shrink-0" />
+								<p className="flex items-center h-6 px-2 text-sm font-medium text-gray-900 uppercase bg-gray-200 rounded-md dark:bg-gray-700/50 dark:text-gray-400">{item.latest}</p>
+							</>)}
 								
 						</li>
 					))}
