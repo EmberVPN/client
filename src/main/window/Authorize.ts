@@ -1,11 +1,9 @@
 import { Window } from "../class/Window";
 
-class $Authorize extends Window {
-	public open() {
+export class Authorize extends Window {
+	public static open() {
 		this.createWindow({
 			title: "Sign In • Ember VPN"
 		});
 	}
 }
-
-export const Authorize = new $Authorize;
