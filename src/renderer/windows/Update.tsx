@@ -4,7 +4,7 @@ import Spinner from "@ui-elements/Spinner";
 import classNames from "classnames";
 import { useState } from "react";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import { MdBrowserUpdated, MdErrorOutline } from "react-icons/md";
+import { MdArrowRight, MdBrowserUpdated, MdErrorOutline } from "react-icons/md";
 import { gt } from "semver";
 import Titlebar from "../components/Titlebar";
 import useData from "../util/hooks/useData";
@@ -36,7 +36,7 @@ export function UpdateWindow(): JSX.Element {
 			<div className="flex flex-col items-center justify-center w-full grow"
 				key="error">
 				<div className="flex flex-col items-center gap-2 px-4 m-auto">
-					<MdErrorOutline className="text-6xl shrink-0 text-error" />
+					<MdErrorOutline className="text-6xl shrink-0 text-error mt-9" />
 					<h1 className="text-2xl font-medium">Failed to check for updates</h1>
 					<p className="mb-2 text-sm font-medium dark:font-normal opacity-60">{ data.readable ?? data.description ?? data.error ?? "We were unable to check for updates. Please try again later."}</p>
 				</div>
@@ -55,12 +55,14 @@ export function UpdateWindow(): JSX.Element {
 		const versions = [ {
 			name: "Ember VPN",
 			version,
+			latest,
 			isLatest,
 		}, {
 			name: "OpenVPN Core",
 			subtitle: "Required by Ember VPN",
 			isLatest: isOvpnLatest,
-			version: ovpnLatest
+			version: ovpnLatest,
+			latest: ovpnLatest,
 		} ];
 
 		const outdated: string[] = [];
@@ -82,10 +84,10 @@ export function UpdateWindow(): JSX.Element {
 				<div className="flex flex-col items-center gap-2 px-4 m-auto">
 					
 					{/* Update status */}
-					<MdBrowserUpdated className={ classNames("text-6xl shrink-0 mt-10", outdated.length === 0 ? "text-success" : "text-warn") } />
+					<MdBrowserUpdated className={ classNames("text-6xl shrink-0 mt-9", outdated.length === 0 ? "text-success" : "text-warn") } />
 					<h1 className="text-2xl font-medium">{outdated.length === 0 ? "You're' up to date" : "Update found"}</h1>
 					<p className="mb-2 text-sm font-medium text-center dark:font-normal opacity-60">
-						{outdated.length === 0 ? "You're running the latest version of Ember VPN." : "Stay up to date with the latest features and enhancements by updating your EmberVPN client now." }
+						{outdated.length === 0 ? "You're running the latest version of Ember VPN." : "Stay up to date with the latest features and security fixes." }
 					</p>
 				</div>
 					
@@ -105,7 +107,9 @@ export function UpdateWindow(): JSX.Element {
 							</div>
 
 							{/* Dependency version */}
-							<code className={ classNames("px-1.5 py-0.5 ml-auto font-mono text-sm rounded-md border", item.isLatest ? "text-gray-600 bg-gray-200 dark:text-gray-400 dark:bg-gray-800/50 border-gray/10" : "text-warn-800 dark:text-warn-300 border-warn-700/50 dark:border-warn-400/50 bg-warn/10") }>v{item.version}</code>
+							<code className={ classNames("px-1.5 py-0.5 ml-auto font-mono text-sm rounded-md border", item.isLatest ? "text-gray-600 bg-gray-200 dark:text-gray-400 dark:bg-gray-800/50 border-gray/10" : "text-warn-800 dark:text-warn-300 border-warn-700/50 dark:border-warn-400/50 bg-warn/10") }>{item.version}</code>
+							<MdArrowRight className={ classNames("-mx-2.5 text-xl shrink-0", item.isLatest && "hidden") } />
+							<code className={ classNames("px-1.5 py-0.5 font-mono text-sm rounded-md border", item.isLatest ? "hidden" : "text-success-800 dark:text-success-300 border-success-700/50 dark:border-success-400/50 bg-success/10") }>{item.latest}</code>
 								
 						</li>
 					))}
@@ -116,7 +120,7 @@ export function UpdateWindow(): JSX.Element {
 					<Button className={ classNames(outdated.length === 0 && "opacity-0 pointer-events-none") }
 						color="gray"
 						disabled={ loading }
-						onClick={ () => electron.ipcRenderer.send("update", []) }
+						onClick={ () => [ electron.ipcRenderer.send("update", []), window.close() ] }
 						variant="outlined">maybe later</Button>
 					<Button className={ classNames(outdated.length === 0 && "opacity-0 pointer-events-none") }
 						color="warn"
