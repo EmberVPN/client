@@ -160,6 +160,7 @@ export class Tray {
 		this.pushMenuItem({
 			label: "Check for Updates",
 			click: () => Update.open(),
+			accelerator: "CmdOrCtrl+U"
 		});
 
 		this.pushMenuItem({
