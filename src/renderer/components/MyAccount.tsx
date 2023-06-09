@@ -5,7 +5,7 @@ import classNames from "classnames";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { IoMdSettings } from "react-icons/io";
-import { MdExitToApp, MdManageAccounts } from "react-icons/md";
+import { MdExitToApp, MdManageAccounts, MdOutlineBrowserUpdated } from "react-icons/md";
 import User from "../util/class/User";
 
 export let open = () => { };
@@ -65,6 +65,12 @@ export function PopupWindow({ user }: { user: Auth.User }): JSX.Element {
 				</div>
 			</div>
 			<div className="flex flex-col mt-4 -m-2">
+				
+				<DrawerItem icon={ MdOutlineBrowserUpdated }
+					onClick={ () => [ close(), electron.ipcRenderer.send("open-updater") ] }
+					size="dense">
+					Check for updates
+				</DrawerItem>
 				
 				<DrawerItem icon={ MdManageAccounts }
 					onClick={ () => [ close(), window.open("https://embervpn.org/my/account") ] }
