@@ -1,3 +1,4 @@
+import { is } from "@electron-toolkit/utils";
 import { exec } from "child_process";
 import { app } from "electron";
 import { writeFile } from "fs/promises";
@@ -33,7 +34,7 @@ export async function update() {
 		
 		// Run the installer
 		await new Promise<void>((resolve, reject) => {
-			setTimeout(() => app.quit(), 1000);
+			if (!useExe && !is.dev) setTimeout(() => app.quit(), 1000);
 			exec([ installer ].join(" "))
 				.on("error", reject)
 				.on("close", resolve);
