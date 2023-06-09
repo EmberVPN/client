@@ -67,7 +67,7 @@ export function PopupWindow({ user }: { user: Auth.User }): JSX.Element {
 			<div className="flex flex-col mt-4 -m-2">
 				
 				<DrawerItem icon={ MdOutlineBrowserUpdated }
-					onClick={ () => [ close(), electron.ipcRenderer.send("open-updater") ] }
+					onClick={ () => [ close(), electron.ipcRenderer.send("open", "updater") ] }
 					size="dense">
 					Check for updates
 				</DrawerItem>
@@ -79,7 +79,7 @@ export function PopupWindow({ user }: { user: Auth.User }): JSX.Element {
 				</DrawerItem>
 				
 				<DrawerItem icon={ IoMdSettings }
-					onClick={ () => [ close(), electron.ipcRenderer.send("open-settings") ] }
+					onClick={ () => [ close(), electron.ipcRenderer.send("open", "settings") ] }
 					size="dense">
 					Settings
 				</DrawerItem>
