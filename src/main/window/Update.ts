@@ -31,6 +31,9 @@ class $Update extends Window {
 			BrowserWindow.getAllWindows()
 				.map(win => win.webContents.send("update-finished"));
 		});
+
+		// Observe for menu click
+		ipcMain.on("open-updater", () => this.open());
 			
 	}
 
