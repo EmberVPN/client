@@ -10,10 +10,13 @@ export class Settings extends Window {
 		});
 	}
 
-	// Open the window
+	/**
+	 * Open the settings window
+	 */
 	public static open() {
 		this.configure({
 			title: "Settings • Ember VPN"
 		});
 	}
+
 }

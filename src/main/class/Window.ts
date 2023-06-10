@@ -5,9 +5,7 @@ import { resources } from "..";
 
 export class Window {
 
-	/**
-	 * The window instance
-	 */
+	// The current window
 	protected static instance: BrowserWindow | undefined;
 
 	/**
