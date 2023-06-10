@@ -43,7 +43,8 @@ export class Update extends Window {
 	 */
 	public static open() {
 		this.configure({
-			title: "Check for Updates • Ember VPN"
+			title: "Check for Updates • Ember VPN",
+			alwaysOnTop: true,
 		});
 	}
 
