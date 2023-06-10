@@ -1,4 +1,4 @@
-import electron, { ipcMain } from "electron";
+import { BrowserWindow, ipcMain } from "electron";
 import Store from "electron-store";
 
 export interface ConfigType {
@@ -16,16 +16,36 @@ export class Config {
 		clearInvalidConfig: true,
 		encryptionKey: "embervpn",
 		migrations: {
-			"1.3.162": function(store) {
-				store.set("settings.units.distance", store.get("units.distance"));
-				store.set("settings.appearance.theme", store.get("theme"));
-				store.set("auth.token", store.get("authorization"));
-				store.delete("units.distance");
-				store.delete("authorization");
-				store.delete("theme");
+			"1.3.162": function() {
+				Config.migrate("units.distance", "settings.units.distance");
+				Config.migrate("theme", "settings.appearance.theme");
+				Config.migrate("authorization", "auth.token");
 			}
 		}
 	});
+
+	/**
+	 * Migrates a config key from one key to another
+	 * @param fromKey The key to migrate from
+	 * @param toKey The key to migrate to
+	 * @returns boolean
+	 */
+	private static migrate(fromKey: string, toKey: string) {
+
+		// If we already migrated this key, return
+		if (this.store.has(toKey)) return false;
+
+		// If the key exists, migrate it
+		if (this.store.has(fromKey)) {
+			const value = this.store.get(fromKey);
+			this.store.delete(fromKey);
+			this.store.set(toKey, value);
+			return true;
+		}
+
+		return false;
+
+	}
 	
 	// Listen for config events
 	static {
@@ -50,9 +70,9 @@ export class Config {
 	 * @returns void
 	 */
 	public static set<T extends keyof ConfigType>(key: T, value: ConfigType[T]) {
-		Config.store.set(key, value);
-		const wins = electron.BrowserWindow.getAllWindows();
-		wins.map(win => win.webContents.send("config-updated", key, value));
+		this.store.set(key, value);
+		BrowserWindow.getAllWindows()
+			.map(win => win.webContents.send("config-updated", key, value));
 	}
 
 	/**
@@ -61,7 +81,7 @@ export class Config {
 	 * @returns string | unknown
 	 */
 	public static get<T extends keyof ConfigType>(key: T) {
-		return Config.store.get(key) as ConfigType[T];
+		return this.store.get(key) as ConfigType[T];
 	}
 
 	/**
@@ -70,7 +90,7 @@ export class Config {
 	 * @returns void
 	 */
 	public static delete(key: keyof ConfigType) {
-		Config.store.delete(key);
+		this.store.delete(key);
 	}
 	
 }

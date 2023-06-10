@@ -1,4 +1,5 @@
 import DrawerItem from "@ui-elements/Drawer/DrawerItem";
+import Spinner from "@ui-elements/Spinner";
 import Tooltip from "@ui-elements/Tooltip";
 import useRipple from "@ui-elements/util/useCenteredRipple";
 import classNames from "classnames";
@@ -7,12 +8,30 @@ import { useEffect, useRef, useState } from "react";
 import { IoMdSettings } from "react-icons/io";
 import { MdExitToApp, MdManageAccounts, MdOutlineBrowserUpdated } from "react-icons/md";
 import User from "../util/class/User";
+import { useUser } from "../util/hooks/useUser";
 
 export let open = () => { };
 export let close = () => { };
 
-export function MyAccount({ user }: { user: Auth.User }): JSX.Element {
+export function MyAccount(): JSX.Element {
 
+	// Grab the user
+	const user = useUser();
+	const [ loading, setLoading ] = useState(true);
+	
+	// Wait for the user image to load
+	useEffect(function() {
+		
+		// If the user loaded
+		if (!loading || !user) return;
+
+		// Wait for the users picture to load
+		const img = new Image();
+		img.onload = () => setLoading(false);
+		img.src = User.getAvatarURL(user.id);
+
+	}, [ loading, user ]);
+	
 	const ref = useRef<HTMLButtonElement>(null);
 	const [ _open, setOpen ] = useState(false);
 	open = () => setOpen(true);
@@ -20,37 +39,48 @@ export function MyAccount({ user }: { user: Auth.User }): JSX.Element {
 	useRipple(ref);
 
 	return (
-		<div className={ classNames("group relative", _open && "is-open") }>
-			<button className="flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip"
+		<div className={ classNames("group", _open && "is-open") }>
+			
+			{/* Spinner if loading */}
+			<div className={ classNames("absolute top-0 right-0 w-9 transition-opacity", (user && !loading) ? "opacity-0" : "opacity-100") }>
+				<Spinner className="w-9" />
+			</div>
+				
+			{/* Menu button */}
+			<button className={ classNames("flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip transition-[opacity,transform] duration-[300ms] ease-bounce", loading ? "opacity-0 scale-75" : "opacity-100 scale-100") }
 				onClick={ open }
 				ref={ ref }>
-				<img
+				{user && <img
 					alt="user photo"
 					className="rounded-full w-9 h-9"
-					src={ User.getAvatarURL(user.id) } />
+					src={ User.getAvatarURL(user.id) } />}
 				<Tooltip anchor="right">More</Tooltip>
 			</button>
+
+			{/* Popup window */}
 			<PopupWindow user={ user } />
+			
 		</div>
 	);
 }
 
-export function PopupWindow({ user }: { user: Auth.User }): JSX.Element {
+export function PopupWindow({ user }: { user?: Auth.User }) {
 
-	useEffect(() => {
-
-		const handle = (e: MouseEvent) => {
+	// Close the popup when the user clicks outside of it
+	useEffect(function() {
+		function handle(e: MouseEvent) {
 			if (e.target instanceof HTMLElement && e.target.closest(".group") === null) close();
-		};
-
+		}
 		document.addEventListener("click", handle);
 		return () => document.removeEventListener("click", handle);
-
 	}, []);
+
+	// If the user is not logged in
+	if (!user) return null;
 
 	return (
 		<div
-			className="absolute top-0 right-0 opacity-0 scale-75 group-[.is-open]:opacity-100 group-[.is-open]:scale-100 transition-all origin-top-right rounded-2xl p-4 min-w-full w-[320px] pointer-events-none group-[.is-open]:pointer-events-auto dark:shadow-xl dark:shadow-black/20 border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden ease-bounce duration-[300ms] drop-shadow-xl"
+			className="absolute -m-1 top-0 right-0 opacity-0 scale-75 group-[.is-open]:opacity-100 group-[.is-open]:scale-100 transition-all origin-top-right rounded-2xl p-4 min-w-full w-[320px] pointer-events-none group-[.is-open]:pointer-events-auto select-none dark:shadow-xl dark:shadow-black/20 border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden ease-bounce duration-[300ms] drop-shadow-xl"
 			onClick={ e => e.stopPropagation() }>
 			<div className="flex items-center gap-4 overflow-hidden">
 				<img
