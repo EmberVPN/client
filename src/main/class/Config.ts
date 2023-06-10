@@ -2,10 +2,10 @@ import electron, { ipcMain } from "electron";
 import Store from "electron-store";
 
 export interface ConfigType {
-	"authorization": string;
-	"last-update-procrastinate": number;
-	"units.distance": "IMPERIAL" | "METRIC";
-	"theme": "SYSTEM (DEFAULT)" | "LIGHT" | "DARK";
+	"auth.token": string;
+	"updater.last-remind-me-later": number;
+	"settings.units.distance": "IMPERIAL" | "METRIC";
+	"settings.appearance.theme": "SYSTEM (DEFAULT)" | "LIGHT" | "DARK";
 }
 
 export class Config {

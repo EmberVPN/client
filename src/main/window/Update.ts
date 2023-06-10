@@ -21,7 +21,7 @@ export class Update extends Window {
 		ipcMain.on("update", async(_event, data: string[]) => {
 			
 			// If the array is empty, remind the user later
-			if (data.length === 0) return Config.set("last-update-procrastinate", Date.now());
+			if (data.length === 0) return Config.set("updater.last-remind-me-later", Date.now());
 			
 			if (data.includes("openvpn")) await install();
 			if (data.includes("embervpn")) await update();
@@ -49,7 +49,7 @@ export class Update extends Window {
 	public static async checkForUpdates() {
 
 		// Get last procrastination
-		const procrastinate = Config.get("last-update-procrastinate");
+		const procrastinate = Config.get("updater.last-remind-me-later");
 		if (Date.now() - procrastinate < 1000 * 60 * 60 * 24) return;
 
 		// Make sure the user is authorized

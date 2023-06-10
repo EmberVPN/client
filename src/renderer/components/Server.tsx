@@ -13,10 +13,10 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 
 	// Get the current IP location
 	const { status, active, ipLocation, setStatus, setActive, lastStateChange } = useConnection();
-	const [ authorization ] = useConfigKey("authorization");
+	const [ authorization ] = useConfigKey("auth.token");
 
 	// Get the config
-	const [ config ] = useConfigKey("units.distance");
+	const [ config ] = useConfigKey("settings.units.distance");
 	const imperial = useMemo(() => config === undefined ? ipLocation?.country_code === "US" : config === "IMPERIAL", [ config, ipLocation ]);
 
 	// If location is still loading
