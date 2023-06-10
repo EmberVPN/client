@@ -8,7 +8,8 @@
 		"src/preload/*.d.ts",
 		"types/*",
 		"assets",
-		"src/*.ts"
+		"src/*.ts",
+		"src/main/class/Config.ts"
 	],
 	"compilerOptions": {
 		"composite": true,

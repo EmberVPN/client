@@ -35,13 +35,18 @@ export class Auth {
 		});
 	}
 
-	// Destroy the current authorization session
+	/**
+	 * Destroys the current authorization token
+	 * @returns void
+	 */
 	protected static async destroy() {
+
+		// Unset authorization token and user
 		Auth.authorization = undefined;
 		Auth.user = undefined;
 
 		// Remove authorization token from config
-		Config.set("authorization", undefined);
+		Config.delete("authorization");
 
 		// Close all windows
 		BrowserWindow.getAllWindows().map(win => win.close());
@@ -54,7 +59,11 @@ export class Auth {
 		
 	}
 
-	// Fetch user from authorization token
+	/**
+	 * Fetch user from authorization token
+	 * @param token The authorization token (optional)
+	 * @returns Auth.User
+	 */
 	public static async fetchUser(token = Auth.authorization) {
 
 		// Get authorization token
@@ -85,6 +94,10 @@ export class Auth {
 
 	}
 
+	/**
+	 * Gets whether or not the user is authorized
+	 * @returns boolean
+	 */
 	public static async isAuthorized() {
 		try {
 			return Auth.authorization !== undefined && ((Auth.user || await Auth.fetchUser())?.id || -1) > 0;
@@ -93,6 +106,10 @@ export class Auth {
 		}
 	}
 
+	/**
+	 * Gets the current user authorization token
+	 * @returns string
+	 */
 	public static getAuthorization() {
 		return Auth.authorization;
 	}
