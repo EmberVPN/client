@@ -33,13 +33,13 @@ export class Config {
 	private static migrate(fromKey: string, toKey: string) {
 
 		// If we already migrated this key, return
-		if (Config.store.has(toKey)) return false;
+		if (this.store.has(toKey)) return false;
 
 		// If the key exists, migrate it
-		if (Config.store.has(fromKey)) {
-			const value = Config.store.get(fromKey);
-			Config.store.delete(fromKey);
-			Config.store.set(toKey, value);
+		if (this.store.has(fromKey)) {
+			const value = this.store.get(fromKey);
+			this.store.delete(fromKey);
+			this.store.set(toKey, value);
 			return true;
 		}
 
@@ -61,6 +61,7 @@ export class Config {
 			return Config.set(key, value);
 			
 		});
+
 	}
 
 	/**
@@ -70,7 +71,7 @@ export class Config {
 	 * @returns void
 	 */
 	public static set<T extends keyof ConfigType>(key: T, value: ConfigType[T]) {
-		Config.store.set(key, value);
+		this.store.set(key, value);
 		const wins = electron.BrowserWindow.getAllWindows();
 		wins.map(win => win.webContents.send("config-updated", key, value));
 	}
@@ -81,7 +82,7 @@ export class Config {
 	 * @returns string | unknown
 	 */
 	public static get<T extends keyof ConfigType>(key: T) {
-		return Config.store.get(key) as ConfigType[T];
+		return this.store.get(key) as ConfigType[T];
 	}
 
 	/**
@@ -90,7 +91,7 @@ export class Config {
 	 * @returns void
 	 */
 	public static delete(key: keyof ConfigType) {
-		Config.store.delete(key);
+		this.store.delete(key);
 	}
 	
 }
