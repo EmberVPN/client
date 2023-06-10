@@ -49,7 +49,7 @@ export function MyAccount(): JSX.Element {
 			{/* User controls */}
 				
 			{/* Menu button */}
-			<button className={ classNames("flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip transition-[opacity,transform]", loading ? "opacity-0 scale-75" : "opacity-100 scale-100") }
+			<button className={ classNames("flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip transition-[opacity,transform] duration-[300ms] ease-bounce", loading ? "opacity-0 scale-75" : "opacity-100 scale-100") }
 				onClick={ open }
 				ref={ ref }>
 				{user && <img
