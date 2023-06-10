@@ -1,6 +1,10 @@
 import { Window } from "../class/Window";
 
 export class Main extends Window {
+
+	/**
+	 * Open the main window
+	 */
 	public static open() {
 		this.configure({
 			title: "Ember VPN",
@@ -12,4 +16,5 @@ export class Main extends Window {
 			delayed: true
 		});
 	}
+	
 }

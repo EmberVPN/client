@@ -35,7 +35,6 @@ ipcMain.on("titlebar", (event, key: string, val?: boolean) => {
 	if (key === "minimizeable" && val !== undefined) win.setMinimizable(val);
 	if (key === "restore") win.isMaximized() ? win.restore() : win.maximize();
 	if (key === "hide") Main.is(win) ? win.hide() : win.close();
-
 	if (key === "resizeable" && val !== undefined) {
 		win.setResizable(val);
 		win.setMaximizable(val);

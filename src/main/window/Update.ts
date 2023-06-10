@@ -38,42 +38,48 @@ export class Update extends Window {
 			
 	}
 	
-	// Open the window
+	/**
+	 * Open the update window
+	 */
 	public static open() {
 		this.configure({
 			title: "Check for Updates • Ember VPN"
 		});
 	}
 
-	// Check for updates
+	/**
+	 * Check for updates and open the update window if there are any
+	 * @returns Promise<boolean | null>
+	 */
 	public static async checkForUpdates() {
 
 		// Get last procrastination
 		const procrastinate = Config.get("updater.last-remind-me-later");
-		if (Date.now() - procrastinate < 1000 * 60 * 60 * 24) return;
+		if (Date.now() - procrastinate < 1000 * 60 * 60 * 24) return null;
 
 		// Make sure the user is authorized
-		if (!await Auth.isAuthorized()) return;
+		if (!await Auth.isAuthorized()) return null;
 
 		// Get current version
 		const version = app.getVersion();
 		
 		// Get latest version
-		fetch("https://api.embervpn.org/v2/ember/downloads")
+		return await fetch("https://api.embervpn.org/v2/ember/downloads")
 			.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>)
 			.then(res => {
 			
 				// Make sure the request was successful
-				if (!res.success) return;
+				if (!res.success) return false;
 			
 				// Get latest version
 				const latest = res.version.substring(1);
 				
 				// Compare versions
-				if (!gt(latest, version)) return;
+				if (!gt(latest, version)) return false;
 
 				// await for main window to load
 				this.open();
+				return true;
 				
 			});
 		
