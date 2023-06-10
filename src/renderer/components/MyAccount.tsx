@@ -1,4 +1,5 @@
 import DrawerItem from "@ui-elements/Drawer/DrawerItem";
+import Spinner from "@ui-elements/Spinner";
 import Tooltip from "@ui-elements/Tooltip";
 import useRipple from "@ui-elements/util/useCenteredRipple";
 import classNames from "classnames";
@@ -7,12 +8,30 @@ import { useEffect, useRef, useState } from "react";
 import { IoMdSettings } from "react-icons/io";
 import { MdExitToApp, MdManageAccounts, MdOutlineBrowserUpdated } from "react-icons/md";
 import User from "../util/class/User";
+import { useUser } from "../util/hooks/useUser";
 
 export let open = () => { };
 export let close = () => { };
 
-export function MyAccount({ user }: { user: Auth.User }): JSX.Element {
+export function MyAccount(): JSX.Element {
 
+	// Grab the user
+	const user = useUser();
+	const [ loading, setLoading ] = useState(true);
+	
+	// Wait for the user image to load
+	useEffect(function() {
+		
+		// If the user loaded
+		if (!loading || !user) return;
+
+		// Wait for the users picture to load
+		const img = new Image();
+		img.onload = () => setLoading(false);
+		img.src = User.getAvatarURL(user.id);
+
+	}, [ loading, user ]);
+	
 	const ref = useRef<HTMLButtonElement>(null);
 	const [ _open, setOpen ] = useState(false);
 	open = () => setOpen(true);
@@ -20,17 +39,32 @@ export function MyAccount({ user }: { user: Auth.User }): JSX.Element {
 	useRipple(ref);
 
 	return (
-		<div className={ classNames("group relative", _open && "is-open") }>
-			<button className="flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip"
-				onClick={ open }
-				ref={ ref }>
-				<img
-					alt="user photo"
-					className="rounded-full w-9 h-9"
-					src={ User.getAvatarURL(user.id) } />
-				<Tooltip anchor="right">More</Tooltip>
-			</button>
-			<PopupWindow user={ user } />
+		<div>
+			
+			{/* Spinner if loading */}
+			<div className={ classNames("absolute top-0 right-0 w-9 transition-opacity", (user && !loading) ? "opacity-0" : "opacity-100") }>
+				<Spinner className="w-9" />
+			</div>
+
+			{/* User controls */}
+			{user && <>
+				
+				{/* Menu button */}
+				<button className={ classNames("flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip transition-[opacity,transform]", loading ? "opacity-0 scale-75" : "opacity-100 scale-100") }
+					onClick={ open }
+					ref={ ref }>
+					<img
+						alt="user photo"
+						className="rounded-full w-9 h-9"
+						src={ User.getAvatarURL(user.id) } />
+					<Tooltip anchor="right">More</Tooltip>
+				</button>
+
+				{/* Popup window */}
+				<PopupWindow user={ user } />
+				
+			</>}
+			
 		</div>
 	);
 }
