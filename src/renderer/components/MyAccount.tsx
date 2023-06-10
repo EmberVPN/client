@@ -45,8 +45,6 @@ export function MyAccount(): JSX.Element {
 			<div className={ classNames("absolute top-0 right-0 w-9 transition-opacity", (user && !loading) ? "opacity-0" : "opacity-100") }>
 				<Spinner className="w-9" />
 			</div>
-
-			{/* User controls */}
 				
 			{/* Menu button */}
 			<button className={ classNames("flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip transition-[opacity,transform] duration-[300ms] ease-bounce", loading ? "opacity-0 scale-75" : "opacity-100 scale-100") }
