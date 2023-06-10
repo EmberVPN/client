@@ -129,6 +129,7 @@ rules:
   react/jsx-max-props-per-line:
     - warn
     - maximum: 1
+      when: multiline
   react/jsx-no-useless-fragment: warn
   react/jsx-tag-spacing:
     - warn
