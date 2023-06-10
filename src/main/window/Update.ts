@@ -49,7 +49,7 @@ export class Update extends Window {
 	public static async checkForUpdates() {
 
 		// Get last procrastination
-		const procrastinate = Config.get<number>("last-update-procrastinate") || 0;
+		const procrastinate = Config.get("last-update-procrastinate");
 		if (Date.now() - procrastinate < 1000 * 60 * 60 * 24) return;
 
 		// Make sure the user is authorized
