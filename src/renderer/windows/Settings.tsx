@@ -14,11 +14,11 @@ export function SettingsWindow() {
 	useMounted(() => electron.ipcRenderer.invoke("window-size", 600, 400));
 
 	// Get the distance units
-	const [ units, setUnits ] = useConfigKey("units.distance");
+	const [ units, setUnits ] = useConfigKey("settings.units.distance");
 	const imperial = units === undefined ? ipLocation?.country_code === "US" : units === "IMPERIAL";
 
 	// Get the theme
-	const [ theme, setTheme ] = useConfigKey("theme");
+	const [ theme, setTheme ] = useConfigKey("settings.appearance.theme");
 
 	// If location is still loading
 	if (!ipLocation) return null;

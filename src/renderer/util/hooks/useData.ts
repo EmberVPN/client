@@ -9,7 +9,7 @@ interface Endpoints {
 export default function useData<T extends keyof Endpoints>(route: T): { data: REST.APIResponse<Endpoints[T]> | undefined, isLoading: boolean } {
 
 	// Get authorization token
-	const [ authorization ] = useConfigKey<string>("authorization");
+	const [ authorization ] = useConfigKey("auth.token");
 
 	const { isLoading, data } = useQuery(route, async function() {
 		return await fetch(`https://api.embervpn.org${ route }`, {

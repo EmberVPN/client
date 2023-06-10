@@ -17,7 +17,7 @@ export async function update() {
 	const builds = res.assets.filter(a => a.platform === process.platform);
 
 	// Clear procrastination
-	Config.delete("last-update-procrastinate");
+	Config.delete("updater.last-remind-me-later");
 
 	// Check platform
 	if (process.platform === "win32") {

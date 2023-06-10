@@ -8,7 +8,7 @@ import { Tray } from "./Tray";
 export class Auth {
 
 	// The current authorization token
-	private static authorization?: string = Config.get("authorization");
+	private static authorization?: string = Config.get("auth.token");
 
 	// The current user
 	private static user?: Auth.User;
@@ -46,7 +46,7 @@ export class Auth {
 		Auth.user = undefined;
 
 		// Remove authorization token from config
-		Config.delete("authorization");
+		Config.delete("auth.token");
 
 		// Close all windows
 		BrowserWindow.getAllWindows().map(win => win.close());
@@ -81,7 +81,7 @@ export class Auth {
 		if (!resp || !resp.success) throw new Error(resp ? resp.readable || resp.description || resp.error : "Unknown error");
 
 		// Set authorization token
-		Config.set("authorization", authorization);
+		Config.set("auth.token", authorization);
 
 		// If login window is open, close it and open the main window
 		if (BrowserWindow.getAllWindows().find(win => Authorize.is(win))) {
