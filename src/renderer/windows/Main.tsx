@@ -23,7 +23,7 @@ export function MainWindow() {
 				<EntryPoint />
 
 			</div>
-			
+				
 		</div>
 	);
 }

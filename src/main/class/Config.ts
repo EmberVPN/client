@@ -1,4 +1,4 @@
-import electron, { ipcMain } from "electron";
+import { BrowserWindow, ipcMain } from "electron";
 import Store from "electron-store";
 
 export interface ConfigType {
@@ -61,7 +61,6 @@ export class Config {
 			return Config.set(key, value);
 			
 		});
-
 	}
 
 	/**
@@ -72,8 +71,8 @@ export class Config {
 	 */
 	public static set<T extends keyof ConfigType>(key: T, value: ConfigType[T]) {
 		this.store.set(key, value);
-		const wins = electron.BrowserWindow.getAllWindows();
-		wins.map(win => win.webContents.send("config-updated", key, value));
+		BrowserWindow.getAllWindows()
+			.map(win => win.webContents.send("config-updated", key, value));
 	}
 
 	/**
