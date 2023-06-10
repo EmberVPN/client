@@ -23,7 +23,7 @@ export function UpdateWindow(): JSX.Element {
 		<div className="flex flex-col w-screen h-screen overflow-hidden bg-gray-100 dark:bg-gray-900">
 			<Titlebar minimizeable={ false }
 				resizeable={ false }>Check for Updates</Titlebar>
-			<div className="flex justify-center gap-2 px-4 py-4 bg-red-500 select-none grow"
+			<div className="flex justify-center gap-2 px-4 py-4 select-none grow"
 				ref={ ref }>
 				{ (!data || !ovpnVersion || isLoading) ? (
 					<div className="flex items-center justify-center w-full"
