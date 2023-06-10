@@ -3,12 +3,12 @@ import { exec } from "child_process";
 import { BrowserWindow, app, ipcMain } from "electron";
 import { writeFile } from "fs/promises";
 import { basename, dirname, extname, join } from "path";
+import { platform } from "process";
 import { gt } from "semver";
 import { Auth } from "../class/Auth";
 import { Config } from "../class/Config";
 import { OpenVPN } from "../class/OpenVPN";
 import { Window } from "../class/Window";
-import { platform } from "process";
 
 export class Update extends Window {
 	
