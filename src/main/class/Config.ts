@@ -16,16 +16,36 @@ export class Config {
 		clearInvalidConfig: true,
 		encryptionKey: "embervpn",
 		migrations: {
-			"1.3.162": function(store) {
-				store.set("settings.units.distance", store.get("units.distance"));
-				store.set("settings.appearance.theme", store.get("theme"));
-				store.set("auth.token", store.get("authorization"));
-				store.delete("units.distance");
-				store.delete("authorization");
-				store.delete("theme");
+			"1.3.162": function() {
+				Config.migrate("units.distance", "settings.units.distance");
+				Config.migrate("theme", "settings.appearance.theme");
+				Config.migrate("authorization", "auth.token");
 			}
 		}
 	});
+
+	/**
+	 * Migrates a config key from one key to another
+	 * @param fromKey The key to migrate from
+	 * @param toKey The key to migrate to
+	 * @returns boolean
+	 */
+	private static migrate(fromKey: string, toKey: string) {
+
+		// If we already migrated this key, return
+		if (Config.store.has(toKey)) return false;
+
+		// If the key exists, migrate it
+		if (Config.store.has(fromKey)) {
+			const value = Config.store.get(fromKey);
+			Config.store.delete(fromKey);
+			Config.store.set(toKey, value);
+			return true;
+		}
+
+		return false;
+
+	}
 	
 	// Listen for config events
 	static {
