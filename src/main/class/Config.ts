@@ -5,6 +5,7 @@ export interface ConfigType {
 	"authorization": string;
 	"last-update-procrastinate": number;
 	"units.distance": "IMPERIAL" | "METRIC";
+	"theme": "SYSTEM (DEFAULT)" | "LIGHT" | "DARK";
 }
 
 export class Config {
