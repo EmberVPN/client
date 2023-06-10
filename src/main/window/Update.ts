@@ -63,7 +63,7 @@ export class Update extends Window {
 
 		// Get last procrastination
 		const procrastinate = Config.get("updater.last-remind-me-later");
-		if (Date.now() - procrastinate < 1000 * 60 * 60 * 24) return null;
+		if (Date.now() - procrastinate < 1000 * 60 * 60 * 24) return;
 
 		// Make sure the user is authorized
 		if (!await Auth.isAuthorized()) return null;
