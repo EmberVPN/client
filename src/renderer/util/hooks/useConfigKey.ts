@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react";
+import { ConfigType } from "../../../main/class/Config";
 
-export function useConfigKey<T = unknown>(key: string) {
+export function useConfigKey<T extends keyof ConfigType>(key: T) {
 
 	// Initialize state
-	const [ state, setState ] = useState<T>(electron.ipcRenderer.sendSync("config", key));
+	const state = useState<ConfigType[T]>(electron.ipcRenderer.sendSync("config", key));
 	
 	// Observe state changes
 	useEffect(function() {
 		
 		// Listen for config updates
 		electron.ipcRenderer.on("config-updated", function(_, k: string, value: unknown) {
-			if (key === k) setState(value as T);
+			if (key === k) state[1](value as ConfigType[T]);
 		});
 
-	}, [ key ]);
+	}, [ key, state ]);
 	
-	return [ state, (value: unknown) => electron.ipcRenderer.send("config", key, value) ] as [T, (value: T) => void];
+	return state;
 
 }

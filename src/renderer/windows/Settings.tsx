@@ -14,11 +14,11 @@ export function SettingsWindow() {
 	useMounted(() => electron.ipcRenderer.invoke("window-size", 600, 400));
 
 	// Get the distance units
-	const [ units, setUnits ] = useConfigKey<string>("units.distance");
+	const [ units, setUnits ] = useConfigKey("settings.units.distance");
 	const imperial = units === undefined ? ipLocation?.country_code === "US" : units === "IMPERIAL";
 
 	// Get the theme
-	const [ theme, setTheme ] = useConfigKey<string>("theme");
+	const [ theme, setTheme ] = useConfigKey("settings.appearance.theme");
 
 	// If location is still loading
 	if (!ipLocation) return null;
@@ -62,7 +62,7 @@ export function SettingsWindow() {
 								<DropDown
 									defaultValue={ [ "LIGHT", "DARK" ].includes(theme) ? theme.toLowerCase().replace(/^[a-z]/, letter => letter.toUpperCase()) : "System (default)" }
 									label="App theme"
-									onChange={ (event: ChangeEvent<HTMLInputElement>) => setTheme(event.target.value.toUpperCase()) }
+									onChange={ (event: ChangeEvent<HTMLInputElement>) => setTheme(event.target.value.toUpperCase() as "SYSTEM (DEFAULT)" | "LIGHT" | "DARK") }
 									options={ [
 										"System (default)",
 										"Light",

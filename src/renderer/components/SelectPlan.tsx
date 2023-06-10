@@ -6,7 +6,7 @@ import queryClient from "../util/queryClient";
 export default function SelectPlan() {
 
 	// Get the user's authorization token
-	const [ authorization ] = useConfigKey<string>("authorization");
+	const [ authorization ] = useConfigKey("auth.token");
 
 	// Create a reference to the webview
 	const ref = useRef<HTMLWebViewElement>(null);

@@ -4,7 +4,7 @@ import { useConfigKey } from "./useConfigKey";
 export function useUser() {
 
 	// Get authorization token
-	const [ authorization ] = useConfigKey<string | undefined>("authorization");
+	const [ authorization ] = useConfigKey("auth.token");
 
 	// Initialize user state
 	const [ user, setUser ] = useState<Auth.User | undefined>();

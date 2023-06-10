@@ -4,6 +4,8 @@ import { Update } from "../window/Update";
 import { Auth } from "./Auth";
 
 export class KeybindManager {
+
+	// Attach event listeners
 	static {
 
 		// Observe for browser window creation

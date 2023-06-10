@@ -10,15 +10,20 @@ export interface IpGeo {
 
 export class IPManager {
 
+	// Store the last IP address
 	private static lastIP = "";
+
+	// Store the locations of IP addresses
 	private static geoCache: Record<string, IpGeo> = {};
+
+	// Create an event emitter
 	private static emitter = new EventEmitter();
 
 	/**
 	 * Fetch the IP address
-	 * @returns string
+	 * @returns Promise<string>
 	 */
-	public static async fetchAddress() {
+	public static async fetchAddress(): Promise<string> {
 
 		// Abort if IP times out
 		const controller = new AbortController();
@@ -54,10 +59,19 @@ export class IPManager {
 		
 	}
 
+	/**
+	 * Drop the IP cache
+	 * @returns void
+	 */
 	public static dropCache() {
 		this.lastIP = "";
 	}
 
+	/**
+	 * Fetch the IP location
+	 * @param ip The IP address to fetch the location of (optional)
+	 * @returns Promise<IpGeo>
+	 */
 	public static async fetchGeo(ip = this.lastIP): Promise<IpGeo> {
 		
 		const controller = new AbortController();
@@ -86,6 +100,7 @@ export class IPManager {
 		
 	}
 	
+	// Manage the lifecycle of the IP manager
 	static {
 
 		// Fetch IP address every second and emit event if it changes
@@ -108,9 +123,12 @@ export class IPManager {
 			if (!this.geoCache[this.lastIP]) return;
 			electron.BrowserWindow.getAllWindows()
 				.map(win => win.webContents.send("iplocation", JSON.stringify(this.geoCache[this.lastIP])));
+			
 		}, 50);
 
 	}
+
+	/** Proxy methods to the emitter **/
 
 	public static on(event: "change", listener: (ip: string) => void) {
 		this.emitter.on(event, listener);
