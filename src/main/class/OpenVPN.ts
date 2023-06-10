@@ -11,81 +11,20 @@ import { IPManager } from "./IPManager";
 import { Tray } from "./Tray";
 
 export class OpenVPN {
-
+	
+	// If the manager is currently connecting
 	private static _isConnecting = false;
-	public static isConnecting() {
-		return this._isConnecting;
-	}
 
+	// The current version of OpenVPN
+	private static _version: string | null = null;
+
+	// The current process
 	private static proc: ChildProcess | null = null;
+
+	// The current server
 	private static server: Ember.Server | null = null;
 
-	public static async downloadConfig(server: Ember.Server) {
-		this._isConnecting = true;
-		await Tray.refreshMenu();
-
-		// Ensure authorization is set
-		const auth = Auth.getAuthorization();
-		if (!auth) throw new Error("Authorization not set");
-
-		// Download config
-		const { success, config } = await fetch(`https://api.embervpn.org/v2/rsa/download-client-config?server=${ server.hash }`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"Authorization": auth
-			}
-		}).then(res => res.json() as Promise<{ success: boolean, config: string }>);
-			
-		// Check for errors
-		if (!success) throw new Error("Failed to download server config");
-
-		// Write config file
-		const path = resolve(resources, "ember.ovpn");
-		await writeFile(path, Buffer.from(config, "base64").toString("utf-8"));
-
-	}
-
-	private static async confirmConnection(server: Ember.Server) {
-		this._isConnecting = false;
-		if (!this.proc) throw new Error("Process not started");
-		
-		// On process exit
-		this.proc.on("exit", () => server.hash === this.server?.hash && this.disconnect());
-		this.proc.on("error", error => {
-			BrowserWindow.getAllWindows()
-				.map(win => win.webContents.send("openvpn", "error", server.hash, error.toString()));
-			this.disconnect();
-		});
-
-		// Log stdout
-		this.proc.stdout?.on("data", data => {
-			const line = data.toString().trim();
-			console.log("[OpenVPN]", line);
-			
-			if (line.includes("ERROR:")) {
-				this.proc?.emit("error", new Error(line.split("ERROR:")[1].trim()));
-				return;
-			}
-
-			BrowserWindow.getAllWindows()
-				.map(win => win.webContents.send("openvpn", "log", server.hash, line));
-		});
-
-		// Await new geolocation
-		const newIp: string = await new Promise(resolve => IPManager.once("change", resolve));
-		const geo = await IPManager.fetchGeo(newIp);
-
-		if (geo.ip !== server.ip) throw new Error("Failed to connect to server");
-		
-		// Set connected
-		await Tray.setState("connected");
-		Tray.notify(`Connected to ${ geo.country_code }`);
-		BrowserWindow.getAllWindows()
-			.map(win => win.webContents.send("openvpn", "connected", server.hash));
-		
-	}
-	
+	// Manage the openvpn lifecycle
 	static {
 		
 		// Listen for openvpn events
@@ -132,7 +71,7 @@ export class OpenVPN {
 
 	/**
 	* Disconnect from the VPN
-	* @returns void
+	* @returns Promise<void>
 	 */
 	public static async disconnect(switching = false) {
 
@@ -173,9 +112,8 @@ export class OpenVPN {
 	}
 
 	/**
-	* Connect to the VPN
-	* @param server The server to connect to
-	* @returns void
+	* Connect to the VPN configuration thats been downloaded
+	* @returns Promise<void>
 	*/
 	private static async connect() {
 
@@ -203,6 +141,18 @@ export class OpenVPN {
 		
 	}
 
+	/**
+	 * Confirm that we are connected to a server
+	 * @returns boolean
+	 */
+	public static isConnecting() {
+		return this._isConnecting;
+	}
+
+	/**
+	 * Connect to the closest/quickest server
+	 * @returns Promise<void>
+	 */
 	public static async quickConnect() {
 
 		// Ensure authorization is set
@@ -249,7 +199,10 @@ export class OpenVPN {
 
 	}
 
-	private static _version: string | null = null;
+	/** 
+	 * Get the current version of OpenVPN
+	 * @returns Promise<string>
+	 */
 	public static async getVersion(): Promise<string> {
 		if (this._version) return this._version;
 		const binary = await getBinary();
@@ -265,6 +218,82 @@ export class OpenVPN {
 			});
 
 		});
+	}
+
+	/**
+	 * Download a client configuration file
+	 * @param server The server to download the config for
+	 * @returns Promise<void>
+	 */
+	public static async downloadConfig(server: Ember.Server) {
+		this._isConnecting = true;
+		await Tray.refreshMenu();
+
+		// Ensure authorization is set
+		const auth = Auth.getAuthorization();
+		if (!auth) throw new Error("Authorization not set");
+
+		// Download config
+		const { success, config } = await fetch(`https://api.embervpn.org/v2/rsa/download-client-config?server=${ server.hash }`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"Authorization": auth
+			}
+		}).then(res => res.json() as Promise<{ success: boolean, config: string }>);
+			
+		// Check for errors
+		if (!success) throw new Error("Failed to download server config");
+
+		// Write config file
+		const path = resolve(resources, "ember.ovpn");
+		await writeFile(path, Buffer.from(config, "base64").toString("utf-8"));
+
+	}
+
+	/**
+	 * Confirm that we are connected to a server
+	 * @param server The server to confirm connection for
+	 * @returns Promise<void>
+	 */
+	public static async confirmConnection(server: Ember.Server) {
+		this._isConnecting = false;
+		if (!this.proc) throw new Error("Process not started");
+		
+		// On process exit
+		this.proc.on("exit", () => server.hash === this.server?.hash && this.disconnect());
+		this.proc.on("error", error => {
+			BrowserWindow.getAllWindows()
+				.map(win => win.webContents.send("openvpn", "error", server.hash, error.toString()));
+			this.disconnect();
+		});
+
+		// Log stdout
+		this.proc.stdout?.on("data", data => {
+			const line = data.toString().trim();
+			console.log("[OpenVPN]", line);
+			
+			if (line.includes("ERROR:")) {
+				this.proc?.emit("error", new Error(line.split("ERROR:")[1].trim()));
+				return;
+			}
+
+			BrowserWindow.getAllWindows()
+				.map(win => win.webContents.send("openvpn", "log", server.hash, line));
+		});
+
+		// Await new geolocation
+		const newIp: string = await new Promise(resolve => IPManager.once("change", resolve));
+		const geo = await IPManager.fetchGeo(newIp);
+
+		if (geo.ip !== server.ip) throw new Error("Failed to connect to server");
+		
+		// Set connected
+		await Tray.setState("connected");
+		Tray.notify(`Connected to ${ geo.country_code }`);
+		BrowserWindow.getAllWindows()
+			.map(win => win.webContents.send("openvpn", "connected", server.hash));
+		
 	}
 
 }
