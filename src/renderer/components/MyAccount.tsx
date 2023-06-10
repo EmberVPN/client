@@ -39,7 +39,7 @@ export function MyAccount(): JSX.Element {
 	useRipple(ref);
 
 	return (
-		<div>
+		<div className={ classNames("group", _open && "is-open") }>
 			
 			{/* Spinner if loading */}
 			<div className={ classNames("absolute top-0 right-0 w-9 transition-opacity", (user && !loading) ? "opacity-0" : "opacity-100") }>
@@ -47,44 +47,42 @@ export function MyAccount(): JSX.Element {
 			</div>
 
 			{/* User controls */}
-			{user && <>
 				
-				{/* Menu button */}
-				<button className={ classNames("flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip transition-[opacity,transform]", loading ? "opacity-0 scale-75" : "opacity-100 scale-100") }
-					onClick={ open }
-					ref={ ref }>
-					<img
-						alt="user photo"
-						className="rounded-full w-9 h-9"
-						src={ User.getAvatarURL(user.id) } />
-					<Tooltip anchor="right">More</Tooltip>
-				</button>
+			{/* Menu button */}
+			<button className={ classNames("flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip transition-[opacity,transform]", loading ? "opacity-0 scale-75" : "opacity-100 scale-100") }
+				onClick={ open }
+				ref={ ref }>
+				{user && <img
+					alt="user photo"
+					className="rounded-full w-9 h-9"
+					src={ User.getAvatarURL(user.id) } />}
+				<Tooltip anchor="right">More</Tooltip>
+			</button>
 
-				{/* Popup window */}
-				<PopupWindow user={ user } />
-				
-			</>}
+			{/* Popup window */}
+			<PopupWindow user={ user } />
 			
 		</div>
 	);
 }
 
-export function PopupWindow({ user }: { user: Auth.User }): JSX.Element {
+export function PopupWindow({ user }: { user?: Auth.User }) {
 
-	useEffect(() => {
-
-		const handle = (e: MouseEvent) => {
+	// Close the popup when the user clicks outside of it
+	useEffect(function() {
+		function handle(e: MouseEvent) {
 			if (e.target instanceof HTMLElement && e.target.closest(".group") === null) close();
-		};
-
+		}
 		document.addEventListener("click", handle);
 		return () => document.removeEventListener("click", handle);
-
 	}, []);
+
+	// If the user is not logged in
+	if (!user) return null;
 
 	return (
 		<div
-			className="absolute top-0 right-0 opacity-0 scale-75 group-[.is-open]:opacity-100 group-[.is-open]:scale-100 transition-all origin-top-right rounded-2xl p-4 min-w-full w-[320px] pointer-events-none group-[.is-open]:pointer-events-auto dark:shadow-xl dark:shadow-black/20 border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden ease-bounce duration-[300ms] drop-shadow-xl"
+			className="absolute -m-1 top-0 right-0 opacity-0 scale-75 group-[.is-open]:opacity-100 group-[.is-open]:scale-100 transition-all origin-top-right rounded-2xl p-4 min-w-full w-[320px] pointer-events-none group-[.is-open]:pointer-events-auto select-none dark:shadow-xl dark:shadow-black/20 border dark:border-gray-700/50 text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-400 overflow-hidden ease-bounce duration-[300ms] drop-shadow-xl"
 			onClick={ e => e.stopPropagation() }>
 			<div className="flex items-center gap-4 overflow-hidden">
 				<img
