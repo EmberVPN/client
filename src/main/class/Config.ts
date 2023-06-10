@@ -14,7 +14,17 @@ export class Config {
 	private static store = new Store({
 		accessPropertiesByDotNotation: false,
 		clearInvalidConfig: true,
-		encryptionKey: "embervpn"
+		encryptionKey: "embervpn",
+		migrations: {
+			"1.3.162": function(store) {
+				store.set("settings.units.distance", store.get("units.distance"));
+				store.set("settings.appearance.theme", store.get("theme"));
+				store.set("auth.token", store.get("authorization"));
+				store.delete("units.distance");
+				store.delete("authorization");
+				store.delete("theme");
+			}
+		}
 	});
 	
 	// Listen for config events
