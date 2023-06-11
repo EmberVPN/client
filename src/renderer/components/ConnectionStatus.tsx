@@ -5,36 +5,87 @@ import { MdErrorOutline } from "react-icons/md";
 import useConnection from "../util/hooks/useConnection";
 import useData from "../util/hooks/useData";
 
-export default function ConnectionStatus(): JSX.Element | null {
+export default function ConnectionStatus() {
 
-	// Get the connection status
-	const { status, active, ipLocation } = useConnection();
-
-	// Get the list of servers
+	// Get the connection status & server list
+	const { status, ipLocation } = useConnection();
 	const { data } = useData("/v2/ember/servers");
 	
-	// If the VPN is connected 
-	const isConnected = status === "connected" || status === "will-connect";
+	// Derive the state
+	const isConnected = status === "connected";
+	const isLoading = status === "connecting" || status === "disconnecting" || status === "will-connect" || status === "installing" || (status === "disconnected" && !(ipLocation && data)) || status === "error";
+	const isDisconnected = status === "disconnected" && !isLoading && !isConnected;
+	const hasSublabel = status === "will-connect" || status === "connecting" || status === "installing" || status === "connected" || (status === "disconnected" && !isLoading);
 	
-	// If somethings loading, show the spinning version
-	if (!ipLocation || !data || status === "connecting" || status === "disconnecting" || status === "will-connect" || status === "installing") return (
-		<div className="flex items-center justify-center h-12 gap-2 px-5 transition-colors border rounded-full border-warn/25 bg-warn/10">
-			<Spinner className="w-6 -ml-2 mr-0.5 !stroke-warn shrink-0" />
-			<div className="flex flex-col justify-center w-full pr-2 font-medium whitespace-nowrap">
-				<h1 className={ classNames("text-warn", (status === "will-connect" || status === "connecting" || status === "installing") && "-mb-1") }>{status === "installing" ? "Installing" : status === "will-connect" ? "Pending" : status.includes("ing") ? status[0].toUpperCase() + status.substring(1) : "Loading"}</h1>
-				{(status === "will-connect" || status === "connecting" || status === "installing") && <p className="text-xs">{status === "installing" ? "OpenVPN Core" : status === "will-connect" ? "Generating keypair" : "Obtaining IP"}</p>}
-			</div>
-		</div>
-	);
-
-	// Render the connection status
 	return (
-		<div className={ classNames("h-12 rounded-full flex items-center justify-center transition-colors border gap-2 px-3", isConnected ? "border-success/25 bg-success/10" : "border-error/25 bg-error/10") }>
-			{ isConnected ? <IoMdCheckmarkCircleOutline className="text-2xl text-success shrink-0" /> : <MdErrorOutline className="text-2xl text-error shrink-0" /> }
-			<div className="flex flex-col justify-center w-full pr-2 font-medium whitespace-nowrap">
-				<h1 className={ classNames("-mb-1", isConnected ? "text-success" : "text-error") }>{!isConnected && "Not "}Connected</h1>
-				<p className="text-xs">{(active && data && data.success && data.servers && data.servers[active]) ? data.servers[active].ip : ipLocation.ip || "Couldn't determine IP"}</p>
+		<div className={ classNames("flex items-center justify-center h-12 gap-2 px-5 transition-colors border rounded-full select-none", {
+			"border-warn/25 bg-warn/10": isLoading,
+			"border-success/25 bg-success/10": isConnected,
+			"border-error/25 bg-error/10": isDisconnected
+		}) }>
+			
+			{/* Icon */}
+			<div className="relative w-6 -ml-2 aspect-square shrink-0">
+
+				{/* Loading */}
+				<div className={ classNames("transition-[opacity,transform] duration-[300ms] ease-bounce absolute inset-0", isLoading ? "scale-100 opacity-100" : "scale-50 opacity-0") }>
+					<Spinner className="stroke-warn" />
+				</div>
+
+				{/* Disconnected */}
+				<div className={ classNames("transition-[opacity,transform] duration-[300ms] ease-bounce absolute inset-0", isDisconnected ? "scale-100 opacity-100" : "scale-50 opacity-0") }>
+					<MdErrorOutline className="text-2xl text-error" />
+				</div>
+
+				{/* Connected */}
+				<div className={ classNames("transition-[opacity,transform] duration-[300ms] ease-bounce absolute inset-0", isConnected ? "scale-100 opacity-100" : "scale-50 opacity-0") }>
+					<IoMdCheckmarkCircleOutline className="text-2xl text-success" />
+				</div>
+
 			</div>
+
+			{/* Text */}
+			<div className="flex flex-col justify-center w-full pr-2 font-medium whitespace-nowrap">
+				
+				{/* Label */}
+				<h1 className={ classNames("transition-[margin,color]", hasSublabel && "-mb-1", {
+					"text-warn": isLoading,
+					"text-success": isConnected,
+					"text-error": isDisconnected
+				}) }>
+					{function() {
+						switch (status) {
+							case "installing": return "Updating";
+							case "will-connect": return "Pending";
+							case "connecting": return "Connecting";
+							case "disconnecting": return "Disconnecting";
+							case "connected": return "Connected";
+							case "error":
+							case "disconnected":
+								if (!ipLocation || !data) return "Obtaining IP";
+								else return "Disconnected";
+							default: return "Loading";
+						}
+					}()}
+				</h1>
+				
+				{/* Sublabel */}
+				<p className={ classNames("transition-[height,transform,opacity] overflow-hidden origin-left text-xs", hasSublabel ? "h-4 opacity-100" : "h-0 opacity-0") }>
+					{function() {
+						switch (status) {
+							case "installing": return "OpenVPN Core";
+							case "will-connect": return "Generating keypair";
+							case "connecting":
+							case "disconnecting": return "Obtaining IP";
+							case "connected":
+							case "disconnected":
+							default: return ipLocation?.ip ?? "Couldn't determine IP";
+						}
+					}()}
+				</p>
+
+			</div>
+			
 		</div>
 	);
 }
