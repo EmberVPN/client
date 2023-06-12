@@ -1,9 +1,11 @@
+import { is } from "@electron-toolkit/utils";
 import { exec } from "child_process";
 import { app } from "electron";
 import { writeFile } from "fs/promises";
 import { basename, dirname, extname, join } from "path";
 import { Config } from "./class/Config";
-import { is } from "@electron-toolkit/utils";
+import { Update } from "./window/Update";
+
 export async function update() {
 	
 	// Fetch latest version
@@ -34,14 +36,18 @@ export async function update() {
 			.then(res => res.arrayBuffer())
 			.then(buf => writeFile(join(app.getPath("sessionData"), binary.name), Buffer.from(buf)))
 			.then(() => join(app.getPath("sessionData"), binary.name));
-		
+
+		// Ensure we're not in dev mode
+		if (is.dev) return;
+
 		// Run the installer
-		await new Promise<void>((resolve, reject) => {
-			if (is.dev) return;
-			exec([ installer ].join(" "))
-				.on("error", reject)
-				.on("close", resolve);
-		}).then(() => setTimeout(() => app.quit(), 1000));
+		if (useExe) exec(installer);
+			
+		else exec(`msiexec /i "${ installer }" /passive /norestart`, () => app.quit());
+		
+		// Close update window
+		Update.close();
+		setTimeout(() => app.quit(), 2500);
 
 		return;
 	}

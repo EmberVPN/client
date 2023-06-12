@@ -35,6 +35,9 @@ export class Update extends Window {
 		ipcMain.on("open", (_event, state: string) => {
 			if (state === "updater") this.open();
 		});
+
+		// On another window open, make sure this one is on top
+		app.on("web-contents-created", () => this.checkForUpdates());
 			
 	}
 	
@@ -43,8 +46,7 @@ export class Update extends Window {
 	 */
 	public static open() {
 		this.configure({
-			title: "Check for Updates • Ember VPN",
-			alwaysOnTop: true,
+			title: "Check for Updates • Ember VPN"
 		});
 	}
 
@@ -67,7 +69,7 @@ export class Update extends Window {
 		// Get latest version
 		return await fetch("https://api.embervpn.org/v2/ember/downloads")
 			.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>)
-			.then(res => {
+			.then(async res => {
 			
 				// Make sure the request was successful
 				if (!res.success) return false;
@@ -77,9 +79,16 @@ export class Update extends Window {
 				
 				// Compare versions
 				if (!gt(latest, version)) return false;
-
-				// await for main window to load
+				
+				// await 1 second
+				await new Promise<void>(resolve => setTimeout(resolve, 1000));
+				
 				this.open();
+				this.instance?.once("ready-to-show", () => {
+					this.instance?.focus();
+					this.instance?.flashFrame(true);
+				});
+				
 				return true;
 				
 			});
