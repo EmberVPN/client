@@ -17,6 +17,7 @@ export class Config {
 		encryptionKey: "embervpn",
 		migrations: {
 			">=1.3.162": function() {
+				
 				Config.migrate("units.distance", "settings.units.distance");
 				Config.migrate("theme", "settings.appearance.theme");
 				Config.migrate("authorization", "auth.token");
@@ -25,26 +26,31 @@ export class Config {
 	});
 
 	/**
-	 * Migrates a config key from one key to another
-	 * @param fromKey The key to migrate from
-	 * @param toKey The key to migrate to
-	 * @returns boolean
-	 */
+		* Migrates a config key from one key to another
+		* @param fromKey The key to migrate from
+		* @param toKey The key to migrate to
+		* @returns boolean
+		*/
 	private static migrate(fromKey: string, toKey: string) {
+		try {
+			
+			// If we already migrated this key, return
+			if (this.store.has(toKey)) return false;
 
-		// If we already migrated this key, return
-		if (this.store.has(toKey)) return false;
-
-		// If the key exists, migrate it
-		if (this.store.has(fromKey)) {
-			const value = this.store.get(fromKey);
-			this.store.delete(fromKey);
-			this.store.set(toKey, value);
-			return true;
+			// If the key exists, migrate it
+			if (this.store.has(fromKey)) {
+				const value = this.store.get(fromKey);
+				this.store.delete(fromKey);
+				this.store.set(toKey, value);
+				return true;
+			}
+		
+		} catch (e) {
+			console.error(e);
 		}
 
 		return false;
-
+		
 	}
 	
 	// Listen for config events
