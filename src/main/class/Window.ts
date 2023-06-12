@@ -3,7 +3,7 @@ import { BrowserWindow, app, shell } from "electron";
 import { resolve } from "path";
 import { resources } from "..";
 
-export class Window {
+export abstract class Window {
 
 	// The current window
 	protected static instance: BrowserWindow | undefined;
