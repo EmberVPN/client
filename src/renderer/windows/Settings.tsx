@@ -15,14 +15,9 @@ export function SettingsWindow() {
 	// Adjust the window size
 	useMounted(() => electron.ipcRenderer.invoke("window-size", 600, 400));
 
-	// Get the distance units
+	// Get config hooks
 	const [ units, setUnits ] = useConfigKey("settings.units.distance");
-	const imperial = units === undefined ? ipLocation?.country_code === "US" : units === "IMPERIAL";
-
-	// Get the theme
 	const [ theme, setTheme ] = useConfigKey("settings.appearance.theme");
-	
-	// Use looparound
 	const [ useSSH, setUseSSH ] = useConfigKey("settings.security.use-ssh");
 
 	// If location is still loading
@@ -46,7 +41,7 @@ export function SettingsWindow() {
 						</div>
 						<div className="pt-3 my-auto">
 							<DropDown
-								defaultValue={ imperial ? "Imperial (mi)" : "Metric (km)" }
+								defaultValue={ (units === undefined ? ipLocation?.country_code === "US" : units === "IMPERIAL") ? "Imperial (mi)" : "Metric (km)" }
 								label="Distance Units"
 								onChange={ (event: ChangeEvent<HTMLInputElement>) => setUnits(event.target.value === "Imperial (mi)" ? "IMPERIAL" : "METRIC") }
 								options={ [
@@ -84,7 +79,7 @@ export function SettingsWindow() {
 					<label className="flex items-center justify-between h-20 gap-4 py-2 -mb-4"
 						htmlFor="opt_looparound">
 						<div className="flex flex-col justify-center">
-							<h1 className="-mb-0.5 text-lg font-medium opacity-80">SSH Looparound</h1>
+							<h1 className="-mb-0.5 text-lg font-medium opacity-80">Secure with SSH</h1>
 							<p className="text-sm font-medium dark:font-normal opacity-60">Add an extra layer of encryption via SSH tunneling.</p>
 						</div>
 						<div className="pt-3 my-auto">
