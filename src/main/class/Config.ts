@@ -16,7 +16,7 @@ export class Config {
 		clearInvalidConfig: true,
 		encryptionKey: "embervpn",
 		migrations: {
-			"1.3.162": function() {
+			">=1.3.162": function() {
 				Config.migrate("units.distance", "settings.units.distance");
 				Config.migrate("theme", "settings.appearance.theme");
 				Config.migrate("authorization", "auth.token");
