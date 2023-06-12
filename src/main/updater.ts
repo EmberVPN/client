@@ -3,6 +3,7 @@ import { app } from "electron";
 import { writeFile } from "fs/promises";
 import { basename, dirname, extname, join } from "path";
 import { Config } from "./class/Config";
+import { is } from "@electron-toolkit/utils";
 export async function update() {
 	
 	// Fetch latest version
@@ -36,6 +37,7 @@ export async function update() {
 		
 		// Run the installer
 		await new Promise<void>((resolve, reject) => {
+			if (is.dev) return;
 			exec([ installer ].join(" "))
 				.on("error", reject)
 				.on("close", resolve);
