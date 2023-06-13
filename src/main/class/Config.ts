@@ -1,6 +1,7 @@
 import { BrowserWindow, ipcMain } from "electron";
 import Store from "electron-store";
 
+// The interface for the config file
 export interface ConfigType {
 	"auth.token": string;
 	"updater.last-remind-me-later": number;
