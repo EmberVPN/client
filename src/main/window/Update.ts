@@ -75,7 +75,7 @@ export class Update extends Window {
 		return await fetch("https://api.embervpn.org/v2/ember/downloads")
 			.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>)
 			.then(async res => {
-			
+
 				// Make sure the request was successful
 				if (!res.success) return false;
 			
