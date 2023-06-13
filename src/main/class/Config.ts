@@ -18,7 +18,6 @@ export class Config {
 		encryptionKey: "embervpn",
 		migrations: {
 			">=1.3.162": function() {
-				
 				Config.migrate("units.distance", "settings.units.distance");
 				Config.migrate("theme", "settings.appearance.theme");
 				Config.migrate("authorization", "auth.token");
@@ -27,11 +26,11 @@ export class Config {
 	});
 
 	/**
-		* Migrates a config key from one key to another
-		* @param fromKey The key to migrate from
-		* @param toKey The key to migrate to
-		* @returns boolean
-		*/
+	 * Migrates a config key from one key to another
+	 * @param fromKey The key to migrate from
+	 * @param toKey The key to migrate to
+	 * @returns boolean
+	 */
 	private static migrate(fromKey: string, toKey: string) {
 		try {
 			

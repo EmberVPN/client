@@ -7,6 +7,7 @@ import { Auth } from "./class/Auth";
 import "./class/Config";
 import "./class/IPManager";
 import "./class/KeybindManager";
+import "./class/OpenSSH";
 import "./class/OpenVPN";
 import "./class/Tray";
 

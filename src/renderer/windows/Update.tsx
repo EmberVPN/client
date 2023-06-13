@@ -7,6 +7,7 @@ import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdArrowRight, MdBrowserUpdated, MdErrorOutline } from "react-icons/md";
 import { gt } from "semver";
 import Titlebar from "../components/Titlebar";
+import { useConfigKey } from "../util/hooks/useConfigKey";
 import useData from "../util/hooks/useData";
 import { usePromise } from "../util/hooks/usePromise";
 
@@ -18,6 +19,7 @@ export function UpdateWindow(): JSX.Element {
 	// Fetch the downloads and OpenVPN version
 	const { data, isLoading } = useData("/v2/ember/downloads");
 	const ovpnVersion = usePromise<string>(electron.ipcRenderer.invoke("openvpn", "version"));
+	const opensshVersion = usePromise<string>(electron.ipcRenderer.invoke("openssh", "version"));
 
 	return (
 		<div className="flex flex-col w-screen h-screen overflow-hidden bg-gray-100 dark:bg-gray-900">
@@ -25,12 +27,13 @@ export function UpdateWindow(): JSX.Element {
 				resizeable={ false }>Check for Updates</Titlebar>
 			<div className="flex justify-center gap-2 px-4 py-4 select-none grow"
 				ref={ ref }>
-				{ (!data || !ovpnVersion || isLoading) ? (
+				{ (!data || !ovpnVersion || isLoading || !opensshVersion) ? (
 					<div className="flex items-center justify-center w-full"
 						key="spinner">
 						<Spinner />
 					</div>
 				) : <Content data={ data }
+					opensshVersion={ opensshVersion }
 					ovpnVersion={ ovpnVersion } /> }
 			</div>
 		</div>
@@ -39,10 +42,13 @@ export function UpdateWindow(): JSX.Element {
 }
 
 // Render the content
-function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIResponse<EmberAPI.ClientDownloads> }) {
+function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: string, opensshVersion: string, data: REST.APIResponse<EmberAPI.ClientDownloads> }) {
 		
 	// Fetch the downloads
 	const [ loading, setLoading ] = useState(false);
+	
+	// Use ssh enabled
+	const [ sshEnabled ] = useConfigKey("settings.security.use-ssh");
 
 	// If failed, show the error message
 	if (!data.success) return (
@@ -67,20 +73,32 @@ function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIRes
 	// Get the versions to display
 	const versions = [ {
 		name: "Ember VPN",
+		product: "embervpn",
 		version,
 		latest,
 		isLatest,
 	}, {
 		name: "OpenVPN Core",
+		product: "openvpn",
 		subtitle: "Required by Ember VPN",
 		isLatest: isOvpnLatest,
 		version: ovpnLatest,
 		latest: ovpnLatest,
 	} ];
+	
+	// Add OpenSSH if enabled
+	if (sshEnabled) versions.push({
+		name: "OpenSSH",
+		product: "openssh",
+		subtitle: "Required by Ember VPN",
+		isLatest: false,
+		version: opensshVersion.replace(/[^0-9]/g, "."),
+		latest: opensshVersion.replace(/[^0-9]/g, "."),
+	});
 
 	const outdated: string[] = [];
-	if (!isLatest) outdated.push("embervpn");
-	if (!isOvpnLatest) outdated.push("openvpn");
+	versions.filter(item => !item.isLatest)
+		.forEach(item => outdated.push(item.product));
 
 	// Update the application
 	async function update() {
@@ -92,7 +110,7 @@ function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIRes
 
 	// If the version is the latest, show the message
 	return (
-		<div className="flex flex-col items-center justify-around w-full grow"
+		<div className="flex flex-col items-center justify-around w-full -mt-12 grow"
 			key="result">
 			<div className="flex flex-col items-center gap-2 px-4 m-auto">
 					
@@ -146,7 +164,7 @@ function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIRes
 					color="warn"
 					loading={ loading }
 					onClick={ update }
-					variant="outlined">install update</Button>
+					variant="outlined">update all</Button>
 			</div>
 				
 		</div>
