@@ -81,6 +81,7 @@ function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: string, o
 		name: "OpenVPN Core",
 		product: "openvpn",
 		subtitle: "Required by Ember VPN",
+		product: "openvpn",
 		isLatest: isOvpnLatest,
 		version: ovpnLatest,
 		latest: ovpnLatest,
