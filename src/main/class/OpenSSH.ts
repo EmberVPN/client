@@ -1,8 +1,10 @@
+import { is } from "@electron-toolkit/utils";
 import { exec } from "child_process";
 import { app, ipcMain } from "electron";
-import { writeFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
+import { mkdirp } from "mkdirp";
 import os from "os";
-import { dirname, extname, join } from "path";
+import { dirname, extname, join, resolve } from "path";
 import { resources } from "..";
 
 export class OpenSSH {
@@ -85,6 +87,22 @@ export class OpenSSH {
 			});
 		});
 
+	}
+
+	/**
+	 * Generate keypair
+	 * @returns Promise<string> The public key
+	 */
+	public static async generateKeyPair() {
+
+		// Get path to save keypair
+		const path = resolve(is.dev ? resources : app.getPath("sessionData"), ".ssh", "ember_ed25519");
+		await mkdirp(dirname(path)).catch(console.error);
+
+		const cmd = `${ process.platform === "win32" ? "powershell Write-Output" : "echo" } "y"| ssh-keygen -ted25519 -f "${ path }" -q -N ""`;
+		await new Promise(r => exec(cmd, r));
+
+		return await readFile(path + ".pub", "utf-8");
 	}
 
 }
