@@ -4,7 +4,7 @@ import { BrowserWindow, app, ipcMain } from "electron";
 import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
 import os from "os";
-import { dirname, resolve } from "path";
+import { dirname, extname, join, resolve } from "path";
 import { resources } from "..";
 import { calculateDistance } from "../../calculateDistance";
 import { Auth } from "./Auth";
@@ -346,18 +346,26 @@ export class OpenVPN {
 
 			// Get architecture
 			const arch = [ "ppc64", "x64", "s390x" ].includes(os.arch()) ? "amd64" : os.arch() === "arm64" ? "arm64" : "x86";
-		
-			// Figure out where to put it
-			const SAVE_PATH = resolve(app.getPath("sessionData"), `openvpn-latest-stable-${ arch }.msi`);
+			
+			// Get latest version from API
+			const downloads = await fetch("https://api.embervpn.org/v3/ember/downloads")
+				.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>)
+				.then(res => res.success ? res.dependencies["openvpn"].assets[process.platform] : null);
+			if (!downloads) throw new Error("Failed to fetch downloads links");
 
-			// Download installer to user's temp directory
-			await fetch(`https://build.openvpn.net/downloads/releases/latest/openvpn-latest-stable-${ arch }.msi`)
+			// Get download link
+			const download = downloads.find(download => download.includes(arch));
+			if (!download) throw new Error("Failed to find a download for this platform/architecture");
+			
+			const savePath = join(resources, "openvpn-update" + extname(download));
+			
+			// Download installer
+			await fetch(download)
 				.then(res => res.arrayBuffer())
-				.then(buffer => writeFile(SAVE_PATH, Buffer.from(buffer)));
+				.then(buffer => writeFile(savePath, Buffer.from(buffer)));
 
 			// Install openvpn
-			await exec(`msiexec /i "${ SAVE_PATH }" PRODUCTDIR="${ dirname(app.getPath("exe")) }" ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun /passive`);
-			return;
+			return await new Promise(resolve => exec(`msiexec /i "${ savePath }" PRODUCTDIR="${ dirname(app.getPath("exe")) }" ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun /passive`, resolve));
 
 		}
 
