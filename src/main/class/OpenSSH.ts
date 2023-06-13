@@ -1,5 +1,5 @@
 import { is } from "@electron-toolkit/utils";
-import { exec } from "child_process";
+import { ChildProcessWithoutNullStreams, exec, spawn } from "child_process";
 import { app, ipcMain } from "electron";
 import { readFile, writeFile } from "fs/promises";
 import { mkdirp } from "mkdirp";
@@ -9,8 +9,11 @@ import { resources } from "..";
 
 export class OpenSSH {
 
-	// The current version of OpenVPN
-	private static _version: string | null = null;
+	// Instance of OpenSSH
+	private static instance: ChildProcessWithoutNullStreams;
+
+	// Path to the keypair
+	private static keypair: string;
 
 	// Manage the openssh lifecycle
 	static {
@@ -67,9 +70,6 @@ export class OpenSSH {
 	 */
 	public static async getVersion() {
 
-		// If we already have the version, return it
-		if (this._version) return this._version;
-
 		// Get the version
 		return new Promise<string>(resolve => {
 			exec("ssh -V", (err, stdout, stderr) => {
@@ -95,14 +95,36 @@ export class OpenSSH {
 	 */
 	public static async generateKeyPair() {
 
-		// Get path to save keypair
-		const path = resolve(is.dev ? resources : app.getPath("sessionData"), ".ssh", "ember_ed25519");
-		await mkdirp(dirname(path)).catch(console.error);
+		// Get path to save keypair;
+		this.keypair = resolve(is.dev ? resources : app.getPath("sessionData"), ".ssh", "ember_ed25519");
 
-		const cmd = `${ process.platform === "win32" ? "powershell Write-Output" : "echo" } "y"| ssh-keygen -ted25519 -f "${ path }" -q -N ""`;
+		await mkdirp(dirname(this.keypair)).catch(console.error);
+
+		const cmd = `${ process.platform === "win32" ? "powershell Write-Output" : "echo" } "y"| ssh-keygen -ted25519 -f "${ this.keypair }" -q -N ""`;
 		await new Promise(r => exec(cmd, r));
 
-		return await readFile(path + ".pub", "utf-8");
+		return await readFile(this.keypair + ".pub", "utf-8")
+			.then(key => key.split(" ")[1]);
+	}
+
+	/**
+	 * Start OpenSSH link to a server
+	 * @param ip The server to connect to
+	 */
+	public static async start(ip: string) {
+
+		// Check if OpenSSH is already running
+		if (this.instance?.pid) this.instance.kill();
+
+		const cmd = `ssh -i "${ this.keypair }" -NL 1194:localhost:1194 vpn@${ ip }`;
+
+		// Start the tunnel
+		this.instance = spawn(cmd, { shell: true })
+			.on("exit", () => console.log("exited"));
+		
+		// Let SSH start
+		return await new Promise(resolve => setTimeout(resolve, 1000));
+
 	}
 
 }

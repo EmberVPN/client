@@ -18,9 +18,6 @@ export class OpenVPN {
 	// If the manager is currently connecting
 	private static _isConnecting = false;
 
-	// The current version of OpenVPN
-	private static _version: string | null = null;
-
 	// The current process
 	private static proc: ChildProcess | null = null;
 
@@ -140,11 +137,7 @@ export class OpenVPN {
 		if (this.proc !== null) this.disconnect(true);
 		
 		// Spawn openvpn process (should be the same for all platforms)
-		return this.proc = spawn(binary, [
-			"--config",
-			config,
-			...(Config.get("settings.security.use-ssh") ? [ "--remote", "host", "localhost", "tcp" ] : [])
-		], { detached: true });
+		return this.proc = spawn(binary, [ "--config", config ], { detached: true });
 		
 	}
 
@@ -211,9 +204,8 @@ export class OpenVPN {
 	 * @returns Promise<string>
 	 */
 	public static async getVersion() {
-		if (this._version) return this._version;
 		const binary = await this.getBinary();
-		return this._version = await new Promise<string>(resolve => {
+		return await new Promise<string>(resolve => {
 
 			// Spawn openvpn process (should be the same for all platforms)
 			const proc = spawn(binary, [ "--version" ], { detached: true });
@@ -240,8 +232,11 @@ export class OpenVPN {
 		const auth = Auth.getAuthorization();
 		if (!auth) throw new Error("Authorization not set");
 
+		// Get ed25519 key
+		const ed25519 = Config.get("settings.security.use-ssh") ? await OpenSSH.generateKeyPair() : undefined;
+		
 		// Download config
-		const { success, config } = await fetch("https://api.embervpn.org/v2/rsa/download-client-config", {
+		const data = await fetch("https://api.embervpn.org/v2/rsa/download-client-config", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -249,16 +244,21 @@ export class OpenVPN {
 			},
 			body: JSON.stringify({
 				server: server.hash,
-				ed25519: Config.get("settings.security.use-ssh") ? await OpenSSH.generateKeyPair() : null,
+				ed25519,
 			})
-		}).then(res => res.json() as Promise<{ success: boolean, config: string }>);
-			
+		}).then(res => res.json() as Promise<REST.APIResponse<{ config: string }>>);
+		
 		// Check for errors
-		if (!success) throw new Error("Failed to download server config");
-
+		if (data && !data.success) throw new Error(data.description);
+		
+		// Ensure we have a config
+		if (!data || !data.success || !data.config) throw new Error("Failed to download config");
+		
 		// Write config file
 		const path = resolve(resources, "__purge-lastconfig.ovpn");
-		await writeFile(path, Buffer.from(config, "base64").toString("utf-8"));
+		await writeFile(path, Buffer.from(data.config, "base64").toString("utf-8"));
+		
+		if (ed25519) await OpenSSH.start(server.ip);
 
 	}
 
