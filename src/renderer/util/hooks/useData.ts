@@ -3,7 +3,7 @@ import { useConfigKey } from "./useConfigKey";
 
 interface Endpoints {
 	"/v2/ember/servers": EmberAPI.Servers;
-	"/v2/ember/downloads": EmberAPI.ClientDownloads;
+	"/v3/ember/downloads": EmberAPI.ClientDownloads;
 }
 
 export default function useData<T extends keyof Endpoints>(route: T): { data: REST.APIResponse<Endpoints[T]> | undefined, isLoading: boolean } {
