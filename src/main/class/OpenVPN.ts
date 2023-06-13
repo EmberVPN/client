@@ -16,9 +16,6 @@ export class OpenVPN {
 	// If the manager is currently connecting
 	private static _isConnecting = false;
 
-	// The current version of OpenVPN
-	private static _version: string | null = null;
-
 	// The current process
 	private static proc: ChildProcess | null = null;
 
@@ -205,9 +202,8 @@ export class OpenVPN {
 	 * @returns Promise<string>
 	 */
 	public static async getVersion() {
-		if (this._version) return this._version;
 		const binary = await this.getBinary();
-		return this._version = await new Promise<string>(resolve => {
+		return await new Promise<string>(resolve => {
 
 			// Spawn openvpn process (should be the same for all platforms)
 			const proc = spawn(binary, [ "--version" ], { detached: true });
