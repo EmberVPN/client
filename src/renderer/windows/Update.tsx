@@ -67,20 +67,22 @@ function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIRes
 	// Get the versions to display
 	const versions = [ {
 		name: "Ember VPN",
+		product: "embervpn",
 		version,
 		latest,
 		isLatest,
 	}, {
 		name: "OpenVPN Core",
 		subtitle: "Required by Ember VPN",
+		product: "openvpn",
 		isLatest: isOvpnLatest,
 		version: ovpnLatest,
 		latest: ovpnLatest,
 	} ];
 
 	const outdated: string[] = [];
-	if (!isLatest) outdated.push("embervpn");
-	if (!isOvpnLatest) outdated.push("openvpn");
+	versions.filter(item => !item.isLatest)
+		.forEach(item => outdated.push(item.product));
 
 	// Update the application
 	async function update() {
