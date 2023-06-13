@@ -8,6 +8,7 @@ import { Auth } from "../class/Auth";
 import { Config } from "../class/Config";
 import { OpenVPN } from "../class/OpenVPN";
 import { Window } from "../class/Window";
+import { platform } from "process";
 
 export class Update extends Window {
 	
@@ -79,7 +80,7 @@ export class Update extends Window {
 				if (!res.success) return false;
 			
 				// Get latest version
-				const latest = res.version.substring(1);
+				const latest = res.latest.substring(1);
 				
 				// Compare versions
 				if (!gt(latest, version)) return false;
@@ -113,7 +114,7 @@ export class Update extends Window {
 		if (!res.success) return;
 
 		// Get latest version
-		const builds = res.assets.filter(a => a.platform === process.platform);
+		const builds = res.assets[platform];
 
 		// Clear procrastination
 		Config.delete("updater.last-remind-me-later");
