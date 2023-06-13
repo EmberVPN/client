@@ -72,13 +72,13 @@ export class Update extends Window {
 		const version = app.getVersion();
 		
 		// Get latest version
-		return await fetch("https://api.embervpn.org/v2/ember/downloads")
+		return await fetch("https://api.embervpn.org/v3/ember/downloads")
 			.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>)
 			.then(async res => {
 
 				// Make sure the request was successful
 				if (!res.success) return false;
-			
+
 				// Get latest version
 				const latest = res.latest.substring(1);
 				
