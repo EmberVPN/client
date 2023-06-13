@@ -12,11 +12,11 @@ type TrayState = "connected" | "disconnected" | "connecting";
 
 export class Tray {
 
+	// Initialize the tray state
+	public static state: TrayState = "disconnected";
+	
 	// Initialize the actual tray
 	private static tray?: ElectronTray;
-
-	// Initialize the tray state
-	private static state: TrayState = "disconnected";
 	
 	// Initialize the tray menu
 	private static menu: Record<string, Electron.MenuItemConstructorOptions> = {};
