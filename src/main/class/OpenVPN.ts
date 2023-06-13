@@ -123,7 +123,7 @@ export class OpenVPN {
 		
 		// Get binary and config path
 		const binary = await this.getBinary();
-		const config = resolve(resources, "ember.ovpn");
+		const config = resolve(resources, "__purge-lastconfig.ovpn");
 		
 		// Set connecting state
 		await Tray.setState("connecting");
@@ -247,7 +247,7 @@ export class OpenVPN {
 		if (!success) throw new Error("Failed to download server config");
 
 		// Write config file
-		const path = resolve(resources, "ember.ovpn");
+		const path = resolve(resources, "__purge-lastconfig.ovpn");
 		await writeFile(path, Buffer.from(config, "base64").toString("utf-8"));
 
 	}
@@ -357,7 +357,7 @@ export class OpenVPN {
 			const download = downloads.find(download => download.includes(arch));
 			if (!download) throw new Error("Failed to find a download for this platform/architecture");
 			
-			const savePath = join(resources, "openvpn-update" + extname(download));
+			const savePath = join(resources, "__purge-openvpn" + extname(download));
 			
 			// Download installer
 			await fetch(download)
