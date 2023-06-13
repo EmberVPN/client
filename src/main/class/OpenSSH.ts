@@ -19,17 +19,23 @@ export class OpenSSH {
 
 	/**
 	 * Installs OpenSSH on the system
-	 * @returns {Promise<void>}
+	 * @returns Promise<void>
 	 */
-	private static async install() {
+	public static async update() {
 
-		// Install OpenSSH
+		// Check platform
+		if (process.platform === "win32") {
+
+			return;
+		}
+
+		throw new Error("Unsupported platform");
 
 	}
 
 	/**
 	 * Gets the version of OpenSSH
-	 * @returns {Promise<string>} The version of OpenSSH
+	 * @returns Promise<string> The version of OpenSSH
 	 */
 	public static async getVersion() {
 
@@ -43,7 +49,7 @@ export class OpenSSH {
 				// If there was an error, install openssh and try again
 				if (err) {
 					console.error(err);
-					if (err) return this.install().then(() => this.getVersion());
+					if (err) return this.update().then(() => this.getVersion());
 				}
 
 				const output = [ stdout, stderr ].join("\n").trim();

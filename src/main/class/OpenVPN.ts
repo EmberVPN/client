@@ -345,7 +345,7 @@ export class OpenVPN {
 		if (process.platform === "win32") {
 
 			// Get architecture
-			const arch = [ "arm64", "ppc64", "x64", "s390x" ].includes(os.arch()) ? "amd64" : "x86";
+			const arch = [ "ppc64", "x64", "s390x" ].includes(os.arch()) ? "amd64" : os.arch() === "arm64" ? "arm64" : "x86";
 		
 			// Figure out where to put it
 			const SAVE_PATH = resolve(app.getPath("sessionData"), `openvpn-latest-stable-${ arch }.msi`);
