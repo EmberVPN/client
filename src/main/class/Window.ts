@@ -46,7 +46,8 @@ export abstract class Window {
 				preload: resolve(__dirname, "../preload/index.js"),
 				nodeIntegration: true,
 				sandbox: false,
-				webviewTag: true
+				webviewTag: true,
+				devTools: is.dev
 			},
 			...options,
 			show: false,
