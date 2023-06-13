@@ -3,7 +3,7 @@ import { BrowserWindow, app, shell } from "electron";
 import { resolve } from "path";
 import { resources } from "..";
 
-export class Window {
+export abstract class Window {
 
 	// The current window
 	protected static instance: BrowserWindow | undefined;
@@ -46,7 +46,8 @@ export class Window {
 				preload: resolve(__dirname, "../preload/index.js"),
 				nodeIntegration: true,
 				sandbox: false,
-				webviewTag: true
+				webviewTag: true,
+				devTools: is.dev
 			},
 			...options,
 			show: false,

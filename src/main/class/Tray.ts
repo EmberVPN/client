@@ -1,4 +1,4 @@
-import { BrowserWindow, Tray as ElectronTray, Menu, Notification, app, nativeImage } from "electron";
+import { Tray as ElectronTray, Menu, Notification, app, nativeImage } from "electron";
 import { resolve } from "path";
 import { resources } from "..";
 import { Main } from "../window/Main";
@@ -7,42 +7,69 @@ import { Update } from "../window/Update";
 import { Auth } from "./Auth";
 import { OpenVPN } from "./OpenVPN";
 
+// The state that the tray can be in
+type TrayState = "connected" | "disconnected" | "connecting";
+
 export class Tray {
 
+	// Initialize the tray state
+	public static state: TrayState = "disconnected";
+	
 	// Initialize the actual tray
 	private static tray?: ElectronTray;
-
-	// Initialize the tray state
-	private static _state: "connected" | "disconnected" | "connecting" = "disconnected";
-
-	static get state() {
-		return this._state;
-	}
+	
+	// Initialize the tray menu
+	private static menu: Record<string, Electron.MenuItemConstructorOptions> = {};
 
 	// Initialize the tray tooltip
 	private static tooltip = "Ember VPN";
 
-	// Initialize the tray images
-	private static imagesByState = {
-		"connected": "tray-connected",
-		"disconnected": "tray",
-		"connecting": "tray-pending"
-	} satisfies Record<typeof this._state, string>;
+	// A record of images by state
+	private static imagesByState: Record<TrayState, string> = {
+		connected: "tray-connected",
+		disconnected: "tray",
+		connecting: "tray-pending"
+	};
 
-	// Initialize the tray menu
-	private static menu: Record<string, Electron.MenuItemConstructorOptions> = {};
+	// Await app ready, then create the tray
+	static {
+		app.once("ready", async() => {
 
-	// Takes a name and optional size and returns a resized image for the tray
+			// Initialize the tray
+			this.tray = new ElectronTray(this.resizeImage("tray"));
+
+			// Open the window when the tray is clicked
+			this.tray.on("click", () => Main.open());
+
+			// Set the default state
+			await this.setState(this.state);
+			await this.refreshMenu();
+			
+		});
+	}
+
+	/**
+	 * Resize an image using the nativeImage module
+	 * @param name name of the image, without path or extension 
+	 * @param size size of the image, in pixels (default 16)
+	 * @returns NativeImage
+	 */
 	private static resizeImage(name: string, size = 16) {
 		return nativeImage.createFromPath(resolve(resources, `./assets/${ name }.png`)).resize({ width: size, height: size });
 	}
 
-	// Sets the tray menu
+	/**
+	 * Completely replace the tray menu with a new one
+	 * @param menu Electron.MenuItemConstructorOptions[]
+	 */
 	private static setMenu(menu: Electron.MenuItemConstructorOptions[]) {
 		this.tray?.setContextMenu(Menu.buildFromTemplate(menu));
 	}
 
-	// Pushes a menu item to the tray menu
+	/**
+	 * Push a menu item to the tray menu (items are appended to the end)
+	 * @param item Electron.MenuItemConstructorOptions
+	 */
 	private static pushMenuItem(item: Electron.MenuItemConstructorOptions) {
 
 		// Get the item label
@@ -56,49 +83,29 @@ export class Tray {
 
 	}
 
-	// Removes a menu item from the tray menu
+	/**
+	 * Remove a menu item from the tray menu from its label or object
+	 * @param item Electron.MenuItemConstructorOptions | string
+	 */
 	private static removeMenuItem(item: string | Electron.MenuItemConstructorOptions) {
 		if (typeof item === "string") delete this.menu[item];
 		else delete this.menu[JSON.stringify(item)];
 		this.setMenu(Object.values(this.menu));
 	}
 
-	static {
-		
-		// Request single instance lock before the app init
-		const isUnlocked = app.requestSingleInstanceLock();
-		if (!isUnlocked) app.quit();
-			
-		// Await app ready, then create the tray
-		else app.once("ready", async() => {
-
-			// Initialize the tray
-			this.tray = new ElectronTray(this.resizeImage("tray"));
-
-			// Open the window when the tray is clicked
-			this.tray.on("click", function() {
-			
-				// Sort so main window with Main.is is first
-				BrowserWindow.getAllWindows().sort((a, b) => {
-					if (Main.is(a)) return -1;
-					if (Main.is(b)) return 1;
-					return 0;
-				}).at(0)?.show();
-				
-			});
-
-			// Set the default state
-			await this.setState(this._state);
-			await this.refreshMenu();
-			
-		});
-	}
-
+	/**
+	 * Set the tray tooltip
+	 * @param tooltip string | undefined
+	 */
 	private static setToolTip(tooltip?: string) {
 		this.tooltip = tooltip ? `Ember VPN • ${ tooltip }` : "Ember VPN";
 		this.tray?.setToolTip(this.tooltip);
 	}
 
+	/**
+	 * Remove and re-add all items in the tray menu.
+	 * This is used to update the menu when the user connects or disconnects, logs in/out, etc.
+	 */
 	public static async refreshMenu() {
 
 		// Reset the tray menu
@@ -125,25 +132,6 @@ export class Tray {
 			label: "settings-sep"
 		});
 		
-		await this.addMenuItems();
-
-		this.pushMenuItem({
-			type: "separator",
-			label: "title-sep"
-		});
-
-		// Add the tray title
-		this.pushMenuItem({
-			label: "Ember VPN",
-			accelerator: `v${ app.getVersion() }`,
-			enabled: false,
-			icon: this.resizeImage("icon", 16),
-		});
-
-	}
-	
-	private static async addMenuItems() {
-
 		// Check if we're authorized
 		const authorized = await Auth.isAuthorized();
 
@@ -169,37 +157,61 @@ export class Tray {
 		});
 		
 		// Add the disconnect button if we're connected
-		if (this._state === "connected") this.pushMenuItem({
+		if (this.state === "connected") this.pushMenuItem({
 			label: "Disconnect",
 			click: () => OpenVPN.disconnect(),
-			enabled: this._state === "connected"
+			enabled: this.state === "connected"
 		});
 
 		// Add the quick connect button if we're disconnected
 		else if (authorized) this.pushMenuItem({
 			label: "Quick Connect",
 			click: () => OpenVPN.quickConnect(),
-			enabled: this._state === "disconnected" && !OpenVPN.isConnecting()
+			enabled: this.state === "disconnected" && !OpenVPN.isConnecting()
 		});
+
+		this.pushMenuItem({
+			type: "separator",
+			label: "title-sep"
+		});
+
+		// Add the tray title
+		this.pushMenuItem({
+			label: "Ember VPN",
+			accelerator: `v${ app.getVersion() }`,
+			enabled: false,
+			icon: this.resizeImage("icon", 16),
+		});
+
 	}
 
-	public static async setState(state: typeof this._state) {
+	/**
+	 * Set the tray state
+	 * @param state TrayState
+	 */
+	public static async setState(state: TrayState) {
 
 		// Set the state
-		this._state = state;
+		this.state = state;
 
 		// Set the tray image
-		this.tray?.setImage(this.resizeImage(this.imagesByState[this._state]));
+		this.tray?.setImage(this.resizeImage(Tray.imagesByState[this.state]));
 
 		// Set tooltip
-		this.setToolTip(this._state.replace(/^\w/, c => c.toUpperCase()));
+		this.setToolTip(this.state.replace(/^\w/, c => c.toUpperCase()));
 
 		// Reload the menu
 		await this.refreshMenu();
 
 	}
 
-	public static notify(body: string, title = this.tooltip, icon = this.imagesByState[this._state]) {
+	/**
+	 * Show a notification
+	 * @param body string
+	 * @param title string (defaults to "Ember VPN")
+	 * @param icon string (defaults to the tray icon for the current state)
+	 */
+	public static notify(body: string, title = this.tooltip, icon = Tray.imagesByState[this.state]) {
 		new Notification({
 			body,
 			title,

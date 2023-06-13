@@ -1,11 +1,12 @@
 import admin from "admin-check";
-import { ChildProcess, spawn } from "child_process";
-import { BrowserWindow, ipcMain } from "electron";
+import { ChildProcess, exec, spawn } from "child_process";
+import { BrowserWindow, app, ipcMain } from "electron";
+import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
-import { resolve } from "path";
+import os from "os";
+import { dirname, resolve } from "path";
 import { resources } from "..";
 import { calculateDistance } from "../../calculateDistance";
-import { getBinary } from "../vpnutils";
 import { Auth } from "./Auth";
 import { IPManager } from "./IPManager";
 import { Tray } from "./Tray";
@@ -70,8 +71,8 @@ export class OpenVPN {
 	}
 
 	/**
-	* Disconnect from the VPN
-	* @returns Promise<void>
+	 * Disconnect from the VPN
+	 * @returns Promise<void>
 	 */
 	public static async disconnect(switching = false) {
 
@@ -112,16 +113,16 @@ export class OpenVPN {
 	}
 
 	/**
-	* Connect to the VPN configuration thats been downloaded
-	* @returns Promise<void>
-	*/
-	private static async connect() {
+	 * Connect to the VPN configuration thats been downloaded
+	 * @returns Promise<void>
+	 */
+	public static async connect() {
 
 		// Ensure we have a server to connect to
 		if (!this.server) throw new Error("Server not set");
 		
 		// Get binary and config path
-		const binary = await getBinary();
+		const binary = await this.getBinary();
 		const config = resolve(resources, "ember.ovpn");
 		
 		// Set connecting state
@@ -203,9 +204,9 @@ export class OpenVPN {
 	 * Get the current version of OpenVPN
 	 * @returns Promise<string>
 	 */
-	public static async getVersion(): Promise<string> {
+	public static async getVersion() {
 		if (this._version) return this._version;
-		const binary = await getBinary();
+		const binary = await this.getBinary();
 		return this._version = await new Promise<string>(resolve => {
 
 			// Spawn openvpn process (should be the same for all platforms)
@@ -294,6 +295,75 @@ export class OpenVPN {
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "connected", server.hash));
 		
+	}
+
+	/**
+	 * Locate the OpenVPN binary
+	 * @returns Promise<string>
+	 */
+	public static async getBinary() {
+
+		// Check platform
+		if (process.platform === "win32") {
+		
+			// Check if openvpn is on path
+			const path = process.env.Path?.split(";").find(path => existsSync(resolve(path, "openvpn.exe")));
+			if (path) return resolve(path, "openvpn.exe");
+
+			// Check default location
+			const defaultLocation = resolve(process.env.ProgramFiles || "C:\\Program Files", "OpenVPN/bin/openvpn.exe");
+			if (existsSync(defaultLocation)) return defaultLocation;
+
+			// Check bundled location
+			const bundledLocation = resolve(dirname(app.getPath("exe")), "bin/openvpn.exe");
+			if (existsSync(bundledLocation)) return bundledLocation;
+		
+			// Set state to installing
+			BrowserWindow.getAllWindows()
+				.map(win => win.webContents.send("openvpn", "installing"));
+			
+			// Install OpenVPN
+			await this.update();
+
+			// Return bundled location
+			return await this.getBinary();
+
+		}
+	
+		// Throw an error if the platform is not supported *yet*
+		throw new Error("Unsupported platform");
+
+	}
+
+	/**
+	 * Install the latest version of OpenVPN
+	 * @returns Promise<void>
+	 */
+	public static async update() {
+
+		// Check platform
+		if (process.platform === "win32") {
+
+			// Get architecture
+			const arch = [ "arm64", "ppc64", "x64", "s390x" ].includes(os.arch()) ? "amd64" : "x86";
+		
+			// Figure out where to put it
+			const SAVE_PATH = resolve(app.getPath("sessionData"), `openvpn-latest-stable-${ arch }.msi`);
+
+			// Download installer to user's temp directory
+			await fetch(`https://build.openvpn.net/downloads/releases/latest/openvpn-latest-stable-${ arch }.msi`)
+				.then(res => res.arrayBuffer())
+				.then(buffer => writeFile(SAVE_PATH, Buffer.from(buffer)));
+
+			// Install openvpn
+			await exec(`msiexec /i "${ SAVE_PATH }" PRODUCTDIR="${ dirname(app.getPath("exe")) }" ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun /passive`);
+			return;
+
+		}
+
+		// Throw an error if the platform is not supported *yet*
+		throw new Error("Unsupported platform");
+
 	}
 
 }
