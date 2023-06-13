@@ -323,7 +323,7 @@ export class OpenVPN {
 				.map(win => win.webContents.send("openvpn", "installing"));
 			
 			// Install OpenVPN
-			await this.install();
+			await this.update();
 
 			// Return bundled location
 			return await this.getBinary();
@@ -339,7 +339,7 @@ export class OpenVPN {
 	 * Install the latest version of OpenVPN
 	 * @returns Promise<void>
 	 */
-	public static async install() {
+	public static async update() {
 
 		// Check platform
 		if (process.platform === "win32") {

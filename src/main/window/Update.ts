@@ -2,9 +2,9 @@ import { BrowserWindow, app, ipcMain } from "electron";
 import { gt } from "semver";
 import { Auth } from "../class/Auth";
 import { Config } from "../class/Config";
+import { OpenVPN } from "../class/OpenVPN";
 import { Window } from "../class/Window";
 import { update } from "../updater";
-import { install } from "../vpnutils";
 
 export class Update extends Window {
 	
@@ -23,7 +23,7 @@ export class Update extends Window {
 			// If the array is empty, remind the user later
 			if (data.length === 0) return Config.set("updater.last-remind-me-later", Date.now());
 			
-			if (data.includes("openvpn")) await install();
+			if (data.includes("openvpn")) await OpenVPN.update();
 			if (data.includes("embervpn")) await update();
 
 			// Send update complete event
