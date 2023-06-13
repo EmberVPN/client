@@ -4,3 +4,4 @@ out
 *.log*
 *.ovpn
 .DS_Store
+*.msi

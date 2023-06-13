@@ -16,7 +16,7 @@ export function UpdateWindow(): JSX.Element {
 	const [ ref ] = useAutoAnimate();
 
 	// Fetch the downloads and OpenVPN version
-	const { data, isLoading } = useData("/v2/ember/downloads");
+	const { data, isLoading } = useData("/v3/ember/downloads");
 	const ovpnVersion = usePromise<string>(electron.ipcRenderer.invoke("openvpn", "version"));
 
 	return (
@@ -57,30 +57,32 @@ function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIRes
 	);
 
 	// Get the latest version
-	const latest = data.version.substring(1);
+	const latest = data.latest.substring(1);
 	const isLatest = latest === version || gt(version, latest);
 
 	// Get the latest OpenVPN version
-	const ovpnLatest = data.openvpn.substring(1);
+	const ovpnLatest = data.dependencies["openvpn"].latest.substring(1);
 	const isOvpnLatest = ovpnLatest === ovpnVersion || gt(ovpnVersion, ovpnLatest);
 
 	// Get the versions to display
 	const versions = [ {
 		name: "Ember VPN",
+		product: "embervpn",
 		version,
 		latest,
 		isLatest,
 	}, {
 		name: "OpenVPN Core",
 		subtitle: "Required by Ember VPN",
+		product: "openvpn",
 		isLatest: isOvpnLatest,
 		version: ovpnLatest,
 		latest: ovpnLatest,
 	} ];
 
 	const outdated: string[] = [];
-	if (!isLatest) outdated.push("embervpn");
-	if (!isOvpnLatest) outdated.push("openvpn");
+	versions.filter(item => !item.isLatest)
+		.forEach(item => outdated.push(item.product));
 
 	// Update the application
 	async function update() {
