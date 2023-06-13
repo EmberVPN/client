@@ -8,7 +8,9 @@ import { dirname, extname, join, resolve } from "path";
 import { resources } from "..";
 import { calculateDistance } from "../../calculateDistance";
 import { Auth } from "./Auth";
+import { Config } from "./Config";
 import { IPManager } from "./IPManager";
+import { OpenSSH } from "./OpenSSH";
 import { Tray } from "./Tray";
 
 export class OpenVPN {
@@ -138,7 +140,11 @@ export class OpenVPN {
 		if (this.proc !== null) this.disconnect(true);
 		
 		// Spawn openvpn process (should be the same for all platforms)
-		return this.proc = spawn(binary, [ "--config", config ], { detached: true });
+		return this.proc = spawn(binary, [
+			"--config",
+			config,
+			...(Config.get("settings.security.use-ssh") ? [ "--remote", "host", "localhost", "tcp" ] : [])
+		], { detached: true });
 		
 	}
 
@@ -235,12 +241,16 @@ export class OpenVPN {
 		if (!auth) throw new Error("Authorization not set");
 
 		// Download config
-		const { success, config } = await fetch(`https://api.embervpn.org/v2/rsa/download-client-config?server=${ server.hash }`, {
+		const { success, config } = await fetch("https://api.embervpn.org/v2/rsa/download-client-config", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 				"Authorization": auth
-			}
+			},
+			body: JSON.stringify({
+				server: server.hash,
+				ed25519: Config.get("settings.security.use-ssh") ? await OpenSSH.generateKeyPair() : null,
+			})
 		}).then(res => res.json() as Promise<{ success: boolean, config: string }>);
 			
 		// Check for errors
