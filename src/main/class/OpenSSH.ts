@@ -1,5 +1,9 @@
 import { exec } from "child_process";
-import { ipcMain } from "electron";
+import { app, ipcMain } from "electron";
+import { writeFile } from "fs/promises";
+import os from "os";
+import { dirname, extname, join } from "path";
+import { resources } from "..";
 
 export class OpenSSH {
 
@@ -22,11 +26,33 @@ export class OpenSSH {
 	 * @returns Promise<void>
 	 */
 	public static async update() {
-
+		
 		// Check platform
 		if (process.platform === "win32") {
+			
+			// Get architecture
+			const arch = [ "ppc64", "x64", "s390x" ].includes(os.arch()) ? "win64" : os.arch() === "arm64" ? "arm64" : "win32";
 
-			return;
+			// Get latest version from API
+			const downloads = await fetch("https://api.embervpn.org/v3/ember/downloads")
+				.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>)
+				.then(res => res.success ? res.dependencies["openssh"].assets[process.platform] : null);
+			if (!downloads) throw new Error("Failed to get latest version of OpenSSH");
+
+			// Get download link
+			const download = downloads.find(download => download.toLowerCase().includes(arch));
+			if (!download) throw new Error("Failed to find a download for this platform/architecture");
+
+			const savePath = join(resources, "openssh-update" + extname(download));
+			
+			// Download installer
+			await fetch(download)
+				.then(res => res.arrayBuffer())
+				.then(buffer => writeFile(savePath, Buffer.from(buffer)));
+
+			// Install openssh
+			return await new Promise(resolve => exec(`msiexec /i "${ savePath }" PRODUCTDIR="${ dirname(app.getPath("exe")) }" ADDLOCAL=Client /passive`, resolve));
+
 		}
 
 		throw new Error("Unsupported platform");

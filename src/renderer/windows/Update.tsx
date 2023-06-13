@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { useState } from "react";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdArrowRight, MdBrowserUpdated, MdErrorOutline } from "react-icons/md";
-import { coerce, gt } from "semver";
+import { coerce, gt, major, minor } from "semver";
 import Titlebar from "../components/Titlebar";
 import { useConfigKey } from "../util/hooks/useConfigKey";
 import useData from "../util/hooks/useData";
@@ -90,7 +90,7 @@ function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: string, o
 	if (sshEnabled) {
 		const current = coerce(opensshVersion.split(/[a-z]/)[0])?.format() || "";
 		const latest = coerce(data.dependencies["openssh"].latest.substring(1).toLowerCase().split(/[a-z]/)[0])?.format() || "";
-		const isLatest = gt(current, latest);
+		const isLatest = gt(current, latest) || (major(current) === major(latest) && minor(current) === minor(latest));
 		versions.push({
 			name: "OpenSSH",
 			product: "openssh",
@@ -110,7 +110,7 @@ function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: string, o
 		setLoading(true);
 		electron.ipcRenderer.send("update", outdated);
 		await new Promise(resolve => electron.ipcRenderer.once("update-finished", resolve));
-		setLoading(false);
+		location.reload();
 	}
 
 	// If the version is the latest, show the message
