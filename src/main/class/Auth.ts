@@ -37,7 +37,7 @@ export class Auth {
 
 	/**
 	 * Destroys the current authorization token
-	 * @returns void
+	 * @returns Promise<void>
 	 */
 	protected static async destroy() {
 
@@ -62,7 +62,7 @@ export class Auth {
 	/**
 	 * Fetch user from authorization token
 	 * @param token The authorization token (optional)
-	 * @returns Auth.User
+	 * @returns Promise<Auth.User>
 	 */
 	public static async fetchUser(token = Auth.authorization) {
 
@@ -96,7 +96,7 @@ export class Auth {
 
 	/**
 	 * Gets whether or not the user is authorized
-	 * @returns boolean
+	 * @returns Promise<boolean>
 	 */
 	public static async isAuthorized() {
 		try {

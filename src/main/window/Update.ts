@@ -43,6 +43,7 @@ export class Update extends Window {
 	
 	/**
 	 * Open the update window
+	 * @returns void
 	 */
 	public static open() {
 		this.configure({

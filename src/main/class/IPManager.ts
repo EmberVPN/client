@@ -1,6 +1,7 @@
 import electron from "electron";
 import EventEmitter from "events";
 
+// The interface of an IP location lookup
 export interface IpGeo {
 	ip: string;
 	country_code: string;
@@ -128,12 +129,20 @@ export class IPManager {
 
 	}
 
-	/** Proxy methods to the emitter **/
-
+	/**
+	 * Listen for IP changes
+	 * @param event "change"
+	 * @param listener (ip: string) => void
+	 */
 	public static on(event: "change", listener: (ip: string) => void) {
 		this.emitter.on(event, listener);
 	}
 
+	/**
+	 * Listen for IP changes once
+	 * @param event "change"
+	 * @param listener (ip: string) => void
+	 */
 	public static once(event: "change", listener: (ip: string) => void) {
 		this.emitter.once(event, listener);
 	}
