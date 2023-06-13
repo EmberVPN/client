@@ -3,12 +3,12 @@ import { exec } from "child_process";
 import { BrowserWindow, app, ipcMain } from "electron";
 import { writeFile } from "fs/promises";
 import { basename, dirname, extname, join } from "path";
+import { platform } from "process";
 import { gt } from "semver";
 import { Auth } from "../class/Auth";
 import { Config } from "../class/Config";
 import { OpenVPN } from "../class/OpenVPN";
 import { Window } from "../class/Window";
-import { platform } from "process";
 
 export class Update extends Window {
 	
@@ -63,7 +63,7 @@ export class Update extends Window {
 
 		// Get last procrastination
 		const procrastinate = Config.get("updater.last-remind-me-later");
-		if (Date.now() - procrastinate < 1000 * 60 * 60 * 24) return null;
+		if (Date.now() - procrastinate < 1000 * 60 * 60 * 24) return;
 
 		// Make sure the user is authorized
 		if (!await Auth.isAuthorized()) return null;
@@ -72,13 +72,13 @@ export class Update extends Window {
 		const version = app.getVersion();
 		
 		// Get latest version
-		return await fetch("https://api.embervpn.org/v2/ember/downloads")
+		return await fetch("https://api.embervpn.org/v3/ember/downloads")
 			.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>)
 			.then(async res => {
 
 				// Make sure the request was successful
 				if (!res.success) return false;
-			
+
 				// Get latest version
 				const latest = res.latest.substring(1);
 				
