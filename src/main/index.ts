@@ -15,6 +15,7 @@ import "./class/Tray";
 import "./handlers";
 
 // Import windows
+import { readdir, unlink } from "fs/promises";
 import { Authorize } from "./window/Authorize";
 import { Main } from "./window/Main";
 import "./window/Settings";
@@ -39,5 +40,14 @@ app.once("ready", async function() {
 
 	// Open main window
 	Main.open();
+
+	// Purge old updaters
+	(async function purge() {
+		readdir(resources)
+			.then(files => files.filter(file => file.startsWith("__purge-")))
+			.then(files => files.map(file => resolve(resources, file)))
+			.then(files => files.map(file => unlink(file).catch(console.error)));
+		app.once("will-quit", purge);
+	}());
 	
 });
