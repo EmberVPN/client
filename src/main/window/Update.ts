@@ -7,6 +7,7 @@ import { platform } from "process";
 import { gt } from "semver";
 import { Auth } from "../class/Auth";
 import { Config } from "../class/Config";
+import { EmberAPI } from "../class/EmberAPI";
 import { OpenSSH } from "../class/OpenSSH";
 import { OpenVPN } from "../class/OpenVPN";
 import { Window } from "../class/Window";
@@ -72,35 +73,33 @@ export class Update extends Window {
 
 		// Get current version
 		const version = app.getVersion();
-
-		// TODO: open window if a dependency is out of date
 		
 		// Get latest version
-		return await fetch("https://api.embervpn.org/v3/ember/downloads")
-			.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>)
-			.then(async res => {
+		const versions = await EmberAPI.fetch("/v3/ember/downloads");
 
-				// Make sure the request was successful
-				if (!res.success) return false;
+		// Compare app versions
+		if (gt(versions.latest, version)) {
+			this.open();
+			return true;
+		}
 
-				// Get latest version
-				const latest = res.latest.substring(1);
-				
-				// Compare versions
-				if (!gt(latest, version)) return false;
-				
-				// await 1 second
-				await new Promise<void>(resolve => setTimeout(resolve, 1000));
-				
-				this.open();
-				this.instance?.once("ready-to-show", () => {
-					this.instance?.focus();
-					this.instance?.flashFrame(true);
-				});
-				
-				return true;
-				
-			});
+		// Now openvpn version
+		const ovpnversion = await OpenVPN.getVersion();
+		if (ovpnversion === "MISSING" || gt(versions.dependencies["openvpn"].latest, ovpnversion)) {
+			this.open();
+			return true;
+		}
+
+		// Now openssh version
+		if (!Config.get("settings.security.use-ssh")) return false;
+		
+		const sshversion = await OpenSSH.getVersion();
+		if (sshversion === "MISSING" || gt(versions.dependencies["openssh"].latest, sshversion)) {
+			this.open();
+			return true;
+		}
+
+		return false;
 		
 	}
 
