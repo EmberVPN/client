@@ -1,8 +1,8 @@
-name: Continuous Deployment
+name: Deployment
 
 on:
   workflow_run:
-    workflows: ["Continuous Integration"]
+    workflows: ["Integration"]
     types:
     - completed
     branches:
