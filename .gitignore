@@ -5,4 +5,4 @@ out
 *.ovpn
 .DS_Store
 .ssh
-.msi
+*.msi
