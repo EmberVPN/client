@@ -72,6 +72,8 @@ export class Update extends Window {
 
 		// Get current version
 		const version = app.getVersion();
+
+		// TODO: open window if a dependency is out of date
 		
 		// Get latest version
 		return await fetch("https://api.embervpn.org/v3/ember/downloads")

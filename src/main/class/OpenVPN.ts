@@ -121,7 +121,9 @@ export class OpenVPN {
 		if (!this.server) throw new Error("Server not set");
 		
 		// Get binary and config path
-		const binary = await this.getBinary();
+		const binary = await this.getBinary(true);
+		if (!binary) throw new Error("Failed to get openvpn binary");
+
 		const config = resolve(resources, "__purge-lastconfig.ovpn");
 		
 		// Set connecting state
@@ -204,12 +206,16 @@ export class OpenVPN {
 	 * @returns Promise<string>
 	 */
 	public static async getVersion() {
-		const binary = await this.getBinary();
+
+		// Get binary
+		const binary = await this.getBinary(false);
+		if (!binary) return "MISSING";
+
 		return await new Promise<string>(resolve => {
 
 			// Spawn openvpn process (should be the same for all platforms)
 			const proc = spawn(binary, [ "--version" ], { detached: true });
-			
+
 			// Listen for data
 			proc.stdout.on("data", data => {
 				const version = data.toString().split("\n")[0].split(" ")[1];
@@ -309,9 +315,9 @@ export class OpenVPN {
 
 	/**
 	 * Locate the OpenVPN binary
-	 * @returns Promise<string>
+	 * @returns Promise<string | null>
 	 */
-	public static async getBinary() {
+	public static async getBinary(installIfMissing = true): Promise<string | null> {
 
 		// Check platform
 		if (process.platform === "win32") {
@@ -328,15 +334,19 @@ export class OpenVPN {
 			const bundledLocation = resolve(dirname(app.getPath("exe")), "bin/openvpn.exe");
 			if (existsSync(bundledLocation)) return bundledLocation;
 		
-			// Set state to installing
-			BrowserWindow.getAllWindows()
-				.map(win => win.webContents.send("openvpn", "installing"));
-			
-			// Install OpenVPN
-			await this.update();
+			if (installIfMissing) {
+				
+				// Set state to installing
+				BrowserWindow.getAllWindows()
+					.map(win => win.webContents.send("openvpn", "installing"));
+				
+				// Install OpenVPN
+				await this.update();
+				
+				// Return bundled location
+				return await this.getBinary();
 
-			// Return bundled location
-			return await this.getBinary();
+			} else return null;
 
 		}
 	
