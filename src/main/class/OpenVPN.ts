@@ -7,8 +7,8 @@ import os from "os";
 import { dirname, extname, join, resolve } from "path";
 import { resources } from "..";
 import { calculateDistance } from "../../calculateDistance";
-import { Auth } from "./Auth";
 import { Config } from "./Config";
+import { EmberAPI } from "./EmberAPI";
 import { IPManager } from "./IPManager";
 import { OpenSSH } from "./OpenSSH";
 import { Tray } from "./Tray";
@@ -156,10 +156,6 @@ export class OpenVPN {
 	 * @returns Promise<void>
 	 */
 	public static async quickConnect() {
-
-		// Ensure authorization is set
-		const auth = Auth.getAuthorization();
-		if (!auth) throw new Error("Authorization not set");
 		
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "will-connect"));
@@ -167,12 +163,7 @@ export class OpenVPN {
 		await Tray.refreshMenu();
 		
 		// Get servers
-		const servers = await fetch("https://api.embervpn.org/v2/ember/servers", {
-			headers: { "authorization": auth }
-		}).then(res => res.json() as Promise<REST.APIResponse<EmberAPI.Servers>>);
-
-		// Check for errors
-		if (!servers || !servers.success) throw new Error("Failed to fetch servers");
+		const servers = await EmberAPI.fetch("/v2/ember/servers");
 		
 		// Fetch geolocation
 		const geo = await IPManager.fetchGeo();
@@ -234,31 +225,17 @@ export class OpenVPN {
 		this._isConnecting = true;
 		await Tray.refreshMenu();
 
-		// Ensure authorization is set
-		const auth = Auth.getAuthorization();
-		if (!auth) throw new Error("Authorization not set");
-
 		// Get ed25519 key
 		const ed25519 = Config.get("settings.security.use-ssh") ? await OpenSSH.generateKeyPair() : undefined;
 		
 		// Download config
-		const data = await fetch("https://api.embervpn.org/v2/rsa/download-client-config", {
+		const data = await EmberAPI.fetch("/v2/rsa/download-client-config", {
 			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"Authorization": auth
-			},
 			body: JSON.stringify({
 				server: server.hash,
 				ed25519,
 			})
-		}).then(res => res.json() as Promise<REST.APIResponse<{ config: string }>>);
-		
-		// Check for errors
-		if (data && !data.success) throw new Error(data.description);
-		
-		// Ensure we have a config
-		if (!data || !data.success || !data.config) throw new Error("Failed to download config");
+		});
 		
 		// Write config file
 		const path = resolve(resources, "__purge-lastconfig.ovpn");
@@ -368,9 +345,9 @@ export class OpenVPN {
 			const arch = [ "ppc64", "x64", "s390x" ].includes(os.arch()) ? "amd64" : os.arch() === "arm64" ? "arm64" : "x86";
 			
 			// Get latest version from API
-			const downloads = await fetch("https://api.embervpn.org/v3/ember/downloads")
-				.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>)
-				.then(res => res.success ? res.dependencies["openvpn"].assets[process.platform] : null);
+			const downloads = await EmberAPI.fetch("/v3/ember/downloads")
+				.then(res => res.dependencies["openvpn"].assets[process.platform]);
+			
 			if (!downloads) throw new Error("Failed to fetch downloads links");
 
 			// Get download link

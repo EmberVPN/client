@@ -6,6 +6,7 @@ import { mkdirp } from "mkdirp";
 import os from "os";
 import { dirname, extname, join, resolve } from "path";
 import { resources } from "..";
+import { EmberAPI } from "./EmberAPI";
 
 export class OpenSSH {
 
@@ -39,10 +40,8 @@ export class OpenSSH {
 			const arch = [ "ppc64", "x64", "s390x" ].includes(os.arch()) ? "win64" : os.arch() === "arm64" ? "arm64" : "win32";
 
 			// Get latest version from API
-			const downloads = await fetch("https://api.embervpn.org/v3/ember/downloads")
-				.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>)
-				.then(res => res.success ? res.dependencies["openssh"].assets[process.platform] : null);
-			if (!downloads) throw new Error("Failed to get latest version of OpenSSH");
+			const downloads = await EmberAPI.fetch("/v3/ember/downloads")
+				.then(res => res.dependencies["openssh"].assets[process.platform]);
 
 			// Get download link
 			const download = downloads.find(download => download.toLowerCase().includes(arch));

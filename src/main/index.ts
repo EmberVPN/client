@@ -1,10 +1,12 @@
 import { is } from "@electron-toolkit/utils";
 import { app } from "electron";
+import { readdir, unlink } from "fs/promises";
 import { resolve } from "path";
 
 // Import state managers
 import { Auth } from "./class/Auth";
 import "./class/Config";
+import "./class/EmberAPI";
 import "./class/IPManager";
 import "./class/KeybindManager";
 import "./class/OpenSSH";
@@ -15,7 +17,6 @@ import "./class/Tray";
 import "./handlers";
 
 // Import windows
-import { readdir, unlink } from "fs/promises";
 import { Authorize } from "./window/Authorize";
 import { Main } from "./window/Main";
 import "./window/Settings";

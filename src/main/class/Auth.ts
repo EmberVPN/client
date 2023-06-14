@@ -2,32 +2,30 @@ import { BrowserWindow, ipcMain } from "electron";
 import { Authorize } from "../window/Authorize";
 import { Main } from "../window/Main";
 import { Config } from "./Config";
+import { EmberAPI } from "./EmberAPI";
 import { OpenVPN } from "./OpenVPN";
 import { Tray } from "./Tray";
 
-export class Auth {
-
-	// The current authorization token
-	private static authorization?: string = Config.get("auth.token");
+export class Auth extends EmberAPI {
 
 	// The current user
 	private static user?: Auth.User;
 
-	// Listen for authorization token changes
+	// Sync with the render process
 	static {
 		ipcMain.on("authorization", async(_, authorization: string | null) => {
 			
 			// Ignore if the authorization token is the same
-			if (authorization === Auth.authorization) return;
+			if (authorization === EmberAPI.authorization) return;
 			
 			// If were signing out, handle that
-			if (authorization === null) return await Auth.destroy();
+			if (authorization === null) return await Auth.logout();
 
 			// Set authorization token
-			Auth.authorization = authorization;
+			EmberAPI.authorization = authorization;
 
 			// Fetch user
-			await Auth.fetchUser();
+			await Auth.login();
 
 			// Refresh the tray menu
 			await Tray.refreshMenu();
@@ -36,58 +34,48 @@ export class Auth {
 	}
 
 	/**
-	 * Destroys the current authorization token
+	 * Destroys the current authorization token (signs out)
 	 * @returns Promise<void>
 	 */
-	protected static async destroy() {
+	protected static async logout() {
+
+		// Destroy token
+		await EmberAPI.fetch("/v2/auth/session", { method: "DELETE" });
 
 		// Unset authorization token and user
-		Auth.authorization = undefined;
 		Auth.user = undefined;
-
-		// Remove authorization token from config
 		Config.delete("auth.token");
 
+		// Disconnect from OpenVPN
+		await OpenVPN.disconnect();
+		
 		// Close all windows
 		BrowserWindow.getAllWindows().map(win => win.close());
 		
 		// Open login window
 		Authorize.open();
-
-		// Disconnect from OpenVPN
-		OpenVPN.disconnect();
 		
 	}
 
 	/**
-	 * Fetch user from authorization token
-	 * @param token The authorization token (optional)
+	 * Logs in to the Ember API given an authorization token
+	 * @param token The authorization token (defaults to the current authorization token)
 	 * @returns Promise<Auth.User>
 	 */
-	public static async fetchUser(token = Auth.authorization) {
-
-		// Get authorization token
-		const authorization = token;
+	public static async login(token = EmberAPI.authorization) {
 
 		// If we don't have a token, throw an error
-		if (!authorization) throw new Error("No authorization token provided");
+		if (!token) throw new Error("No authorization token. You must provide one from the renderer process.");
 
 		// If we got a token from the renderer, attempt to sign in
-		const resp = await fetch("https://api.embervpn.org/v2/auth/@me", { headers: { authorization }})
-			.then(resp => resp.json() as Promise<REST.APIResponse<{ user: Auth.User }>>)
-			.catch(() => null);
-			
-		// If the response is an error, throw it
-		if (!resp || !resp.success) throw new Error(resp ? resp.readable || resp.description || resp.error : "Unknown error");
+		const resp = await EmberAPI.fetch("/v2/auth/@me");
 
 		// Set authorization token
-		Config.set("auth.token", authorization);
+		EmberAPI.setAuthorization(token);
 
 		// If login window is open, close it and open the main window
-		if (BrowserWindow.getAllWindows().find(win => Authorize.is(win))) {
-			Authorize.close();
-			Main.open();
-		}
+		Authorize.close();
+		Main.open();
 		
 		// Return the user
 		return Auth.user = resp.user;
@@ -100,18 +88,10 @@ export class Auth {
 	 */
 	public static async isAuthorized() {
 		try {
-			return Auth.authorization !== undefined && ((Auth.user || await Auth.fetchUser())?.id || -1) > 0;
+			return EmberAPI.authorization !== undefined && ((Auth.user || await Auth.login())?.id || -1) > 0;
 		} catch (e) {
 			return false;
 		}
-	}
-
-	/**
-	 * Gets the current user authorization token
-	 * @returns string
-	 */
-	public static getAuthorization() {
-		return Auth.authorization;
 	}
 
 }
