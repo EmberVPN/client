@@ -7,6 +7,7 @@ import { platform } from "process";
 import { gt } from "semver";
 import { Auth } from "../class/Auth";
 import { Config } from "../class/Config";
+import { OpenSSH } from "../class/OpenSSH";
 import { OpenVPN } from "../class/OpenVPN";
 import { Window } from "../class/Window";
 
@@ -28,6 +29,7 @@ export class Update extends Window {
 			if (data.length === 0) return Config.set("updater.last-remind-me-later", Date.now());
 			
 			if (data.includes("openvpn")) await OpenVPN.update();
+			if (data.includes("openssh")) await OpenSSH.update();
 			if (data.includes("embervpn")) await this.update();
 
 			// Send update complete event
@@ -70,6 +72,8 @@ export class Update extends Window {
 
 		// Get current version
 		const version = app.getVersion();
+
+		// TODO: open window if a dependency is out of date
 		
 		// Get latest version
 		return await fetch("https://api.embervpn.org/v3/ember/downloads")

@@ -3,10 +3,11 @@ import Button from "@ui-elements/Button";
 import Spinner from "@ui-elements/Spinner";
 import classNames from "classnames";
 import { useState } from "react";
-import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { IoMdCheckmarkCircleOutline, IoMdHelpCircleOutline } from "react-icons/io";
 import { MdArrowRight, MdBrowserUpdated, MdErrorOutline } from "react-icons/md";
-import { gt } from "semver";
+import { coerce, gt, major, minor } from "semver";
 import Titlebar from "../components/Titlebar";
+import { useConfigKey } from "../util/hooks/useConfigKey";
 import useData from "../util/hooks/useData";
 import { usePromise } from "../util/hooks/usePromise";
 
@@ -18,6 +19,7 @@ export function UpdateWindow(): JSX.Element {
 	// Fetch the downloads and OpenVPN version
 	const { data, isLoading } = useData("/v3/ember/downloads");
 	const ovpnVersion = usePromise<string>(electron.ipcRenderer.invoke("openvpn", "version"));
+	const opensshVersion = usePromise<string>(electron.ipcRenderer.invoke("openssh", "version"));
 
 	return (
 		<div className="flex flex-col w-screen h-screen overflow-hidden bg-gray-100 dark:bg-gray-900">
@@ -25,12 +27,13 @@ export function UpdateWindow(): JSX.Element {
 				resizeable={ false }>Check for Updates</Titlebar>
 			<div className="flex justify-center gap-2 px-4 py-4 select-none grow"
 				ref={ ref }>
-				{ (!data || !ovpnVersion || isLoading) ? (
+				{ (!data || !ovpnVersion || isLoading || !opensshVersion) ? (
 					<div className="flex items-center justify-center w-full"
 						key="spinner">
 						<Spinner />
 					</div>
 				) : <Content data={ data }
+					opensshVersion={ opensshVersion }
 					ovpnVersion={ ovpnVersion } /> }
 			</div>
 		</div>
@@ -39,10 +42,13 @@ export function UpdateWindow(): JSX.Element {
 }
 
 // Render the content
-function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIResponse<EmberAPI.ClientDownloads> }) {
+function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: string, opensshVersion: string, data: REST.APIResponse<EmberAPI.ClientDownloads> }) {
 		
 	// Fetch the downloads
 	const [ loading, setLoading ] = useState(false);
+	
+	// Use ssh enabled
+	const [ sshEnabled ] = useConfigKey("settings.security.use-ssh");
 
 	// If failed, show the error message
 	if (!data.success) return (
@@ -58,11 +64,11 @@ function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIRes
 
 	// Get the latest version
 	const latest = data.latest.substring(1);
-	const isLatest = latest === version || gt(version, latest);
+	const isLatest = version !== "MISSING" && (latest === version || gt(version, latest));
 
 	// Get the latest OpenVPN version
 	const ovpnLatest = data.dependencies["openvpn"].latest.substring(1);
-	const isOvpnLatest = ovpnLatest === ovpnVersion || gt(ovpnVersion, ovpnLatest);
+	const isOvpnLatest = ovpnVersion !== "MISSING" && (ovpnLatest === ovpnVersion || gt(ovpnVersion, ovpnLatest));
 
 	// Get the versions to display
 	const versions = [ {
@@ -73,12 +79,29 @@ function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIRes
 		isLatest,
 	}, {
 		name: "OpenVPN Core",
-		subtitle: "Required by Ember VPN",
 		product: "openvpn",
+		subtitle: "Required by Ember VPN",
 		isLatest: isOvpnLatest,
-		version: ovpnLatest,
+		version: ovpnVersion,
 		latest: ovpnLatest,
 	} ];
+	
+	console.log(versions);
+	
+	// Add OpenSSH if enabled
+	if (sshEnabled) {
+		const current = coerce(opensshVersion.split(/[a-z]/)[0])?.format() || "";
+		const latest = coerce(data.dependencies["openssh"].latest.substring(1).toLowerCase().split(/[a-z]/)[0])?.format() || "";
+		const isLatest = gt(current, latest) || (major(current) === major(latest) && minor(current) === minor(latest)) && current !== "MISSING";
+		versions.push({
+			name: "OpenSSH",
+			product: "openssh",
+			subtitle: "Required for SSH Tunneling",
+			isLatest,
+			version: current,
+			latest
+		});
+	}
 
 	const outdated: string[] = [];
 	versions.filter(item => !item.isLatest)
@@ -89,20 +112,22 @@ function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIRes
 		setLoading(true);
 		electron.ipcRenderer.send("update", outdated);
 		await new Promise(resolve => electron.ipcRenderer.once("update-finished", resolve));
-		setLoading(false);
+		location.reload();
 	}
+
+	const isMissing = versions.some(item => item.version === "MISSING");
 
 	// If the version is the latest, show the message
 	return (
-		<div className="flex flex-col items-center justify-around w-full grow"
+		<div className="flex flex-col items-center justify-around w-full -mt-12 grow"
 			key="result">
 			<div className="flex flex-col items-center gap-2 px-4 m-auto">
 					
 				{/* Update status */}
-				<MdBrowserUpdated className={ classNames("text-6xl shrink-0 mt-9", outdated.length === 0 ? "text-success" : "text-warn") } />
-				<h1 className="text-2xl font-medium">{outdated.length === 0 ? "You're up to date" : "Update found"}</h1>
+				<MdBrowserUpdated className={ classNames("text-6xl shrink-0 mt-9", isMissing ? "text-error" : outdated.length === 0 ? "text-success" : "text-warn") } />
+				<h1 className="text-2xl font-medium">{isMissing ? "Somethings missing" : outdated.length === 0 ? "You're up to date" : "Update found"}</h1>
 				<p className="mb-2 text-sm font-medium text-center dark:font-normal opacity-60">
-					{outdated.length === 0 ? "You're running the latest version of Ember VPN." : "Stay up to date with the latest features and security fixes." }
+					{isMissing ? "Ember VPN is missing software it depends on." : outdated.length === 0 ? "You're running the latest version of Ember VPN." : "Stay up to date with the latest features and security fixes."}
 				</p>
 			</div>
 					
@@ -113,7 +138,7 @@ function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIRes
 						key={ key }>
 								
 						{/* Dependency icon */}
-						{ item.isLatest ? <IoMdCheckmarkCircleOutline className="text-2xl text-success shrink-0" /> : <MdErrorOutline className="text-2xl text-warn shrink-0" />}
+						{ (!item.isLatest && item.version === "MISSING") ? <IoMdHelpCircleOutline className="text-2xl text-error shrink-0" /> : item.isLatest ? <IoMdCheckmarkCircleOutline className="text-2xl text-success shrink-0" /> : <MdErrorOutline className="text-2xl text-warn shrink-0" />}
 								
 						{/* Dependency name */}
 						<div className="flex flex-col grow">
@@ -123,12 +148,13 @@ function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIRes
 
 						{/* Dependency version */}
 						<p className={ classNames("font-medium text-sm uppercase h-6 flex items-center px-2 rounded-md", {
-							"bg-gray-200 dark:bg-gray-700/50 text-gray-900 dark:text-gray-400": item.isLatest,
-							"bg-warn-200 dark:bg-warn-700/50 text-warn-900 dark:text-warn-400": !item.isLatest,
+							"bg-gray-200 dark:bg-gray-700/50 text-gray-900 dark:text-gray-400": item.version !== "MISSING" && item.isLatest,
+							"bg-warn-200 dark:bg-warn-700/50 text-warn-900 dark:text-warn-400": item.version !== "MISSING" && !item.isLatest,
+							"bg-error-200 dark:bg-error-700/50 text-error-900 dark:text-error-400": item.version === "MISSING"
 						}) }>{item.version}</p>
 
 						{/* Latest version */}
-						{!item.isLatest && (<>
+						{!item.isLatest && item.version !== "MISSING" && (<>
 							<MdArrowRight className="-mx-2.5 text-xl shrink-0" />
 							<p className="flex items-center h-6 px-2 text-sm font-medium text-gray-900 uppercase bg-gray-200 rounded-md dark:bg-gray-700/50 dark:text-gray-400">{item.latest}</p>
 						</>)}
@@ -139,16 +165,16 @@ function Content({ ovpnVersion, data }: { ovpnVersion: string, data: REST.APIRes
 
 			{/* Update button */}
 			<div className="flex justify-end w-full gap-4 p-2 mt-4">
-				<Button className={ classNames(outdated.length === 0 && "opacity-0 pointer-events-none") }
+				<Button className={ classNames((outdated.length === 0 || isMissing) && "opacity-0 pointer-events-none") }
 					color="gray"
 					disabled={ loading }
 					onClick={ () => [ electron.ipcRenderer.send("update", []), window.close() ] }
 					variant="outlined">maybe later</Button>
 				<Button className={ classNames(outdated.length === 0 && "opacity-0 pointer-events-none") }
-					color="warn"
+					color={ isMissing ? "error" : "warn" }
 					loading={ loading }
 					onClick={ update }
-					variant="outlined">install update</Button>
+					variant="outlined">{isMissing ? "install" : "update"} all</Button>
 			</div>
 				
 		</div>
