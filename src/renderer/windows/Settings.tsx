@@ -14,7 +14,7 @@ export function SettingsWindow() {
 	
 	// Adjust the window size
 	useMounted(() => electron.ipcRenderer.invoke("window-size", 600, 400));
-
+	
 	// Get config hooks
 	const [ units, setUnits ] = useConfigKey("settings.units.distance");
 	const [ theme, setTheme ] = useConfigKey("settings.appearance.theme");
