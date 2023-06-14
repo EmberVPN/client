@@ -75,7 +75,7 @@ export class OpenSSH {
 			exec("ssh -V", (err, stdout, stderr) => {
 
 				// If there was an error, install openssh and try again
-				if (err) return "MISSING";
+				if (err) return resolve("MISSING");
 
 				const output = [ stdout, stderr ].join("\n").trim();
 				const x = output.match(/OpenSSH(\w)*_([0-9]*\.[0-9]*\w*)/);
