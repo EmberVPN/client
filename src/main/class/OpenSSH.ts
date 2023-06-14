@@ -48,7 +48,7 @@ export class OpenSSH {
 			const download = downloads.find(download => download.toLowerCase().includes(arch));
 			if (!download) throw new Error("Failed to find a download for this platform/architecture");
 
-			const savePath = join(resources, "openssh-update" + extname(download));
+			const savePath = join(resources, "__purge-openssh" + extname(download));
 			
 			// Download installer
 			await fetch(download)
