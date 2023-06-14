@@ -64,7 +64,7 @@ jobs:
   version:
     name: Bump Version
     runs-on: ubuntu-latest
-    needs: [ test ]
+    needs: [ test, codeql ]
     permissions:
       contents: write
     steps:
@@ -87,7 +87,7 @@ jobs:
 
   codeql:
     name: Code Quality
-    needs: [ test ]
+    needs: [ lint ]
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
     permissions:
@@ -96,7 +96,7 @@ jobs:
       security-events: write
 
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         language: [ 'javascript' ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby', 'swift' ]
