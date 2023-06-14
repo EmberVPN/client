@@ -241,7 +241,7 @@ export class OpenVPN {
 		const path = resolve(resources, "__purge-lastconfig.ovpn");
 		await writeFile(path, Buffer.from(data.config, "base64").toString("utf-8"));
 		
-		if (ed25519) await OpenSSH.start(server.ip);
+		if (ed25519) await OpenSSH.connect(server.ip);
 
 	}
 

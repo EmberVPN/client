@@ -107,7 +107,7 @@ export class OpenSSH {
 	 * Start OpenSSH link to a server
 	 * @param ip The server to connect to
 	 */
-	public static async start(ip: string) {
+	public static async connect(ip: string) {
 
 		// Check if OpenSSH is already running
 		if (this.instance?.pid) this.instance.kill();
