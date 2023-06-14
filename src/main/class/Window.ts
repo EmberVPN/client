@@ -18,16 +18,15 @@ export abstract class Window {
 		// Prevent multiple instances
 		const isUnlocked = app.requestSingleInstanceLock();
 		if (!isUnlocked && this.instance && !this.instance.isDestroyed()) {
-			this.instance.show();
-			this.instance.focus();
-			return this.instance;
-		}
 
-		// Prevent multiple instances
-		if (this.instance && !this.instance.isDestroyed()) {
-			this.instance.show();
-			this.instance.focus();
+			// If minimized, restore
+			if (this.instance.isMinimized()) this.instance.restore();
+
+			// If hidden, show
+			if (!this.instance.isVisible()) this.instance.once("ready-to-show", () => this.instance?.show());
+
 			return this.instance;
+
 		}
 
 		// Create the window
