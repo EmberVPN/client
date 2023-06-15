@@ -2,8 +2,9 @@ name: Integration
 
 on:
   push:
-    branches-ignore:
-      - master
+    branches: "**"
+    # branches-ignore:
+      # - master
       
 jobs:
 
@@ -31,7 +32,7 @@ jobs:
     needs: [ source-changed ]
     permissions:
       contents: write
-    if: ${{ needs.source-changed.outputs.source_changed == '1' }}
+    if: needs.source-changed.outputs.source_changed == '1'
     steps:
 
       - name: Checkout
@@ -165,7 +166,7 @@ jobs:
   build:
     name: Build
     needs: [ version ]
-    # if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     runs-on: ${{ (matrix.platform == 'darwin' && 'macos-latest') || (matrix.platform == 'win32' && 'windows-latest') || 'ubuntu-latest' }}
     strategy:
       fail-fast: true
