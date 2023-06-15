@@ -91,7 +91,7 @@ export class OpenVPN {
 		// Notify the UI that we are disconnecting
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "disconnecting"));
-		await Tray.setState("connecting");
+		if (Tray.state !== "disconnected") await Tray.setState("connecting");
 
 		// Await new IP
 		IPManager.dropCache();
