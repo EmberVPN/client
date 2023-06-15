@@ -11,8 +11,6 @@ jobs:
   source-changed:
     name: Did source change
     runs-on: ubuntu-latest
-    outputs:
-      source_changed: ${{ steps.source-changed.outputs.source_changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -22,16 +20,15 @@ jobs:
 
       - name: Check for source changes
         id: source-changed
-        run: |
-          echo "::set-output name=source_changed::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '.*\.(js|jsx|ts|tsx|json)$' | wc -l)"
+        run: echo "numChanges=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '.*\.(js|jsx|ts|tsx|json)$' | wc -l)" >> $GITHUB_ENV
 
   lint:
     name: Lint source
     runs-on: ubuntu-latest
     needs: [ source-changed ]
+    if: ${{ github.env.numChanges > 0 }}
     permissions:
       contents: write
-    if: needs.source-changed.outputs.source_changed == '1'
     steps:
 
       - name: Checkout
