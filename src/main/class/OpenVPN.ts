@@ -239,7 +239,7 @@ export class OpenVPN {
 		const data = await EmberAPI.fetch("/v2/rsa/download-client-config", {
 			method: "POST",
 			body: JSON.stringify({
-				server: server.hash,
+				hash: server.hash,
 				ed25519,
 			})
 		});

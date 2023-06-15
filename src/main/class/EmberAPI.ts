@@ -26,15 +26,17 @@ export class EmberAPI {
 		// Make sure the path is not outside of the API root domain
 		if (path.startsWith("http") && !path.startsWith(EmberAPI.URL)) throw new Error("Path cannot be absolute. Start with a slash to make it relative to the API root.");
 
+		if (!init) init = {};
+		if (!init.headers) init.headers = {} as HeadersInit;
+		if (init.body && typeof init.body !== "string") init.body = JSON.stringify(init.body);
+		if (init.body) init.headers["Content-Type"] = "application/json";
+
 		// If we have an authorization token, add it to the headers
 		if (EmberAPI.authorization) {
-			if (!init) init = {};
-			if (!init.headers) init.headers = {};
-			Object.defineProperty(init.headers, "authorization", {
-				value: EmberAPI.authorization,
-				enumerable: true
-			});
+			init.headers["Authorization"] = EmberAPI.authorization;
 		}
+
+		console.log(path, init);
 
 		// Fetch the data
 		const response = await fetch(EmberAPI.URL.concat(path), init)

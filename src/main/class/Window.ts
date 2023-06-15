@@ -23,7 +23,7 @@ export abstract class Window {
 			if (this.instance.isMinimized()) this.instance.restore();
 
 			// If hidden, show
-			else if (!this.instance.isVisible()) this.instance.once("ready-to-show", () => this.instance?.show());
+			else if (!this.instance.isVisible()) this.instance.show();
 
 			// Return the window
 			return this.instance;

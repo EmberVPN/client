@@ -6,6 +6,10 @@ export class Main extends Window {
 	 * Open the main window
 	 */
 	public static open() {
+
+		// If the instance already exists, just reopen that one
+		if (this.instance) return this.instance.show();
+
 		this.configure({
 			title: "Ember VPN",
 			resizable: true,
