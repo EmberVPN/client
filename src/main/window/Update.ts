@@ -98,10 +98,7 @@ export class Update extends Window {
 		const outOfDate =
 			dependencies.some(dep => dep.has === null) ||
 			dependencies.some(dep => dep.has && dep.wanted && lt(dep.has, dep.wanted));
-		console.log(dependencies, { outOfDate });
 		
-		if (outOfDate) this.open();
-
 		return outOfDate;
 		
 	}
