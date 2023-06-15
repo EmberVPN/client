@@ -11,6 +11,8 @@ jobs:
   source-changed:
     name: Did source change
     runs-on: ubuntu-latest
+    outputs:
+      has_applicable_changes: ${{ steps.check_for_changes.outputs.has_applicable_changes }}
     permissions:
       contents: read
     steps:
@@ -23,8 +25,9 @@ jobs:
           fetch-depth: 0
 
       - name: Check for changes
+        id: check_for_changes
         run: |
-          echo "has_applicable_changes=$([[ $(git diff --name-only 84cbaac64653086b235c77f7376d587cad4e4ea9 87a4ef6dae9918cb9b78eba04cecdbed3b694a28 | grep -E '.*\.(js|jsx|ts|tsx|json)' | wc -l) -gt 0 ]] && echo "true" || echo "false")" >> $GITHUB_ENV
+          echo "has_applicable_changes=$([[ $(git diff --name-only 84cbaac64653086b235c77f7376d587cad4e4ea9 87a4ef6dae9918cb9b78eba04cecdbed3b694a28 | grep -E '.*\.(js|jsx|ts|tsx|json)' | wc -l) -gt 0 ]] && echo "true" || echo "false")" >> $GITHUB_OUTPUT
 
   lint:
     name: Lint source
@@ -32,7 +35,7 @@ jobs:
     needs: [ source-changed ]
     permissions:
       contents: write
-    if: ${{ github.env.has_applicable_changes == 'true' }}
+    if: needs.source-changed.outputs.has_applicable_changes == 'true'
     steps:
 
       - name: Checkout
