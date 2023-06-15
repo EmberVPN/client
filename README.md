@@ -7,7 +7,7 @@ The following may be required by Ember VPN during runtime depending on your oper
 - [PowerShell/Win32-OpenSSH](https://github.com/PowerShell/Win32-OpenSSH)
 ---
 
-## 🙌 Contributing 
+# 🙌 Contributing 
 [![CI/CD](https://github.com/EmberVPN/client/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/EmberVPN/client/actions/workflows/ci-cd.yml)
 ```bash
 git clone -b next --recurse-submodules https://github.com/EmberVPN/client.git embervpn-client
