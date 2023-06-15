@@ -3,8 +3,6 @@ name: CI/CD
 on:
   push:
     branches: "**"
-    # branches-ignore:
-      # - master
       
 jobs:
 
@@ -209,3 +207,5 @@ jobs:
             dist/*.rpm
             dist/*.zip
             dist/*.tar.gz
+
+            
