@@ -37,7 +37,7 @@ jobs:
       
       - name: "output"
         # run: echo ${{needs.source-changed.outputs.source_changed }}
-        run: echo ${{ github.env.diff }} ${{ github.env.diff > 0 }}
+        run: echo ${{ github.env.diff != '0' }}
 
       - name: Checkout
         uses: actions/checkout@v3
