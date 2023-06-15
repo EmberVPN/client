@@ -151,6 +151,8 @@ jobs:
       fail-fast: true
       matrix:
         platform: [ 'darwin', 'win32', 'linux' ]
+    permissions:
+      contents: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
