@@ -115,7 +115,7 @@ export class OpenSSH {
 		// Check if OpenSSH is already running
 		if (this.instance?.pid) this.instance.kill();
 
-		const cmd = `ssh -i "${ this.keypair }" -NL 1194:localhost:1194 vpn@${ ip }`;
+		const cmd = `ssh -i "${ this.keypair }" -NL 1194:localhost:1194 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vpn@${ ip }`;
 
 		// Start the tunnel
 		this.instance = spawn(cmd, { shell: true })
