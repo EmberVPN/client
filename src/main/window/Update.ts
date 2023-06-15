@@ -4,7 +4,7 @@ import { BrowserWindow, app, ipcMain } from "electron";
 import { writeFile } from "fs/promises";
 import { basename, dirname, extname, join } from "path";
 import { platform } from "process";
-import { gt } from "semver";
+import { coerce, gt, lt } from "semver";
 import { Auth } from "../class/Auth";
 import { Config } from "../class/Config";
 import { EmberAPI } from "../class/EmberAPI";
@@ -16,9 +16,6 @@ export class Update extends Window {
 	
 	// Attach event listeners
 	static {
-
-		// Check for updates when a new window is created
-		app.once("browser-window-created", () => this.checkForUpdates());
 
 		// Check for updates every hour
 		setInterval(() => this.checkForUpdates(), 1000 * 60 * 60);
@@ -43,8 +40,8 @@ export class Update extends Window {
 			if (state === "updater") this.open();
 		});
 
-		// On another window open, make sure this one is on top
-		app.on("web-contents-created", () => this.checkForUpdates());
+		// Check for updates on startup
+		app.once("ready", () => this.checkForUpdates());
 			
 	}
 	
@@ -82,24 +79,30 @@ export class Update extends Window {
 			this.open();
 			return true;
 		}
-
-		// Now openvpn version
-		const ovpnversion = await OpenVPN.getVersion();
-		if (ovpnversion === "MISSING" || gt(versions.dependencies["openvpn"].latest, ovpnversion)) {
-			this.open();
-			return true;
-		}
-
-		// Now openssh version
-		if (!Config.get("settings.security.use-ssh")) return false;
 		
-		const sshversion = await OpenSSH.getVersion();
-		if (sshversion === "MISSING" || gt(versions.dependencies["openssh"].latest, sshversion)) {
-			this.open();
-			return true;
-		}
+		// Initialize array of dependencies
+		const dependencies = [ {
+			name: "openvpn",
+			wanted: coerce(versions.dependencies["openvpn"].latest),
+			has: await OpenVPN.getVersion()
+		} ];
 
-		return false;
+		// Check if we're using ssh
+		if (Config.get("settings.security.use-ssh")) dependencies.push({
+			name: "openssh",
+			wanted: coerce(coerce(versions.dependencies["openssh"].latest)?.version.replace(/\.([0-9]*)$/g, ".0")),
+			has: await OpenSSH.getVersion()
+		});
+		
+		// See if a dependency needs to be updated
+		const outOfDate =
+			dependencies.some(dep => dep.has === null) ||
+			dependencies.some(dep => dep.has && dep.wanted && lt(dep.has, dep.wanted));
+		console.log(dependencies, { outOfDate });
+		
+		if (outOfDate) this.open();
+
+		return outOfDate;
 		
 	}
 

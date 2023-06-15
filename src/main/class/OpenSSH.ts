@@ -5,6 +5,7 @@ import { readFile, writeFile } from "fs/promises";
 import { mkdirp } from "mkdirp";
 import os from "os";
 import { dirname, extname, join, resolve } from "path";
+import { SemVer, coerce } from "semver";
 import { resources } from "..";
 import { EmberAPI } from "./EmberAPI";
 
@@ -65,20 +66,22 @@ export class OpenSSH {
 
 	/**
 	 * Gets the version of OpenSSH
-	 * @returns Promise<string> The version of OpenSSH
+	 * @returns Promise<SemVer> The version of OpenSSH
 	 */
 	public static async getVersion() {
 
 		// Get the version
-		return new Promise<string>(resolve => {
+		return new Promise<SemVer | null>((resolve, reject) => {
 			exec("ssh -V", (err, stdout, stderr) => {
 
 				// If there was an error, install openssh and try again
-				if (err) return resolve("MISSING");
+				if (err) return resolve(null);
 
 				const output = [ stdout, stderr ].join("\n").trim();
 				const x = output.match(/OpenSSH(\w)*_([0-9]*\.[0-9]*\w*)/);
-				if (x && x[2]) return resolve(x[2]);
+				const v = x && x[2] && coerce(x[2].replace("p", "."));
+				if (v) resolve(v);
+				else reject("Failed to get version");
 				
 			});
 		});

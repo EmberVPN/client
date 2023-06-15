@@ -23,8 +23,9 @@ export abstract class Window {
 			if (this.instance.isMinimized()) this.instance.restore();
 
 			// If hidden, show
-			if (!this.instance.isVisible()) this.instance.once("ready-to-show", () => this.instance?.show());
+			else if (!this.instance.isVisible()) this.instance.once("ready-to-show", () => this.instance?.show());
 
+			// Return the window
 			return this.instance;
 
 		}
@@ -86,6 +87,11 @@ export abstract class Window {
 		this.instance.webContents.setWindowOpenHandler(details => {
 			shell.openExternal(details.url);
 			return { action: "deny" };
+		});
+
+		this.instance.on("blur", () => {
+			if (!this.instance?.isAlwaysOnTop()) return;
+			this.instance.flashFrame(true);
 		});
 
 		// Return the window

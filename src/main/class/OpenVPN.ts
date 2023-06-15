@@ -5,6 +5,7 @@ import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
 import os from "os";
 import { dirname, extname, join, resolve } from "path";
+import { SemVer, coerce } from "semver";
 import { resources } from "..";
 import { calculateDistance } from "../../calculateDistance";
 import { Config } from "./Config";
@@ -194,26 +195,32 @@ export class OpenVPN {
 
 	/** 
 	 * Get the current version of OpenVPN
-	 * @returns Promise<string>
+	 * @returns Promise<SemVer | null>
 	 */
 	public static async getVersion() {
 
 		// Get binary
 		const binary = await this.getBinary(false);
-		if (!binary) return "MISSING";
+		if (!binary) return null;
 
-		return await new Promise<string>(resolve => {
+		return await new Promise<SemVer | null>((resolve, reject) => {
 
 			// Spawn openvpn process (should be the same for all platforms)
 			const proc = spawn(binary, [ "--version" ], { detached: true });
 
 			// Listen for data
 			proc.stdout.on("data", data => {
-				const version = data.toString().split("\n")[0].split(" ")[1];
-				resolve(version);
+				const raw = data.toString().split("\n")[0].split(" ")[1];
+				const ver = coerce(raw);
+				if (ver) resolve(ver);
+				else reject("Failed to parse version");
 			});
 
+			// On error
+			proc.on("error", reject);
+
 		});
+
 	}
 
 	/**
