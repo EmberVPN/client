@@ -11,20 +11,27 @@ jobs:
   source-changed:
     name: Did source change
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
-      source_changed: ${{ steps.source-changed.outputs.source_changed }}
+      files_changed: ${{ steps.check.outputs.files_changed }}
     steps:
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
           submodules: recursive
 
-      - name: Check for source changes
-        id: source-changed
-        # run: |
-        #   echo "::set-output name=source_changed::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '.*\.(js|jsx|ts|tsx|json)$' | wc -l)"
-        run: echo "diff=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '.*\.(js|jsx|ts|tsx|json)$' | wc -l)" >> $GITHUB_ENV
+      - name: Check for changes
+        id: check
+        run: |
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
+          if echo "${changed_files}" | grep -E '.*\.(js|jsx|ts|tsx|json)$'; then
+            echo "files_changed=true" >> $GITHUB_ENV
+          else
+            echo "files_changed=false" >> $GITHUB_ENV
+          fi
 
   lint:
     name: Lint source
@@ -32,7 +39,7 @@ jobs:
     needs: [ source-changed ]
     permissions:
       contents: write
-    # if: needs.source-changed.outputs.source_changed != '0'
+    if: ${{ needs.source-changed.outputs.files_changed == 'true' }}
     steps:
       
       - name: "output"
