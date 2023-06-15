@@ -221,9 +221,7 @@ jobs:
 
       # download all artifacts from the last step
       - name: Download artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: "*"
+        uses: actions/download-artifact@v3
       
       # create release
       - name: Create release
