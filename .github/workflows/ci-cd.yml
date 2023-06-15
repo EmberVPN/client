@@ -41,16 +41,13 @@ jobs:
       contents: write
     if: ${{ needs.source-changed.outputs.files_changed == 'true' }}
     steps:
-      
-      - name: "output"
-        # run: echo ${{needs.source-changed.outputs.source_changed }}
-        run: echo ${{ github.env.diff != '0' }}
 
       - name: Checkout
         uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
           submodules: recursive
+          fetch-depth: 0
 
       - name: Use Node.js 18
         uses: actions/setup-node@v3
