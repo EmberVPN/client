@@ -1,4 +1,4 @@
-name: Integration
+name: CI/CD
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
       
 jobs:
 
-  # See if any .js,.jsx,.ts,.tsx files were changed
   source-changed:
     name: Did source change
     runs-on: ubuntu-latest
@@ -82,7 +81,6 @@ jobs:
       - name: "Test"
         run: npm run test
 
-  # Code Scanning analyzes your code for security vulnerabilities and coding errors.
   codeql:
     name: Code quality scan
     needs: [ lint ]
