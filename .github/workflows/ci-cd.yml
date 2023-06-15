@@ -23,7 +23,7 @@ jobs:
       - name: Check for source changes
         id: source-changed
         run: |
-          echo "::set-output name=source_changed::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '.*\.(js|jsx|ts|tsx)$' | wc -l)"
+          echo "::set-output name=source_changed::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '.*\.(js|jsx|ts|tsx|json)$' | wc -l)"
 
   lint:
     name: Lint source
