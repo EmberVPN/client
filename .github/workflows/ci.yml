@@ -7,11 +7,31 @@ on:
       
 jobs:
 
-  lint:
-    name: Lint
+  # See if any .js,.jsx,.ts,.tsx files were changed
+  source-changed:
+    name: Did source change
     runs-on: ubuntu-latest
+    outputs:
+      source_changed: ${{ steps.source-changed.outputs.source_changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          submodules: recursive
+
+      - name: Check for source changes
+        id: source-changed
+        run: |
+          echo "::set-output name=source_changed::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '.*\.(js|jsx|ts|tsx)$' | wc -l)"
+
+  lint:
+    name: Lint source
+    runs-on: ubuntu-latest
+    needs: [ source-changed ]
     permissions:
       contents: write
+    if: ${{ needs.source-changed.outputs.source_changed == '1' }}
     steps:
 
       - name: Checkout
@@ -37,7 +57,7 @@ jobs:
           git push origin ${{ github.head_ref }} || true
 
   test:
-    name: Test
+    name: Test build
     runs-on: ubuntu-latest
     needs: [ lint ]
     steps:
@@ -63,7 +83,7 @@ jobs:
 
   # Code Scanning analyzes your code for security vulnerabilities and coding errors.
   codeql:
-    name: Code Quality
+    name: Code quality scan
     needs: [ lint ]
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
@@ -119,7 +139,7 @@ jobs:
         category: "/language:${{matrix.language}}"
 
   version:
-    name: Bump Version
+    name: Bump version
     runs-on: ubuntu-latest
     needs: [ test, codeql ]
     permissions:
@@ -150,7 +170,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        platform: [ 'darwin', 'win32', 'linux' ]
+        platform: [ win32 ]
     permissions:
       contents: write
     env:
