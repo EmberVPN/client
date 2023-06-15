@@ -22,8 +22,9 @@ jobs:
 
       - name: Check for source changes
         id: source-changed
-        run: |
-          echo "::set-output name=source_changed::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '.*\.(js|jsx|ts|tsx|json)$' | wc -l)"
+        # run: |
+        #   echo "::set-output name=source_changed::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '.*\.(js|jsx|ts|tsx|json)$' | wc -l)"
+        run: echo "diff=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '.*\.(js|jsx|ts|tsx|json)$' | wc -l)" >> $GITHUB_ENV
 
   lint:
     name: Lint source
@@ -35,7 +36,8 @@ jobs:
     steps:
       
       - name: "output"
-        run: echo ${{needs.source-changed.outputs.source_changed}}
+        # run: echo ${{needs.source-changed.outputs.source_changed }}
+        run: echo ${{ github.env.diff }} ${{ github.env.diff > 0 }}
 
       - name: Checkout
         uses: actions/checkout@v3
