@@ -33,7 +33,7 @@ jobs:
     needs: [ source-changed ]
     permissions:
       contents: write
-    # if: needs.source-changed.outputs.has_applicable_changes == 'true'
+    if: needs.source-changed.outputs.has_applicable_changes == 'true'
     steps:
 
       - name: Checkout
@@ -152,7 +152,7 @@ jobs:
   build:
     name: Build
     needs: [ version ]
-    # if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     runs-on: ${{ (matrix.platform == 'darwin' && 'macos-latest') || (matrix.platform == 'win32' && 'windows-latest') || 'ubuntu-latest' }}
     strategy:
       fail-fast: true
