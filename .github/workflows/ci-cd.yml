@@ -31,7 +31,7 @@ jobs:
     needs: [ source-changed ]
     permissions:
       contents: write
-    if: needs.source-changed.outputs.source_changed > 0
+    if: needs.source-changed.outputs.source_changed != '0'
     steps:
 
       - name: Checkout
