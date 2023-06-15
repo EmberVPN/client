@@ -28,12 +28,7 @@ jobs:
         id: check
         run: |
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
-          echo $changed_files;
-          if echo "${changed_files}" | grep -E '.*\.(js|jsx|ts|tsx|json)$'; then
-            echo "files_changed=true" >> $GITHUB_ENV
-          else
-            echo "files_changed=false" >> $GITHUB_ENV
-          fi
+          echo changes=$($changed_files | grep -E '.*\.(js|jsx|ts|tsx|json)$')
 
   lint:
     name: Lint source
