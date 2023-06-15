@@ -171,7 +171,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build:${{ (matrix.platform == 'darwin' && 'mac') || (matrix.platform == 'win' && 'win') || 'linux' }}
+        run: npm run build:${{ (matrix.platform == 'darwin' && 'mac') || (matrix.platform == 'win32' && 'win') || 'linux' }}
 
       - name: Upload
         uses: actions/upload-artifact@v3
