@@ -27,7 +27,6 @@ export const resources = is.dev ? resolve(".") : resolve(app.getPath("exe"), "..
 
 // Configure app
 app.setAppUserModelId("org.embervpn.client");
-app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
 app.on("activate", () => Main.open());
 
 // App lifecycle

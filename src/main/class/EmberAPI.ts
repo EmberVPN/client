@@ -3,7 +3,7 @@ import { Config } from "./Config";
 export interface IdealResponses {
 	"/v3/ember/downloads": EmberAPI.ClientDownloads;
 	"/v2/auth/@me": { user: Auth.User };
-	"/v2/auth/session": null;
+	"/auth/session": null;
 	"/v2/ember/servers": EmberAPI.Servers;
 	"/v2/rsa/download-client-config": { config: string };
 }

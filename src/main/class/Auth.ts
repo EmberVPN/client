@@ -39,8 +39,15 @@ export class Auth extends EmberAPI {
 	 */
 	protected static async logout() {
 
+		// Close all windows
+		BrowserWindow.getAllWindows()
+			.map(win => win.close());
+		
+		// Open login window
+		Authorize.open();
+		
 		// Destroy token
-		await EmberAPI.fetch("/v2/auth/session", { method: "DELETE" });
+		await EmberAPI.fetch("/auth/session", { method: "DELETE" });
 
 		// Unset authorization token and user
 		Auth.user = undefined;
@@ -48,12 +55,6 @@ export class Auth extends EmberAPI {
 
 		// Disconnect from OpenVPN
 		await OpenVPN.disconnect();
-		
-		// Close all windows
-		BrowserWindow.getAllWindows().map(win => win.close());
-		
-		// Open login window
-		Authorize.open();
 		
 	}
 

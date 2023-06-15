@@ -26,7 +26,7 @@ export abstract class Window {
 			else if (!this.instance.isVisible()) this.instance.show();
 
 			// Return the window
-			return this.instance;
+			if (!this.instance.isDestroyed()) return this.instance;
 
 		}
 
