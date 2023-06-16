@@ -32,11 +32,7 @@ export class EmberAPI {
 		if (init.body) init.headers["Content-Type"] = "application/json";
 
 		// If we have an authorization token, add it to the headers
-		if (EmberAPI.authorization) {
-			init.headers["Authorization"] = EmberAPI.authorization;
-		}
-
-		console.log(path, init);
+		if (EmberAPI.authorization) init.headers["Authorization"] = EmberAPI.authorization;
 
 		// Fetch the data
 		const response = await fetch(EmberAPI.URL.concat(path), init)

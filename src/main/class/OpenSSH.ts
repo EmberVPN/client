@@ -118,8 +118,7 @@ export class OpenSSH {
 		const cmd = `ssh -i "${ this.keypair }" -NL 1194:localhost:1194 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vpn@${ ip }`;
 
 		// Start the tunnel
-		this.instance = spawn(cmd, { shell: true })
-			.on("exit", () => console.log("exited"));
+		this.instance = spawn(cmd, { shell: true });
 		
 		// Let SSH start
 		return await new Promise(resolve => setTimeout(resolve, 1000));
