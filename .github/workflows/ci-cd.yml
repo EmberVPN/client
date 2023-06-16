@@ -25,7 +25,7 @@ jobs:
       - name: Check for changes
         id: check_for_changes
         run: |
-          echo "has_applicable_changes=$([[ $(git diff --name-only 84cbaac64653086b235c77f7376d587cad4e4ea9 87a4ef6dae9918cb9b78eba04cecdbed3b694a28 | grep -E '.*\.(js|jsx|ts|tsx|json)' | wc -l) -gt 0 ]] && echo "true" || echo "false")" >> $GITHUB_OUTPUT
+          echo "has_applicable_changes=$([[ $(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '.*\.(js|jsx|ts|tsx|json)' | wc -l) -gt 0 ]] && echo "true" || echo "false")" >> $GITHUB_OUTPUT
 
   lint:
     name: Lint source
