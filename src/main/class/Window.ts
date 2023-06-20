@@ -15,18 +15,17 @@ export abstract class Window {
 	 */
 	protected static configure(options?: Electron.BrowserWindowConstructorOptions & { delayed?: boolean }) {
 
-		// Prevent multiple instances
-		const isUnlocked = app.requestSingleInstanceLock();
-		if (!isUnlocked && this.instance && !this.instance.isDestroyed()) {
+		// If the window is already open, focus it
+		if (this.instance) {
 
-			// If minimized, restore
+			// If the window is minimized, restore it
 			if (this.instance.isMinimized()) this.instance.restore();
 
-			// If hidden, show
-			else if (!this.instance.isVisible()) this.instance.show();
+			// Focus the window
+			this.instance.focus();
 
 			// Return the window
-			if (!this.instance.isDestroyed()) return this.instance;
+			return this.instance;
 
 		}
 
