@@ -8,19 +8,22 @@ export abstract class Window {
 	// The current window
 	protected static instance: BrowserWindow | undefined;
 
+	// Whether the window is loading
+	protected static isLoading = true;
+
 	/**
 	 * Configure the window
 	 * @param options BrowserWindowConstructorOptions
 	 * @returns BrowserWindow
 	 */
-	protected static configure(options?: Electron.BrowserWindowConstructorOptions & { delayed?: boolean }) {
-
+	protected static configure(options?: Electron.BrowserWindowConstructorOptions) {
+		
 		// If the window is already open, focus it
-		if (this.instance) {
-
+		if (this.instance && !this.instance.isDestroyed() && !this.isLoading) {
+			
 			// If the window is minimized, restore it
 			if (this.instance.isMinimized()) this.instance.restore();
-
+			
 			// Focus the window
 			this.instance.focus();
 
@@ -60,10 +63,7 @@ export abstract class Window {
 			.replace(/^-|-$/g, "");
 
 		// In development load the react app
-		if (is.dev && process.env["ELECTRON_RENDERER_URL"]) this.instance.loadURL([
-			process.env["ELECTRON_RENDERER_URL"],
-			hash
-		].join("#"));
+		if (is.dev && process.env["ELECTRON_RENDERER_URL"]) this.instance.loadURL([ process.env["ELECTRON_RENDERER_URL"], hash ].join("#"));
 
 		// Otherwise load the index.html file
 		else this.instance.loadFile(resolve(__dirname, "../renderer/index.html"), { hash });
@@ -76,7 +76,10 @@ export abstract class Window {
 		});
 		
 		// Show when ready
-		this.instance.once("ready-to-show", () => setTimeout(() => this.instance?.show(), options?.delayed ? 500 : 50));
+		this.instance.webContents.once("did-finish-load", () => {
+			setTimeout(() => this.instance?.show(), 100);
+			this.isLoading = false;
+		});
 
 		// Listen for titlebar events
 		this.instance.on("maximize", () => this.instance?.webContents.send("titlebar", "maximize"));

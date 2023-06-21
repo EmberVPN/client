@@ -8,7 +8,7 @@ export class Main extends Window {
 	public static open() {
 
 		// If the instance already exists, just reopen that one
-		if (this.instance && !this.instance.isDestroyed()) return this.instance.show();
+		if (this.instance && !this.instance.isDestroyed() && !this.isLoading) return this.instance.show();
 
 		this.configure({
 			title: "Ember VPN",
@@ -16,8 +16,7 @@ export class Main extends Window {
 			height: 600,
 			width: 800,
 			minWidth: 600,
-			minHeight: 400,
-			delayed: true
+			minHeight: 400
 		});
 	}
 	
