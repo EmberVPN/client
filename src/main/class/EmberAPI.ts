@@ -24,7 +24,7 @@ export class EmberAPI {
 	 * @param path The path to fetch from (if not absolute, will be appended to the API root)
 	 * @returns Promise<IdealResponse[T]>
 	 */
-	public static async fetch<T extends keyof IdealResponses>(path: T, init?: Partial<RequestInit>) {
+	public static async fetch<T extends keyof IdealResponses>(path: T, init?: Partial<RequestInit>): Promise<IdealResponses[T]> {
 
 		// Attempt to dedupe
 		const key = `${ init?.method || "GET" } ${ path }`;
