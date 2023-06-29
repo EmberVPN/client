@@ -1,7 +1,7 @@
 import favicon from "@assets/icon.svg";
-import classNames from "classnames";
 import React, { HTMLAttributes, useEffect, useState } from "react";
 import { VscChromeClose, VscChromeMaximize, VscChromeMinimize, VscChromeRestore } from "react-icons/vsc";
+import { cn } from "../util/cn";
 
 interface Props {
 	children?: React.ReactNode;
@@ -38,14 +38,14 @@ export default function Titlebar({ children, resizeable = true, minimizeable = t
 
 	// If were on mac, our job is easy
 	if (platform === "darwin") return (
-		<div className={ classNames("flex h-7 shrink-0 w-full items-center relative isolate select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag text-xs justify-center", className) }>
+		<div className={ cn("flex h-7 shrink-0 w-full items-center relative isolate select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag text-xs justify-center", className) }>
 			<p className="flex items-center my-auto">{children ? `${ children } • Ember VPN` : "Ember VPN"}</p>
 		</div>
 	);
 
 	// Somewhat easier on windows
 	if (platform === "win32") return (
-		<div className={ classNames("flex h-8 shrink-0 w-full items-center relative isolate select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag text-xs justify-between", className) }>
+		<div className={ cn("flex h-8 shrink-0 w-full items-center relative isolate select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag text-xs justify-between", className) }>
 			
 			{/* Left side */}
 			<div className="z-10 flex items-center px-1">
@@ -80,7 +80,7 @@ export default function Titlebar({ children, resizeable = true, minimizeable = t
 
 	// Generic titlebar for most other platforms and linux distros
 	return (
-		<div className={ classNames("flex h-9 shrink-0 w-full items-center relative isolate select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag justify-center group", className) }>
+		<div className={ cn("flex h-9 shrink-0 w-full items-center relative isolate select-none text-gray-800 dark:text-gray-200 z-[70] font-system app-drag justify-center group", className) }>
 			
 			{/* Window title  */}
 			<p className="flex items-center my-auto font-medium -z-[1]">{children ? `${ children } • Ember VPN` : "Ember VPN"}</p>

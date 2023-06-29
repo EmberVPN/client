@@ -316,10 +316,6 @@ export class OpenVPN {
 		
 			if (installIfMissing) {
 				
-				// Set state to installing
-				BrowserWindow.getAllWindows()
-					.map(win => win.webContents.send("openvpn", "installing"));
-				
 				// Install OpenVPN
 				await this.update();
 				

@@ -1,12 +1,12 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Button from "@ui-elements/Button";
 import Spinner from "@ui-elements/Spinner";
-import classNames from "classnames";
 import { useState } from "react";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdArrowRight, MdBrowserUpdated, MdErrorOutline } from "react-icons/md";
 import { SemVer, coerce, lt, major, minor } from "semver";
 import Titlebar from "../components/Titlebar";
+import { cn } from "../util/cn";
 import { useConfigKey } from "../util/hooks/useConfigKey";
 import useData from "../util/hooks/useData";
 import { usePromise } from "../util/hooks/usePromise";
@@ -128,7 +128,7 @@ function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: SemVer | 
 					
 			{/* Update status */}
 			<div className="flex flex-col items-center gap-2 px-4 m-auto">
-				<MdBrowserUpdated className={ classNames("text-6xl shrink-0 mt-9", isUpToDate ? "text-success" : "text-warn") } />
+				<MdBrowserUpdated className={ cn("text-6xl shrink-0 mt-9", isUpToDate ? "text-success" : "text-warn") } />
 				<h1 className="text-2xl font-medium">{isMissing ? "Somethings missing" : isUpToDate ? "You're up to date" : "Update found"}</h1>
 				<p className="mb-2 text-sm font-medium text-center dark:font-normal opacity-60">
 					{isMissing ? "Ember VPN is missing software it depends on." : isUpToDate ? "You're running the latest version of Ember VPN." : "Stay up to date with the latest features and security fixes."}
@@ -151,7 +151,7 @@ function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: SemVer | 
 						</div>
 
 						{/* Dependency version */}
-						<p className={ classNames("font-medium text-sm uppercase h-6 flex items-center px-2 rounded-md", outdated.includes(item.product) ? "bg-warn-200 dark:bg-warn-700/50 text-warn-900 dark:text-warn-400" : "bg-gray-200 dark:bg-gray-700/50 text-gray-900 dark:text-gray-400") }>{item.has === null ? "MISSING" : item.has.toString()}</p>
+						<p className={ cn("font-medium text-sm uppercase h-6 flex items-center px-2 rounded-md", outdated.includes(item.product) ? "bg-warn-200 dark:bg-warn-700/50 text-warn-900 dark:text-warn-400" : "bg-gray-200 dark:bg-gray-700/50 text-gray-900 dark:text-gray-400") }>{item.has === null ? "MISSING" : item.has.toString()}</p>
 
 						{/* Latest version */}
 						{ outdated.includes(item.product) && item.wanted && (<>
@@ -165,12 +165,12 @@ function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: SemVer | 
 
 			{/* Update button */}
 			<div className="flex justify-end w-full gap-4 p-2 mt-4">
-				<Button className={ classNames((isUpToDate || isMissing) && "opacity-0 pointer-events-none", loading && "hidden") }
+				<Button className={ cn((isUpToDate || isMissing) && "opacity-0 pointer-events-none", loading && "hidden") }
 					color="gray"
 					disabled={ loading }
 					onClick={ () => [ electron.ipcRenderer.send("update", []), window.close() ] }
 					variant="outlined">maybe later</Button>
-				<Button className={ classNames(isUpToDate && "opacity-0 pointer-events-none") }
+				<Button className={ cn(isUpToDate && "opacity-0 pointer-events-none") }
 					color="warn"
 					loading={ loading }
 					onClick={ update }

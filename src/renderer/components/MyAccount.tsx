@@ -2,12 +2,12 @@ import DrawerItem from "@ui-elements/Drawer/DrawerItem";
 import Spinner from "@ui-elements/Spinner";
 import Tooltip from "@ui-elements/Tooltip";
 import useRipple from "@ui-elements/util/useCenteredRipple";
-import classNames from "classnames";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { IoMdSettings } from "react-icons/io";
 import { MdExitToApp, MdManageAccounts, MdOutlineBrowserUpdated } from "react-icons/md";
 import User from "../util/class/User";
+import { cn } from "../util/cn";
 import { useUser } from "../util/hooks/useUser";
 
 export let open = () => { };
@@ -39,15 +39,15 @@ export function MyAccount(): JSX.Element {
 	useRipple(ref);
 
 	return (
-		<div className={ classNames("group", _open && "is-open") }>
+		<div className={ cn("group", _open && "is-open") }>
 			
 			{/* Spinner if loading */}
-			<div className={ classNames("absolute top-0 right-0 w-9 transition-opacity", (user && !loading) ? "opacity-0" : "opacity-100") }>
+			<div className={ cn("absolute top-0 right-0 w-9 transition-opacity", (user && !loading) ? "opacity-0" : "opacity-100") }>
 				<Spinner className="w-9" />
 			</div>
 				
 			{/* Menu button */}
-			<button className={ classNames("flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip transition-[opacity,transform] duration-[300ms] ease-bounce", loading ? "opacity-0 scale-75" : "opacity-100 scale-100") }
+			<button className={ cn("flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip transition-[opacity,transform] duration-[300ms] ease-bounce", loading ? "opacity-0 scale-75" : "opacity-100 scale-100") }
 				onClick={ open }
 				ref={ ref }>
 				{user && <img

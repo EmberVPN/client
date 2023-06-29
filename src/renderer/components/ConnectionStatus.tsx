@@ -1,88 +1,80 @@
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Spinner from "@ui-elements/Spinner";
-import classNames from "classnames";
+import { ClassValue } from "clsx";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdErrorOutline } from "react-icons/md";
+import { cn } from "../util/cn";
 import useConnection from "../util/hooks/useConnection";
 import useData from "../util/hooks/useData";
 
-export default function ConnectionStatus() {
+export default function ConnectionStatus(): JSX.Element | null {
 
-	// Get the connection status & server list
-	const { status, ipLocation } = useConnection();
+	// Get the connection status
+	const { status, ipLocation, active } = useConnection();
 	const { data } = useData("/v2/ember/servers");
-	
-	// Derive the state
-	const isConnected = status === "connected";
-	const isLoading = status === "connecting" || status === "disconnecting" || status === "will-connect" || status === "installing" || (status === "disconnected" && !(ipLocation && data)) || status === "error";
-	const isDisconnected = status === "disconnected" && !isLoading && !isConnected;
-	const hasSublabel = status === "will-connect" || status === "connecting" || status === "installing" || status === "connected" || (status === "disconnected" && !isLoading);
+
+	// Use animatable
+	const [ animatable ] = useAutoAnimate({ duration: 100 });
+
+	// Get the class list for the status
+	const classes: ClassValue[] = [
+
+		// Base classes
+		"flex items-center h-12 gap-2 px-3 transition-colors border rounded-full select-none",
+
+		// Color
+		{
+			"border-warn text-warn bg-warn/10": true,
+			"border-success text-success bg-success/10": status === "connected",
+			"border-error text-error bg-error/10": status === "disconnected" || status === "disconnecting",
+		}
+
+	];
 	
 	return (
-		<div className={ classNames("flex items-center justify-center h-12 gap-2 px-5 transition-colors border rounded-full select-none", {
-			"border-warn/25 bg-warn/10": isLoading,
-			"border-success/25 bg-success/10": isConnected,
-			"border-error/25 bg-error/10": isDisconnected
-		}) }>
+		<div className={ cn(classes) }>
 			
 			{/* Icon */}
-			<div className="relative w-6 -ml-2 aspect-square shrink-0">
+			<div className="flex items-center justify-center w-6 h-6" ref={ animatable }>
+				{function() {
+					switch (status) {
 
-				{/* Loading */}
-				<div className={ classNames("transition-[opacity,transform] duration-[300ms] ease-bounce absolute inset-0", isLoading ? "scale-100 opacity-100" : "scale-50 opacity-0") }>
-					<Spinner className="stroke-warn" />
-				</div>
+						// Spinner
+						default:
+							return <Spinner className="stroke-current" key="spinner" />;
+					
+						// Disconnected
+						case "disconnected":
+							return <MdErrorOutline className="w-full h-full text-current" key="disconnected" />;
+						
+						// Connected
+						case "connected":
+							return <IoMdCheckmarkCircleOutline className="w-full h-full text-current" key="connected" />;
 
-				{/* Disconnected */}
-				<div className={ classNames("transition-[opacity,transform] duration-[300ms] ease-bounce absolute inset-0", isDisconnected ? "scale-100 opacity-100" : "scale-50 opacity-0") }>
-					<MdErrorOutline className="text-2xl text-error" />
-				</div>
-
-				{/* Connected */}
-				<div className={ classNames("transition-[opacity,transform] duration-[300ms] ease-bounce absolute inset-0", isConnected ? "scale-100 opacity-100" : "scale-50 opacity-0") }>
-					<IoMdCheckmarkCircleOutline className="text-2xl text-success" />
-				</div>
-
+					}
+				}()}
 			</div>
 
-			{/* Text */}
-			<div className="flex flex-col justify-center w-full pr-2 font-medium whitespace-nowrap">
+			{/* Status indicator */}
+			<div className="flex flex-col justify-center pr-1">
 				
-				{/* Label */}
-				<h1 className={ classNames("transition-[margin,color]", hasSublabel && "-mb-1", {
-					"text-warn": isLoading,
-					"text-success": isConnected,
-					"text-error": isDisconnected
-				}) }>
+				{/* Status text */}
+				<h1 className="font-medium whitespace-nowrap" key={ status }>
 					{function() {
 						switch (status) {
-							case "installing": return "Updating";
-							case "will-connect": return "Pending";
-							case "connecting": return "Connecting";
-							case "disconnecting": return "Disconnecting";
-							case "connected": return "Connected";
-							case "error":
-							case "disconnected":
-								if (!ipLocation || !data) return "Obtaining IP";
-								else return "Disconnected";
-							default: return "Loading";
+							default: return status.replace(/-/g, " ").replace(/(?:^|\s)\S/g, a => a.toUpperCase());
+							
+							// Will connect
+							case "will-connect": return "Generating Keys";
+						
 						}
 					}()}
 				</h1>
-				
-				{/* Sublabel */}
-				<p className={ classNames("transition-[height,transform,opacity] overflow-hidden origin-left text-xs", hasSublabel ? "h-4 opacity-100" : "h-0 opacity-0") }>
-					{function() {
-						switch (status) {
-							case "installing": return "OpenVPN Core";
-							case "will-connect": return "Generating keypair";
-							case "connecting":
-							case "disconnecting": return "Obtaining IP";
-							case "connected":
-							case "disconnected":
-							default: return ipLocation?.ip ?? "Couldn't determine IP";
-						}
-					}()}
-				</p>
+
+				{/* Status subtext */}
+				{status.endsWith("ed") && ipLocation && (
+					<p className="-mt-1 text-xs font-medium text-gray-700 dark:text-gray-300">{(status === "connected" && data && data.success && active && data.servers) ? data.servers[active].ip : ipLocation?.ip}</p>
+				)}
 
 			</div>
 			
