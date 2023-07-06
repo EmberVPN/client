@@ -270,7 +270,7 @@ export class OpenVPN {
 		});
 
 		// Log stdout
-		this.proc.stdout?.on("data", data => {
+		this.proc.stdout?.on("data", async data => {
 			const line = data.toString().trim();
 			console.log("[OpenVPN]", line);
 			
@@ -279,27 +279,20 @@ export class OpenVPN {
 				return;
 			}
 
-			// Error on connection failed
-			if (line.includes("connection-reset")) {
-				this.proc?.emit("error", new Error("Connection failed"));
-				return;
+			// If we are connected
+			if (line.includes("Initialization Sequence Completed")) {
+
+				// Set connected
+				await Tray.setState("connected");
+				Tray.notify(`New IP: ${ server.ip }`);
+				BrowserWindow.getAllWindows()
+					.map(win => win.webContents.send("openvpn", "connected", server.hash));
+				
 			}
 
 			BrowserWindow.getAllWindows()
 				.map(win => win.webContents.send("openvpn", "log", server.hash, line));
 		});
-
-		// Await new geolocation
-		const newIp: string = await new Promise(resolve => IPManager.once("change", resolve));
-		const geo = await IPManager.fetchGeo(newIp);
-
-		if (geo.ip !== server.ip) throw new Error("Failed to connect to server");
-		
-		// Set connected
-		await Tray.setState("connected");
-		Tray.notify(`Connected to ${ geo.country_code }`);
-		BrowserWindow.getAllWindows()
-			.map(win => win.webContents.send("openvpn", "connected", server.hash));
 		
 	}
 
