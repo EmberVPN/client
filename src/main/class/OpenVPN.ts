@@ -279,6 +279,12 @@ export class OpenVPN {
 				return;
 			}
 
+			// Error on connection failed
+			if (line.includes("connection-reset")) {
+				this.proc?.emit("error", new Error("Connection failed"));
+				return;
+			}
+
 			BrowserWindow.getAllWindows()
 				.map(win => win.webContents.send("openvpn", "log", server.hash, line));
 		});
