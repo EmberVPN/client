@@ -279,6 +279,12 @@ export class OpenVPN {
 				return;
 			}
 
+			// Error on connection failed
+			if (line.includes("Restart pause, 2")) {
+				this.proc?.emit("error", new Error("Connection failed"));
+				return;
+			}
+
 			// If we are connected
 			if (line.includes("Initialization Sequence Completed")) {
 
