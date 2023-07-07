@@ -1,6 +1,5 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Spinner from "@ui-elements/Spinner";
-import { ClassValue } from "clsx";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdErrorOutline } from "react-icons/md";
 import { cn } from "../util/cn";
@@ -13,68 +12,46 @@ export default function ConnectionStatus(): JSX.Element | null {
 	const { status, ipLocation, active } = useConnection();
 	const { data } = useData("/v2/ember/servers");
 
-	// Use animatable
-	const [ animatable ] = useAutoAnimate({ duration: 100 });
+	const [ animated ] = useAutoAnimate();
 
 	// Get the class list for the status
-	const classes: ClassValue[] = [
-
-		// Base classes
-		"flex items-center h-12 gap-2 px-3 transition-colors border rounded-full select-none",
-
-		// Color
-		{
-			"border-warn text-warn bg-warn/10": true,
-			"border-success text-success bg-success/10": status === "connected",
-			"border-error text-error bg-error/10": status === "disconnected" || status === "disconnecting",
-		}
-
-	];
+	const classes = {
+		"flex items-center h-12 gap-2 px-3 border rounded-full select-none": true,
+		"border-warn text-warn bg-warn/10": true,
+		"border-success text-success bg-success/10": status === "connected",
+		"border-error text-error bg-error/10": status === "disconnected",
+	};
 	
 	return (
 		<div className={ cn(classes) }>
 			
 			{/* Icon */}
-			<div className="flex items-center justify-center w-6 h-6" ref={ animatable }>
-				{function() {
-					switch (status) {
-
-						// Spinner
-						default:
-							return <Spinner className="stroke-current" key="spinner" />;
-					
-						// Disconnected
-						case "disconnected":
-							return <MdErrorOutline className="w-full h-full text-current" key="disconnected" />;
-						
-						// Connected
-						case "connected":
-							return <IoMdCheckmarkCircleOutline className="w-full h-full text-current" key="connected" />;
-
-					}
-				}()}
+			<div className="relative flex items-center justify-center w-6 h-6">
+				<div className={ cn("absolute inset-0", "transition-[transform,opacity]", !(status === "disconnected" || status === "connected") ? "scale-100 opacity-100" : "scale-0 opacity-0") } key="spinner">
+					<Spinner className="stroke-current" />
+				</div>
+				<MdErrorOutline className={ cn("absolute inset-0 w-full h-full text-current", "transition-[transform,opacity]", status === "disconnected" ? "scale-100 opacity-100" : "scale-0 opacity-0") } />
+				<IoMdCheckmarkCircleOutline className={ cn("absolute inset-0 w-full h-full text-current", "transition-[transform,opacity]", status === "connected" ? "scale-100 opacity-100" : "scale-0 opacity-0") } />
 			</div>
 
 			{/* Status indicator */}
-			<div className="flex flex-col justify-center pr-1">
+			<div className="flex flex-col justify-center pr-2" ref={ animated }>
 				
 				{/* Status text */}
-				<h1 className="font-medium whitespace-nowrap" key={ status }>
-					{function() {
-						switch (status) {
-							default: return status.replace(/-/g, " ").replace(/(?:^|\s)\S/g, a => a.toUpperCase());
-							
-							// Will connect
-							case "will-connect": return "Generating Keys";
-						
-						}
-					}()}
+				<h1 className="font-medium leading-6 whitespace-nowrap" key="title">
+					{status === "connected" && "Connected"}
+					{status === "disconnected" && "Disconnected"}
+					{status === "disconnecting" && "Disconnecting"}
+					{!(status === "disconnected" || status === "connected" || status === "disconnecting") && "Connecting"}
 				</h1>
 
 				{/* Status subtext */}
-				{status.endsWith("ed") && ipLocation && (
-					<p className="-mt-1 text-xs font-medium text-gray-700 dark:text-gray-300">{(status === "connected" && data && data.success && active && data.servers) ? data.servers[active].ip : ipLocation?.ip}</p>
-				)}
+				<p className="text-xs font-medium leading-3 text-gray-700 dark:text-gray-300" key="subtitle">
+					{status === "will-connect" && "Generating cryptography"}
+					{status === "connecting" && "Obtaining IP address"}
+					{status === "connected" && data && data.success && active && data.servers[active].ip}
+					{status === "disconnected" && ipLocation?.ip}
+				</p>
 
 			</div>
 			
