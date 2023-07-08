@@ -47,7 +47,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 
 				{/* Status subtext */}
 				<p className="text-xs font-medium leading-3 text-gray-700 dark:text-gray-300" key="subtitle">
-					{status === "will-connect" && "Generating cryptography"}
+					{status === "will-connect" && "Generating Keypair"}
 					{status === "connecting" && "Obtaining IP address"}
 					{status === "connected" && data && data.success && active && data.servers[active].ip}
 					{status === "disconnected" && ipLocation?.ip}
