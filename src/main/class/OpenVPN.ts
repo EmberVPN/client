@@ -256,8 +256,6 @@ export class OpenVPN {
 			return port;
 
 		}());
-
-		console.log(port);
 		
 		// Download config
 		const data = await EmberAPI.fetch("/v2/rsa/download-client-config", {
@@ -265,6 +263,7 @@ export class OpenVPN {
 			body: JSON.stringify({
 				hash: server.hash,
 				ed25519,
+				proto: ed25519 ? "SSH" : "TCP",
 				port
 			})
 		});
