@@ -110,18 +110,24 @@ export class OpenSSH {
 	 * Start OpenSSH link to a server
 	 * @param ip The server to connect to
 	 */
-	public static async connect(ip: string) {
+	public static async connect(ip: string, port: number) {
 
-		// Check if OpenSSH is already running
-		if (this.instance?.pid) this.instance.kill();
+		console.log("[OpenSSH]", "Connecting to:", ip);
 
-		const cmd = `ssh -i "${ this.keypair }" -NL 1194:localhost:1194 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vpn@${ ip }`;
+		// Kill any existing instance
+		if (this.instance) this.instance.kill();
+
+		const cmd = `ssh -i "${ this.keypair }" -vNL ${ port }:localhost:1194 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vpn@${ ip }`;
 
 		// Start the tunnel
-		this.instance = spawn(cmd, { shell: true });
+		this.instance = spawn(cmd, { shell: true })
+			.on("message", message => console.log("[OpenSSH]", message))
+			.on("error", error => console.error("[OpenSSH]", error))
+			.on("close", code => console.log("[OpenSSH]", "Closed with code:", code))
+			.on("disconnect", () => console.log("[OpenSSH]", "Disconnected"));
 		
 		// Let SSH start
-		return await new Promise(resolve => setTimeout(resolve, 1000));
+		return await new Promise(resolve => setTimeout(resolve, 500));
 
 	}
 

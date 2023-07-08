@@ -3,6 +3,7 @@ import { ChildProcess, exec, spawn } from "child_process";
 import { BrowserWindow, ipcMain } from "electron";
 import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
+import { createServer } from "http";
 import os from "os";
 import { extname, join, resolve } from "path";
 import { SemVer, coerce } from "semver";
@@ -140,7 +141,7 @@ export class OpenVPN {
 		if (this.proc !== null) this.disconnect(true);
 		
 		// Spawn openvpn process (should be the same for all platforms)
-		return this.proc = spawn(binary, [ "--config", config ], { detached: true });
+		return this.proc = spawn(binary, [ "--config", config ]);
 		
 	}
 
@@ -234,6 +235,29 @@ export class OpenVPN {
 
 		// Get ed25519 key
 		const ed25519 = Config.get("settings.security.use-ssh") ? await OpenSSH.generateKeyPair() : undefined;
+
+		const port = await (async function findPort() {
+			
+			// Get a random port
+			const port = Math.floor(Math.random() * (65535 - 1024) + 1024);
+
+			// Check if the port is in use
+			const inUse = await new Promise<boolean>(resolve => {
+				const server = createServer();
+				server.listen(port, () => {
+					server.close(() => resolve(false));
+				}).on("error", () => resolve(true));
+			});
+
+			// If the port is in use, try again
+			if (inUse) return findPort();
+
+			// Otherwise return the port
+			return port;
+
+		}());
+
+		console.log(port);
 		
 		// Download config
 		const data = await EmberAPI.fetch("/v2/rsa/download-client-config", {
@@ -241,6 +265,7 @@ export class OpenVPN {
 			body: JSON.stringify({
 				hash: server.hash,
 				ed25519,
+				port
 			})
 		});
 		
@@ -248,7 +273,10 @@ export class OpenVPN {
 		const path = resolve(resources, "__purge-lastconfig.ovpn");
 		await writeFile(path, Buffer.from(data.config, "base64").toString("utf-8"));
 		
-		if (ed25519) await OpenSSH.connect(server.ip);
+		if (ed25519) {
+			await OpenSSH.connect(server.ip, port);
+			await new Promise(resolve => setTimeout(resolve, 1000));
+		}
 
 	}
 
@@ -272,6 +300,7 @@ export class OpenVPN {
 		// Log stdout
 		this.proc.stdout?.on("data", async data => {
 			const line = data.toString().trim();
+
 			console.log("[OpenVPN]", line);
 			
 			if (line.includes("ERROR:")) {
