@@ -16,6 +16,8 @@ export default function useData<T extends keyof Endpoints>(route: T): { data: RE
 			headers: { authorization }
 		})
 			.then(res => res.json());
+	}, {
+		staleTime: 1000 * 5
 	});
 
 	return { isLoading, data };
