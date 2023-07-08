@@ -17,9 +17,9 @@ export default function ConnectionStatus(): JSX.Element | null {
 	// Get the class list for the status
 	const classes = {
 		"flex items-center h-12 gap-2 px-3 border rounded-full select-none": true,
-		"border-warn text-warn bg-warn/10": true,
-		"border-success text-success bg-success/10": status === "connected",
-		"border-error text-error bg-error/10": status === "disconnected",
+		"border-warn/40 text-warn bg-warn/10": true,
+		"border-success/40 text-success bg-success/10": status === "connected",
+		"border-error/40 text-error bg-error/10": status === "disconnected",
 	};
 	
 	return (
