@@ -8,7 +8,6 @@ export class KeybindManager {
 
 	// Keybinds to disregard in production
 	private static disregardInProd: Electron.Accelerator[] = [
-		"CommandOrControl+Shift+I",
 		"CommandOrControl+R",
 		"CommandOrControl+Shift+R",
 	];

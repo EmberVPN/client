@@ -41,7 +41,6 @@ export default function Application() {
 
 	// Theme provider from config
 	const [ theme ] = useConfigKey("settings.appearance.theme");
-
 	useEffect(function() {
 		if (theme === "DARK") return document.documentElement.classList.add("dark");
 		if (theme === "LIGHT") return document.documentElement.classList.remove("dark");

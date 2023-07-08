@@ -55,7 +55,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 			switch (state) {
 
 				case "log":
-					console.log(JSON.parse(message || "{}"));
+					console.log(message);
 					break;
 				
 				case "error":
