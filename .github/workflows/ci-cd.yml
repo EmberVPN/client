@@ -132,6 +132,7 @@ jobs:
     name: Bump version
     runs-on: ubuntu-latest
     needs: [ test, codeql, lint ]
+    if: github.ref != 'refs/heads/master'
     permissions:
       contents: write
     steps:
@@ -154,7 +155,7 @@ jobs:
 
   build:
     name: Build
-    needs: [ version ]
+    needs: [ test, codeql, lint ]
     if: github.ref == 'refs/heads/master'
     runs-on: ${{ (matrix.platform == 'darwin' && 'macos-latest') || (matrix.platform == 'win32' && 'windows-latest') || 'ubuntu-latest' }}
     strategy:
