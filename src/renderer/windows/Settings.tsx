@@ -39,8 +39,8 @@ export function SettingsWindow() {
 								label="Distance Units"
 								onChange={ (event: ChangeEvent<HTMLInputElement>) => setUnits(event.target.value === "Imperial (mi)" ? "IMPERIAL" : "METRIC") }
 								options={ [
+									"Imperial (mi)",
 									"Metric (km)",
-									"Imperial (mi)"
 								] }
 								type="select" />
 						</div>
@@ -58,9 +58,9 @@ export function SettingsWindow() {
 								label="App theme"
 								onChange={ (event: ChangeEvent<HTMLInputElement>) => setTheme(event.target.value.toUpperCase() as typeof theme) }
 								options={ [
-									"System (default)",
+									"Dark",
 									"Light",
-									"Dark"
+									"System (default)",
 								] }
 								type="select" />
 						</div>
