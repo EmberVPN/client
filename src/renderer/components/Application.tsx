@@ -1,4 +1,4 @@
-import Spinner from "@ui-elements/Spinner";
+import { Spinner } from "@nextui/Spinner";
 import useData from "../util/hooks/useData";
 import SelectPlan from "./SelectPlan";
 import { ServerList } from "./ServerList";

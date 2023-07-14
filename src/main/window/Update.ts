@@ -4,9 +4,11 @@ import { BrowserWindow, app, ipcMain } from "electron";
 import { writeFile } from "fs/promises";
 import { basename, dirname, extname, join } from "path";
 import { platform } from "process";
-import { gt } from "semver";
+import { coerce, gt, lt } from "semver";
 import { Auth } from "../class/Auth";
 import { Config } from "../class/Config";
+import { EmberAPI } from "../class/EmberAPI";
+import { OpenSSH } from "../class/OpenSSH";
 import { OpenVPN } from "../class/OpenVPN";
 import { Window } from "../class/Window";
 
@@ -14,9 +16,6 @@ export class Update extends Window {
 	
 	// Attach event listeners
 	static {
-
-		// Check for updates when a new window is created
-		app.once("browser-window-created", () => this.checkForUpdates());
 
 		// Check for updates every hour
 		setInterval(() => this.checkForUpdates(), 1000 * 60 * 60);
@@ -28,6 +27,7 @@ export class Update extends Window {
 			if (data.length === 0) return Config.set("updater.last-remind-me-later", Date.now());
 			
 			if (data.includes("openvpn")) await OpenVPN.update();
+			if (data.includes("openssh")) await OpenSSH.update();
 			if (data.includes("embervpn")) await this.update();
 
 			// Send update complete event
@@ -40,8 +40,8 @@ export class Update extends Window {
 			if (state === "updater") this.open();
 		});
 
-		// On another window open, make sure this one is on top
-		app.on("web-contents-created", () => this.checkForUpdates());
+		// Check for updates on startup
+		app.once("ready", () => this.checkForUpdates());
 			
 	}
 	
@@ -72,31 +72,31 @@ export class Update extends Window {
 		const version = app.getVersion();
 		
 		// Get latest version
-		return await fetch("https://api.embervpn.org/v3/ember/downloads")
-			.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>)
-			.then(async res => {
+		const versions = await EmberAPI.fetch("/v3/ember/downloads");
 
-				// Make sure the request was successful
-				if (!res.success) return false;
-
-				// Get latest version
-				const latest = res.latest.substring(1);
-				
-				// Compare versions
-				if (!gt(latest, version)) return false;
-				
-				// await 1 second
-				await new Promise<void>(resolve => setTimeout(resolve, 1000));
-				
-				this.open();
-				this.instance?.once("ready-to-show", () => {
-					this.instance?.focus();
-					this.instance?.flashFrame(true);
-				});
-				
-				return true;
-				
-			});
+		// Compare app versions
+		if (gt(versions.latest, version)) {
+			this.open();
+			return true;
+		}
+		
+		// Initialize array of dependencies
+		const dependencies = [ {
+			name: "openvpn",
+			wanted: coerce(versions.dependencies["openvpn"].latest),
+			has: await OpenVPN.getVersion()
+		}, {
+			name: "openssh",
+			wanted: coerce(coerce(versions.dependencies["openssh"].latest)?.version.replace(/\.([0-9]*)$/g, ".0")),
+			has: await OpenSSH.getVersion()
+		} ];
+		
+		// See if a dependency needs to be updated
+		const outOfDate =
+			dependencies.some(dep => dep.has === null) ||
+			dependencies.some(dep => dep.has && dep.wanted && lt(dep.has, dep.wanted));
+		
+		return outOfDate;
 		
 	}
 

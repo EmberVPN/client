@@ -1,10 +1,14 @@
 import { useQuery } from "react-query";
+import queryClient from "../queryClient";
 import { useConfigKey } from "./useConfigKey";
 
 interface Endpoints {
 	"/v2/ember/servers": EmberAPI.Servers;
 	"/v3/ember/downloads": EmberAPI.ClientDownloads;
 }
+
+// Drop cache
+electron.ipcRenderer.on("drop-cache", () => queryClient.clear());
 
 export default function useData<T extends keyof Endpoints>(route: T): { data: REST.APIResponse<Endpoints[T]> | undefined, isLoading: boolean } {
 
@@ -16,6 +20,8 @@ export default function useData<T extends keyof Endpoints>(route: T): { data: RE
 			headers: { authorization }
 		})
 			.then(res => res.json());
+	}, {
+		staleTime: 1000 * 5
 	});
 
 	return { isLoading, data };

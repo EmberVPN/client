@@ -22,6 +22,9 @@
 			"@ui-elements/*": [
 				"src/renderer/ui-elements/*"
 			],
+			"@nextui/*": [
+				"src/renderer/nextui/*"
+			],
 			"@assets/*": [
 				"assets/*"
 			],

@@ -1,9 +1,9 @@
-[submodule "src/renderer/ui-elements"]
-	path = src/renderer/ui-elements
-	url = https://github.com/JoshMerlino/ui-elements.git
 [submodule "assets"]
 	path = assets
 	url = https://github.com/EmberVPN/resources.git
 [submodule "types"]
 	path = types
 	url = https://github.com/EmberVPN/types.git
+[submodule "src/renderer/nextui"]
+	path = src/renderer/nextui
+	url = https://github.com/JoshMerlino/nextui.git

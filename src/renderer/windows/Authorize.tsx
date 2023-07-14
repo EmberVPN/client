@@ -1,6 +1,6 @@
-import Spinner from "@ui-elements/Spinner";
 import { useEffect, useRef } from "react";
 import Titlebar from "../components/Titlebar";
+import { Spinner } from "@nextui/Spinner";
 
 export function AuthorizeWindow() {
 

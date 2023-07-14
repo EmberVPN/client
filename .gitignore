@@ -4,4 +4,6 @@ out
 *.log*
 *.ovpn
 .DS_Store
+.ssh
 *.msi
+__purge-*

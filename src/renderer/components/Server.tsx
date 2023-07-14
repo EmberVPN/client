@@ -1,10 +1,10 @@
-import Button from "@ui-elements/Button";
-import Card from "@ui-elements/Card";
-import Spinner from "@ui-elements/Spinner";
-import classNames from "classnames";
+import { Button } from "@nextui/Button";
+import { Card } from "@nextui/Card";
+import { Spinner } from "@nextui/Spinner";
 import { useMemo } from "react";
 import { MdOutlineTimer } from "react-icons/md";
 import { calculateDistance } from "../../calculateDistance";
+import { cn } from "../util/cn";
 import { useConfigKey } from "../util/hooks/useConfigKey";
 import useConnection from "../util/hooks/useConnection";
 import Timestamp from "./Timestamp";
@@ -43,17 +43,17 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 
 	// Render the server
 	return (
-		<li className={ classNames(isLoading && "z-10") }>
-			<Card className={ classNames("transition-[height,margin,transform] duration-100", isLoading ? "h-[88px] my-[23px] scale-110 shadow-lg" : "h-[134px]", isActive && status === "connected" && "scale-110 shadow-lg my-2") }>
+		<li className={ cn(isLoading && "z-10") }>
+			<Card className={ cn("transition-[height,margin,transform] duration-100", isLoading ? "h-[88px] my-[23px] scale-110 shadow-lg" : "h-[134px]", isActive && status === "connected" && "scale-110 shadow-lg my-2") }>
 			
 				{/* Server Info */}
 				<div className="flex items-center gap-4 p-1">
 
 					{/* Icon/spinner */}
 					<div className="relative w-12 h-12 shrink-0">
-						<img className={ classNames(isLoading && "!opacity-0", "opacity-100 transition-opacity") }
+						<img className={ cn(isLoading && "!opacity-0", "opacity-100 transition-opacity") }
 							src={ `https://cdn.ipregistry.co/flags/emojitwo/${ server.location.countryCode.toLowerCase() }.svg` } />
-						<Spinner className={ classNames("absolute top-0 left-0 !stroke-gray-800 dark:!stroke-gray-200", !isLoading && "!opacity-0", "opacity-100 transition-opacity") } />
+						<Spinner className={ cn("absolute top-0 left-0 !stroke-gray-800 dark:!stroke-gray-200", !isLoading && "!opacity-0", "opacity-100 transition-opacity") } />
 					</div>
 					
 					{/* Server details */}
@@ -73,7 +73,7 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 
 									// Measure ping and distance
 									<>
-										<p className={ classNames(ping > 0 ? ping < 50 ? "text-success" : ping < 150 ? "text-warn" : "text-error" : "text-gray", "transition-colors") }>{ping > 0 ? `${ Math.trunc(ping) }ms` : "---"}</p>
+										<p className={ cn(ping > 0 ? ping < 50 ? "text-success" : ping < 150 ? "text-warning" : "text-error" : "text-gray", "transition-colors") }>{ping > 0 ? `${ Math.trunc(ping) }ms` : "---"}</p>
 										
 										<span className="text-gray-400 dark:text-gray-600">•</span>
 										<p>{Intl.NumberFormat().format(Math.floor(distance * (imperial ? 0.621371 : 1)))} {imperial ? "Mi" : "Km"}</p>
@@ -99,7 +99,7 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 
 				{/* Connect/disconnect action */}
 				<Button
-					className={ classNames("justify-center shrink-0", willConnect && "opacity-50 pointer-events-none !shadow-none", active && isLoading && "!opacity-0") }
+					className={ cn("justify-center shrink-0 !w-full", willConnect && "opacity-50 pointer-events-none !shadow-none", active && isLoading && "!opacity-0") }
 					color={ isActive && status === "connected" ? "error" : "success" }
 					onClick={ isActive && status === "connected" ? disconnect : connect }>
 					{(isActive && status === "connected") ? "Disconnect" : "Connect"}

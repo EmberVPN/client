@@ -1,5 +1,6 @@
-import React, { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
+import { Toast, useToasts } from "@nextui/Toast";
+import React, { PropsWithChildren, createContext, useContext, useEffect, useRef, useState } from "react";
+import { MdErrorOutline } from "react-icons/md";
 import useData from "./useData";
 
 type State =| "connected"
@@ -46,6 +47,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 	const [ lastStateChange, setLastStateChange ] = useState<number>(Date.now());
 	const { data: servers } = useData("/v2/ember/servers");
 	const lastServerRef = useRef<string>("");
+	const { push } = useToasts();
 	
 	// Sync state with main process
 	useEffect(function() {
@@ -55,11 +57,11 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 			switch (state) {
 
 				case "log":
-					console.log(JSON.parse(message || "{}"));
+					console.log(message);
 					break;
 				
 				case "error":
-					toast.error(message);
+					push(<Toast icon={ MdErrorOutline } iconColor="error"><p>{message}</p></Toast>, { duration: 5000 });
 				case "disconnected":
 					setStatus("disconnected");
 					setActive(false);
@@ -115,7 +117,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 			electron.ipcRenderer.removeAllListeners("openvpn");
 			electron.ipcRenderer.removeAllListeners("iplocation");
 		};
-	}, [ active, ipLocation, servers, setActive, setIpLocation, setStatus, status ]);
+	}, [ active, ipLocation, push, servers, setActive, setIpLocation, setStatus, status ]);
 
 	return <GlobalStateContext.Provider value={{ status, setStatus, active, setActive, ipLocation, setIpLocation, lastStateChange }}>{children}</GlobalStateContext.Provider>;
 }

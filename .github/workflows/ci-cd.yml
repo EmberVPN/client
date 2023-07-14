@@ -1,0 +1,237 @@
+name: CI/CD
+
+on:
+  push:
+    branches: "**"
+  workflow_dispatch:
+      
+jobs:
+
+  source-changed:
+    name: Did source change
+    runs-on: ubuntu-latest
+    outputs:
+      has_applicable_changes: ${{ steps.check_for_changes.outputs.has_applicable_changes }}
+    permissions:
+      contents: read
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Check for changes
+        id: check_for_changes
+        run: |
+          echo "has_applicable_changes=$([[ $(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '.*\.(js|jsx|ts|tsx|json|less)' | wc -l) -gt 0 ]] && echo "true" || echo "false")" >> $GITHUB_OUTPUT
+
+  lint:
+    name: Lint source
+    runs-on: ubuntu-latest
+    needs: [ source-changed ]
+    permissions:
+      contents: write
+    if: needs.source-changed.outputs.has_applicable_changes == 'true'
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          submodules: recursive
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: "Lint"
+        run: |
+          git config --global user.name 'CI/CD'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          npm run lint || true
+          git commit -am "Eslint: fix all" || true
+          git push origin ${{ github.head_ref }} || true
+
+  test:
+    name: Test build
+    runs-on: ubuntu-latest
+    needs: [ source-changed ]
+    if: needs.source-changed.outputs.has_applicable_changes == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          submodules: recursive
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: "Build"
+        run: npm run build
+
+      - name: "Test"
+        run: npm run test
+
+  codeql:
+    name: Code quality scan
+    needs: [ source-changed ]
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
+    if: needs.source-changed.outputs.has_applicable_changes == 'true'
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: true
+      matrix:
+        language: [ 'javascript' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        
+    - name: Use Node.js 18
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: "Build"
+      run: npm run build
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"
+
+  version:
+    name: Bump version
+    runs-on: ubuntu-latest
+    needs: [ test, codeql, lint ]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Bump Version
+        run: |
+          git config --global user.name 'CI/CD'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          npm version patch -m "Bump: %s"
+          git push origin ${{ github.head_ref }}
+
+  build:
+    name: Build
+    needs: [ version ]
+    if: github.ref == 'refs/heads/master'
+    runs-on: ${{ (matrix.platform == 'darwin' && 'macos-latest') || (matrix.platform == 'win32' && 'windows-latest') || 'ubuntu-latest' }}
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [ win32 ]
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          submodules: recursive
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build:${{ (matrix.platform == 'darwin' && 'mac') || (matrix.platform == 'win32' && 'win') || 'linux' }}
+
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.platform }}
+          path: |
+            dist/*.exe
+            dist/*.msi
+            dist/*.dmg
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
+            dist/*.zip
+            dist/*.tar.gz
+
+  release:
+    name: Create release
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+
+      # checkout
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          
+      # get version
+      - name: Get version
+        id: get-version
+        run: echo ::set-output name=current-version::$(node -p "require('./package.json').version")
+
+      # clear cwd
+      - name: Clear CWD
+        run: rm -rf *
+
+      # download all artifacts from the last step
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+      
+      # create release
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          generate_release_notes: true
+          tag_name: v${{ steps.get-version.outputs.current-version }}
+          files: '**/*'

@@ -1,5 +1,5 @@
 import { is } from "@electron-toolkit/utils";
-import { BrowserWindow, app, globalShortcut } from "electron";
+import { BrowserWindow, app, globalShortcut, ipcRenderer } from "electron";
 import { Settings } from "../window/Settings";
 import { Update } from "../window/Update";
 import { Auth } from "./Auth";
@@ -8,7 +8,6 @@ export class KeybindManager {
 
 	// Keybinds to disregard in production
 	private static disregardInProd: Electron.Accelerator[] = [
-		"CommandOrControl+Shift+I",
 		"CommandOrControl+R",
 		"CommandOrControl+Shift+R",
 	];
@@ -67,6 +66,21 @@ export class KeybindManager {
 		// Control U
 		if (input.control && input.key === "u") {
 			Update.open();
+			event.preventDefault();
+			return;
+		}
+
+		// Control Alt L
+		if (input.control && input.alt && input.key === "l") {
+			Auth.logout();
+			event.preventDefault();
+			return;
+		}
+
+		// Control Shift R
+		if (input.control && input.shift && input.key === "r") {
+			if (is.dev) return;
+			ipcRenderer.send("drop-cache");
 			event.preventDefault();
 			return;
 		}

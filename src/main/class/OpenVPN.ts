@@ -1,23 +1,24 @@
 import admin from "admin-check";
 import { ChildProcess, exec, spawn } from "child_process";
-import { BrowserWindow, app, ipcMain } from "electron";
+import { BrowserWindow, ipcMain } from "electron";
 import { existsSync } from "fs";
 import { writeFile } from "fs/promises";
+import { createServer } from "http";
 import os from "os";
-import { dirname, extname, join, resolve } from "path";
+import { extname, join, resolve } from "path";
+import { SemVer, coerce } from "semver";
 import { resources } from "..";
 import { calculateDistance } from "../../calculateDistance";
-import { Auth } from "./Auth";
+import { Config } from "./Config";
+import { EmberAPI } from "./EmberAPI";
 import { IPManager } from "./IPManager";
+import { OpenSSH } from "./OpenSSH";
 import { Tray } from "./Tray";
 
 export class OpenVPN {
 	
 	// If the manager is currently connecting
 	private static _isConnecting = false;
-
-	// The current version of OpenVPN
-	private static _version: string | null = null;
 
 	// The current process
 	private static proc: ChildProcess | null = null;
@@ -91,7 +92,7 @@ export class OpenVPN {
 		// Notify the UI that we are disconnecting
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "disconnecting"));
-		await Tray.setState("connecting");
+		if (Tray.state !== "disconnected") await Tray.setState("connecting");
 
 		// Await new IP
 		IPManager.dropCache();
@@ -122,7 +123,9 @@ export class OpenVPN {
 		if (!this.server) throw new Error("Server not set");
 		
 		// Get binary and config path
-		const binary = await this.getBinary();
+		const binary = await this.getBinary(true);
+		if (!binary) throw new Error("Failed to get openvpn binary");
+
 		const config = resolve(resources, "__purge-lastconfig.ovpn");
 		
 		// Set connecting state
@@ -138,7 +141,7 @@ export class OpenVPN {
 		if (this.proc !== null) this.disconnect(true);
 		
 		// Spawn openvpn process (should be the same for all platforms)
-		return this.proc = spawn(binary, [ "--config", config ], { detached: true });
+		return this.proc = spawn(binary, [ "--config", config ]);
 		
 	}
 
@@ -155,10 +158,6 @@ export class OpenVPN {
 	 * @returns Promise<void>
 	 */
 	public static async quickConnect() {
-
-		// Ensure authorization is set
-		const auth = Auth.getAuthorization();
-		if (!auth) throw new Error("Authorization not set");
 		
 		BrowserWindow.getAllWindows()
 			.map(win => win.webContents.send("openvpn", "will-connect"));
@@ -166,12 +165,7 @@ export class OpenVPN {
 		await Tray.refreshMenu();
 		
 		// Get servers
-		const servers = await fetch("https://api.embervpn.org/v2/ember/servers", {
-			headers: { "authorization": auth }
-		}).then(res => res.json() as Promise<REST.APIResponse<EmberAPI.Servers>>);
-
-		// Check for errors
-		if (!servers || !servers.success) throw new Error("Failed to fetch servers");
+		const servers = await EmberAPI.fetch("/v2/ember/servers");
 		
 		// Fetch geolocation
 		const geo = await IPManager.fetchGeo();
@@ -202,23 +196,32 @@ export class OpenVPN {
 
 	/** 
 	 * Get the current version of OpenVPN
-	 * @returns Promise<string>
+	 * @returns Promise<SemVer | null>
 	 */
 	public static async getVersion() {
-		if (this._version) return this._version;
-		const binary = await this.getBinary();
-		return this._version = await new Promise<string>(resolve => {
+
+		// Get binary
+		const binary = await this.getBinary(false);
+		if (!binary) return null;
+
+		return await new Promise<SemVer | null>((resolve, reject) => {
 
 			// Spawn openvpn process (should be the same for all platforms)
 			const proc = spawn(binary, [ "--version" ], { detached: true });
-			
+
 			// Listen for data
 			proc.stdout.on("data", data => {
-				const version = data.toString().split("\n")[0].split(" ")[1];
-				resolve(version);
+				const raw = data.toString().split("\n")[0].split(" ")[1];
+				const ver = coerce(raw);
+				if (ver) resolve(ver);
+				else reject("Failed to parse version");
 			});
 
+			// On error
+			proc.on("error", reject);
+
 		});
+
 	}
 
 	/**
@@ -230,25 +233,49 @@ export class OpenVPN {
 		this._isConnecting = true;
 		await Tray.refreshMenu();
 
-		// Ensure authorization is set
-		const auth = Auth.getAuthorization();
-		if (!auth) throw new Error("Authorization not set");
+		// Get ed25519 key
+		const ed25519 = Config.get("settings.openvpn.protocol") === "SSH" ? await OpenSSH.generateKeyPair() : undefined;
 
-		// Download config
-		const { success, config } = await fetch(`https://api.embervpn.org/v2/rsa/download-client-config?server=${ server.hash }`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"Authorization": auth
-			}
-		}).then(res => res.json() as Promise<{ success: boolean, config: string }>);
+		const port = await (async function findPort() {
 			
-		// Check for errors
-		if (!success) throw new Error("Failed to download server config");
+			// Get a random port
+			const port = Math.floor(Math.random() * (65535 - 1024) + 1024);
 
+			// Check if the port is in use
+			const inUse = await new Promise<boolean>(resolve => {
+				const server = createServer();
+				server.listen(port, () => {
+					server.close(() => resolve(false));
+				}).on("error", () => resolve(true));
+			});
+
+			// If the port is in use, try again
+			if (inUse) return findPort();
+
+			// Otherwise return the port
+			return port;
+
+		}());
+		
+		// Download config
+		const data = await EmberAPI.fetch("/v2/rsa/download-client-config", {
+			method: "POST",
+			body: JSON.stringify({
+				hash: server.hash,
+				ed25519,
+				proto: ed25519 ? "SSH" : "TCP",
+				port
+			})
+		});
+		
 		// Write config file
 		const path = resolve(resources, "__purge-lastconfig.ovpn");
-		await writeFile(path, Buffer.from(config, "base64").toString("utf-8"));
+		await writeFile(path, Buffer.from(data.config, "base64").toString("utf-8"));
+		
+		if (ed25519) {
+			await OpenSSH.connect(server.ip, port);
+			await new Promise(resolve => setTimeout(resolve, 1000));
+		}
 
 	}
 
@@ -270,8 +297,9 @@ export class OpenVPN {
 		});
 
 		// Log stdout
-		this.proc.stdout?.on("data", data => {
+		this.proc.stdout?.on("data", async data => {
 			const line = data.toString().trim();
+
 			console.log("[OpenVPN]", line);
 			
 			if (line.includes("ERROR:")) {
@@ -279,29 +307,34 @@ export class OpenVPN {
 				return;
 			}
 
+			// Error on connection failed
+			if (line.includes("Restart pause, 2")) {
+				this.proc?.emit("error", new Error("Connection failed"));
+				return;
+			}
+
+			// If we are connected
+			if (line.includes("Initialization Sequence Completed")) {
+
+				// Set connected
+				await Tray.setState("connected");
+				Tray.notify(`New IP: ${ server.ip }`);
+				BrowserWindow.getAllWindows()
+					.map(win => win.webContents.send("openvpn", "connected", server.hash));
+				
+			}
+
 			BrowserWindow.getAllWindows()
 				.map(win => win.webContents.send("openvpn", "log", server.hash, line));
 		});
-
-		// Await new geolocation
-		const newIp: string = await new Promise(resolve => IPManager.once("change", resolve));
-		const geo = await IPManager.fetchGeo(newIp);
-
-		if (geo.ip !== server.ip) throw new Error("Failed to connect to server");
-		
-		// Set connected
-		await Tray.setState("connected");
-		Tray.notify(`Connected to ${ geo.country_code }`);
-		BrowserWindow.getAllWindows()
-			.map(win => win.webContents.send("openvpn", "connected", server.hash));
 		
 	}
 
 	/**
 	 * Locate the OpenVPN binary
-	 * @returns Promise<string>
+	 * @returns Promise<string | null>
 	 */
-	public static async getBinary() {
+	public static async getBinary(installIfMissing = true): Promise<string | null> {
 
 		// Check platform
 		if (process.platform === "win32") {
@@ -313,20 +346,16 @@ export class OpenVPN {
 			// Check default location
 			const defaultLocation = resolve(process.env.ProgramFiles || "C:\\Program Files", "OpenVPN/bin/openvpn.exe");
 			if (existsSync(defaultLocation)) return defaultLocation;
-
-			// Check bundled location
-			const bundledLocation = resolve(dirname(app.getPath("exe")), "bin/openvpn.exe");
-			if (existsSync(bundledLocation)) return bundledLocation;
 		
-			// Set state to installing
-			BrowserWindow.getAllWindows()
-				.map(win => win.webContents.send("openvpn", "installing"));
-			
-			// Install OpenVPN
-			await this.update();
+			if (installIfMissing) {
+				
+				// Install OpenVPN
+				await this.update();
+				
+				// Return bundled location
+				return await this.getBinary();
 
-			// Return bundled location
-			return await this.getBinary();
+			} else return null;
 
 		}
 	
@@ -348,9 +377,9 @@ export class OpenVPN {
 			const arch = [ "ppc64", "x64", "s390x" ].includes(os.arch()) ? "amd64" : os.arch() === "arm64" ? "arm64" : "x86";
 			
 			// Get latest version from API
-			const downloads = await fetch("https://api.embervpn.org/v3/ember/downloads")
-				.then(res => res.json() as Promise<REST.APIResponse<EmberAPI.ClientDownloads>>)
-				.then(res => res.success ? res.dependencies["openvpn"].assets[process.platform] : null);
+			const downloads = await EmberAPI.fetch("/v3/ember/downloads")
+				.then(res => res.dependencies["openvpn"].assets[process.platform]);
+			
 			if (!downloads) throw new Error("Failed to fetch downloads links");
 
 			// Get download link
@@ -365,7 +394,7 @@ export class OpenVPN {
 				.then(buffer => writeFile(savePath, Buffer.from(buffer)));
 
 			// Install openvpn
-			return await new Promise(resolve => exec(`msiexec /i "${ savePath }" PRODUCTDIR="${ dirname(app.getPath("exe")) }" ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun /passive`, resolve));
+			return await new Promise(resolve => exec(`msiexec /i "${ savePath }" ADDLOCAL=OpenVPN.Service,Drivers.OvpnDco,OpenVPN,Drivers,Drivers.TAPWindows6,Drivers.Wintun /passive`, resolve));
 
 		}
 
