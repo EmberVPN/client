@@ -7,7 +7,7 @@ import useConnection from "../util/hooks/useConnection";
 export function SettingsWindow() {
 
 	// Get the current IP location
-	const { ipLocation } = useConnection();
+	const { ipLocation, status } = useConnection();
 	
 	// Get config hooks
 	const [ units, setUnits ] = useConfigKey("settings.units.distance");
@@ -75,16 +75,18 @@ export function SettingsWindow() {
 					<div className="flex items-center justify-between h-20 gap-4 py-2 -mb-4">
 						<div className="flex flex-col justify-center">
 							<h1 className="-mb-0.5 text-lg font-medium opacity-80">Protocol</h1>
-							<p className="text-sm font-medium dark:font-normal opacity-60">Select the protocol openvpn uses.</p>
+							<p className="text-sm font-medium dark:font-normal opacity-60">Select the protocol OpenVPN uses.</p>
 						</div>
 						<div className="pt-3 my-auto bg-gray-100 dark:bg-gray-900">
 							<InputField
 								defaultValue={ protocol || "TCP" }
+								disabled={ status === "will-connect" || status.includes("connecting") || status === "installing" || status === "disconnecting" || status === "connected" }
 								label="Protocol"
 								onChange={ (event: ChangeEvent<HTMLInputElement>) => setProtocol(event.target.value as typeof protocol) }
 								options={ [
 									"SSH",
-									"TCP"
+									"TCP",
+									{ value: "UDP", disabled: true }
 								] }
 								type="select" />
 						</div>

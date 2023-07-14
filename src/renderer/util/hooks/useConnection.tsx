@@ -61,7 +61,7 @@ export function ConnectionProvider({ children }: PropsWithChildren) {
 					break;
 				
 				case "error":
-					push(<Toast icon={ MdErrorOutline } iconColor="error"><p>{message}</p></Toast>);
+					push(<Toast icon={ MdErrorOutline } iconColor="error"><p>{message}</p></Toast>, { duration: 5000 });
 				case "disconnected":
 					setStatus("disconnected");
 					setActive(false);
