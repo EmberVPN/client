@@ -85,14 +85,11 @@ export class Update extends Window {
 			name: "openvpn",
 			wanted: coerce(versions.dependencies["openvpn"].latest),
 			has: await OpenVPN.getVersion()
-		} ];
-
-		// Check if we're using ssh
-		if (Config.get("settings.security.use-ssh")) dependencies.push({
+		}, {
 			name: "openssh",
 			wanted: coerce(coerce(versions.dependencies["openssh"].latest)?.version.replace(/\.([0-9]*)$/g, ".0")),
 			has: await OpenSSH.getVersion()
-		});
+		} ];
 		
 		// See if a dependency needs to be updated
 		const outOfDate =

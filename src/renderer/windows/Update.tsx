@@ -7,7 +7,6 @@ import { MdArrowRight, MdBrowserUpdated, MdErrorOutline } from "react-icons/md";
 import { SemVer, coerce, lt, major, minor } from "semver";
 import Titlebar from "../components/Titlebar";
 import { cn } from "../util/cn";
-import { useConfigKey } from "../util/hooks/useConfigKey";
 import useData from "../util/hooks/useData";
 import { usePromise } from "../util/hooks/usePromise";
 
@@ -47,9 +46,6 @@ function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: SemVer | 
 		
 	// Fetch the downloads
 	const [ loading, setLoading ] = useState(false);
-	
-	// Use ssh enabled
-	const [ sshEnabled ] = useConfigKey("settings.security.use-ssh");
 
 	// If failed, show the error message
 	if (!data.success) return (
@@ -77,16 +73,13 @@ function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: SemVer | 
 		has: ovpnVersion?.raw ? coerce(ovpnVersion.raw) : null,
 		product: "openvpn",
 		subtitle: "Required by Ember VPN",
-	} ];
-	
-	// Check if we're using ssh
-	if (sshEnabled) dependencies.push({
+	}, {
 		name: "Open SSH",
 		wanted: coerce(data.dependencies["openssh"].latest),
 		has: opensshVersion?.raw ? coerce(opensshVersion.raw) : null,
 		product: "openssh",
 		subtitle: "Required by Ember VPN",
-	});
+	} ];
 	
 	// Add outdated dependencies
 	dependencies.map(function(dependency) {

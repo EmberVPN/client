@@ -1,4 +1,3 @@
-import Checkbox from "@ui-elements/Checkbox";
 import useMounted from "@ui-elements/util/useMounted";
 import { ChangeEvent } from "react";
 import Titlebar from "../components/Titlebar";
@@ -10,7 +9,6 @@ export function SettingsWindow() {
 
 	// Get the current IP location
 	const { ipLocation } = useConnection();
-	const { status } = useConnection();
 	
 	// Adjust the window size
 	useMounted(() => electron.ipcRenderer.invoke("window-size", 600, 400));
@@ -18,7 +16,7 @@ export function SettingsWindow() {
 	// Get config hooks
 	const [ units, setUnits ] = useConfigKey("settings.units.distance");
 	const [ theme, setTheme ] = useConfigKey("settings.appearance.theme");
-	const [ useSSH, setUseSSH ] = useConfigKey("settings.security.use-ssh");
+	const [ protocol, setProtocol ] = useConfigKey("settings.openvpn.protocol");
 
 	// If location is still loading
 	if (!ipLocation) return null;
@@ -73,22 +71,25 @@ export function SettingsWindow() {
 				</section>
 
 				<section className="pb-4">
-					<h1 className="mt-6 text-2xl font-medium">Security</h1>
+					<h1 className="mt-6 text-2xl font-medium">Settings</h1>
 
-					{/* Looparound */}
-					<label className="flex items-center justify-between h-20 gap-4 py-2 -mb-4"
-						htmlFor="opt_looparound">
+					{/* Protocol */}
+					<div className="flex items-center justify-between h-20 gap-4 py-2 -mb-4">
 						<div className="flex flex-col justify-center">
-							<h1 className="-mb-0.5 text-lg font-medium opacity-80">Secure with SSH</h1>
-							<p className="text-sm font-medium dark:font-normal opacity-60">Add an extra layer of encryption via SSH tunneling.</p>
+							<h1 className="-mb-0.5 text-lg font-medium opacity-80">Protocol</h1>
+							<p className="text-sm font-medium dark:font-normal opacity-60">Select the protocol openvpn uses.</p>
 						</div>
 						<div className="pt-3 my-auto">
-							<Checkbox defaultChecked={ useSSH }
-								disabled={ status === "connecting" || status === "connected" || status === "disconnecting" || status === "will-connect" || status === "installing" }
-								id="opt_looparound"
-								onChange={ e => setUseSSH(e.target.checked) } />
+							<DropDown
+								defaultValue={ protocol || "TCP" }
+								label="Protocol"
+								onChange={ (event: ChangeEvent<HTMLInputElement>) => setProtocol(event.target.value as typeof protocol) }
+								options={ [
+									"SSH",
+									"TCP"
+								] } />
 						</div>
-					</label>
+					</div>
 
 				</section>
 

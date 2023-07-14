@@ -234,7 +234,7 @@ export class OpenVPN {
 		await Tray.refreshMenu();
 
 		// Get ed25519 key
-		const ed25519 = Config.get("settings.security.use-ssh") ? await OpenSSH.generateKeyPair() : undefined;
+		const ed25519 = Config.get("settings.openvpn.protocol") === "SSH" ? await OpenSSH.generateKeyPair() : undefined;
 
 		const port = await (async function findPort() {
 			
