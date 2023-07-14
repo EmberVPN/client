@@ -17,7 +17,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 	// Get the class list for the status
 	const classes = {
 		"flex items-center h-12 gap-2 px-3 border rounded-full select-none": true,
-		"border-warn/40 text-warn bg-warn/10": true,
+		"border-warning/40 text-warning bg-warning/10": true,
 		"border-success/40 text-success bg-success/10": status === "connected",
 		"border-error/40 text-error bg-error/10": status === "disconnected",
 	};
@@ -28,7 +28,7 @@ export default function ConnectionStatus(): JSX.Element | null {
 			{/* Icon */}
 			<div className="relative flex items-center justify-center w-6 h-6">
 				<div className={ cn("absolute inset-0", "transition-[transform,opacity]", !(status === "disconnected" || status === "connected") ? "scale-100 opacity-100" : "scale-0 opacity-0") } key="spinner">
-					<Spinner className="stroke-current" />
+					<Spinner color="warning" />
 				</div>
 				<MdErrorOutline className={ cn("absolute inset-0 w-full h-full text-current", "transition-[transform,opacity]", status === "disconnected" ? "scale-100 opacity-100" : "scale-0 opacity-0") } />
 				<IoMdCheckmarkCircleOutline className={ cn("absolute inset-0 w-full h-full text-current", "transition-[transform,opacity]", status === "connected" ? "scale-100 opacity-100" : "scale-0 opacity-0") } />

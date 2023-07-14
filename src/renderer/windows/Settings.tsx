@@ -1,7 +1,6 @@
-import useMounted from "@ui-elements/util/useMounted";
+import { InputField } from "@nextui/InputField";
 import { ChangeEvent } from "react";
 import Titlebar from "../components/Titlebar";
-import DropDown from "../ui-elements/DropDown";
 import { useConfigKey } from "../util/hooks/useConfigKey";
 import useConnection from "../util/hooks/useConnection";
 
@@ -9,9 +8,6 @@ export function SettingsWindow() {
 
 	// Get the current IP location
 	const { ipLocation } = useConnection();
-	
-	// Adjust the window size
-	useMounted(() => electron.ipcRenderer.invoke("window-size", 600, 400));
 	
 	// Get config hooks
 	const [ units, setUnits ] = useConfigKey("settings.units.distance");
@@ -37,15 +33,16 @@ export function SettingsWindow() {
 							<h1 className="-mb-0.5 text-lg font-medium opacity-80">Distance Units</h1>
 							<p className="text-sm font-medium dark:font-normal opacity-60">Change the units used to display distances.</p>
 						</div>
-						<div className="pt-3 my-auto">
-							<DropDown
+						<div className="pt-3 my-auto bg-gray-100 dark:bg-gray-900">
+							<InputField
 								defaultValue={ (units === undefined ? ipLocation?.country_code === "US" : units === "IMPERIAL") ? "Imperial (mi)" : "Metric (km)" }
 								label="Distance Units"
 								onChange={ (event: ChangeEvent<HTMLInputElement>) => setUnits(event.target.value === "Imperial (mi)" ? "IMPERIAL" : "METRIC") }
 								options={ [
 									"Metric (km)",
 									"Imperial (mi)"
-								] } />
+								] }
+								type="select" />
 						</div>
 					</div>
 						
@@ -55,8 +52,8 @@ export function SettingsWindow() {
 							<h1 className="-mb-0.5 text-lg font-medium opacity-80">App theme</h1>
 							<p className="text-sm font-medium dark:font-normal opacity-60">Change the theme used by the app.</p>
 						</div>
-						<div className="pt-3 my-auto">
-							<DropDown
+						<div className="pt-3 my-auto bg-gray-100 dark:bg-gray-900">
+							<InputField
 								defaultValue={ [ "LIGHT", "DARK" ].includes(theme) ? theme.toLowerCase().replace(/^[a-z]/, letter => letter.toUpperCase()) : "System (default)" }
 								label="App theme"
 								onChange={ (event: ChangeEvent<HTMLInputElement>) => setTheme(event.target.value.toUpperCase() as typeof theme) }
@@ -64,7 +61,8 @@ export function SettingsWindow() {
 									"System (default)",
 									"Light",
 									"Dark"
-								] } />
+								] }
+								type="select" />
 						</div>
 					</div>
 
@@ -79,15 +77,16 @@ export function SettingsWindow() {
 							<h1 className="-mb-0.5 text-lg font-medium opacity-80">Protocol</h1>
 							<p className="text-sm font-medium dark:font-normal opacity-60">Select the protocol openvpn uses.</p>
 						</div>
-						<div className="pt-3 my-auto">
-							<DropDown
+						<div className="pt-3 my-auto bg-gray-100 dark:bg-gray-900">
+							<InputField
 								defaultValue={ protocol || "TCP" }
 								label="Protocol"
 								onChange={ (event: ChangeEvent<HTMLInputElement>) => setProtocol(event.target.value as typeof protocol) }
 								options={ [
 									"SSH",
 									"TCP"
-								] } />
+								] }
+								type="select" />
 						</div>
 					</div>
 

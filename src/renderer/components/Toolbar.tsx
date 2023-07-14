@@ -1,23 +1,14 @@
-import ToolbarElement from "@ui-elements/Toolbar";
+import { Toolbar } from "@nextui/Toolbar";
 import ConnectionStatus from "./ConnectionStatus";
 import { MyAccount } from "./MyAccount";
 
-export default function Toolbar() {
-
+export default function t() {
 	return (
-		<ToolbarElement htmlFor="entrypoint">
-
-			{/* Connection status */}
+		<Toolbar className="bg-white dark:bg-gray-800" htmlFor="entrypoint">
 			<ConnectionStatus />
-
-			{/* User account */}
 			<div className="relative flex items-center ml-auto h-9 w-9">
-
-				{/* User avatar */}
 				<MyAccount />
-				
 			</div>
-
-		</ToolbarElement>
+		</Toolbar>
 	);
 }

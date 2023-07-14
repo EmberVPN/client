@@ -1,3 +1,6 @@
+import { Button } from "@nextui/Button";
+import { Card } from "@nextui/Card";
+import { Spinner } from "@nextui/Spinner";
 import { useMemo } from "react";
 import { MdOutlineTimer } from "react-icons/md";
 import { calculateDistance } from "../../calculateDistance";
@@ -5,9 +8,6 @@ import { cn } from "../util/cn";
 import { useConfigKey } from "../util/hooks/useConfigKey";
 import useConnection from "../util/hooks/useConnection";
 import Timestamp from "./Timestamp";
-import { Card } from "@nextui/Card";
-import { Spinner } from "@nextui/Spinner";
-import { Button } from "@nextui/Button";
 
 export default function Server({ server: { ping = -1, ...server }}: { server: Ember.Server & { ping: number } }): JSX.Element | null {
 
@@ -73,7 +73,7 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 
 									// Measure ping and distance
 									<>
-										<p className={ cn(ping > 0 ? ping < 50 ? "text-success" : ping < 150 ? "text-warn" : "text-error" : "text-gray", "transition-colors") }>{ping > 0 ? `${ Math.trunc(ping) }ms` : "---"}</p>
+										<p className={ cn(ping > 0 ? ping < 50 ? "text-success" : ping < 150 ? "text-warning" : "text-error" : "text-gray", "transition-colors") }>{ping > 0 ? `${ Math.trunc(ping) }ms` : "---"}</p>
 										
 										<span className="text-gray-400 dark:text-gray-600">•</span>
 										<p>{Intl.NumberFormat().format(Math.floor(distance * (imperial ? 0.621371 : 1)))} {imperial ? "Mi" : "Km"}</p>

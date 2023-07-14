@@ -1,8 +1,24 @@
-@import "../ui-elements/util/index.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+	@apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	@apply bg-gray-400 dark:bg-gray-600;
+}
+
+::-webkit-scrollbar-thumb:active {
+	@apply bg-gray-500;
+}
 
 html {
 	overflow: hidden;
@@ -11,6 +27,9 @@ html {
 body {
 	@apply bg-gray-100 dark:bg-gray-900 dark:text-gray-100;
 	font-family: 'Roboto', sans-serif;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	-webkit-focus-ring-color:  rgba(0, 0, 0, 0);
+	outline: none;
 }
 
 // Electron window controls

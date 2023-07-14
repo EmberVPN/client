@@ -121,7 +121,7 @@ function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: SemVer | 
 					
 			{/* Update status */}
 			<div className="flex flex-col items-center gap-2 px-4 m-auto">
-				<MdBrowserUpdated className={ cn("text-6xl shrink-0 mt-9", isUpToDate ? "text-success" : "text-warn") } />
+				<MdBrowserUpdated className={ cn("text-6xl shrink-0 mt-9", isUpToDate ? "text-success" : "text-warning") } />
 				<h1 className="text-2xl font-medium">{isMissing ? "Somethings missing" : isUpToDate ? "You're up to date" : "Update found"}</h1>
 				<p className="mb-2 text-sm font-medium text-center dark:font-normal opacity-60">
 					{isMissing ? "Ember VPN is missing software it depends on." : isUpToDate ? "You're running the latest version of Ember VPN." : "Stay up to date with the latest features and security fixes."}
@@ -135,7 +135,7 @@ function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: SemVer | 
 						key={ key }>
 								
 						{/* Dependency icon */}
-						{ outdated.includes(item.product) ? <MdErrorOutline className="text-2xl text-warn shrink-0" /> : <IoMdCheckmarkCircleOutline className="text-2xl text-success shrink-0" />}
+						{ outdated.includes(item.product) ? <MdErrorOutline className="text-2xl text-warning shrink-0" /> : <IoMdCheckmarkCircleOutline className="text-2xl text-success shrink-0" />}
 								
 						{/* Dependency name */}
 						<div className="flex flex-col grow">
@@ -144,7 +144,7 @@ function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: SemVer | 
 						</div>
 
 						{/* Dependency version */}
-						<p className={ cn("font-medium text-sm uppercase h-6 flex items-center px-2 rounded-md", outdated.includes(item.product) ? "bg-warn-200 dark:bg-warn-700/50 text-warn-900 dark:text-warn-400" : "bg-gray-200 dark:bg-gray-700/50 text-gray-900 dark:text-gray-400") }>{item.has === null ? "MISSING" : item.has.toString()}</p>
+						<p className={ cn("font-medium text-sm uppercase h-6 flex items-center px-2 rounded-md", outdated.includes(item.product) ? "bg-warning-200 dark:bg-warning-700/50 text-warning-900 dark:text-warning-400" : "bg-gray-200 dark:bg-gray-700/50 text-gray-900 dark:text-gray-400") }>{item.has === null ? "MISSING" : item.has.toString()}</p>
 
 						{/* Latest version */}
 						{ outdated.includes(item.product) && item.wanted && (<>
