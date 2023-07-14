@@ -37,7 +37,7 @@ export class Auth extends EmberAPI {
 	 * Destroys the current authorization token (signs out)
 	 * @returns Promise<void>
 	 */
-	protected static async logout() {
+	public static async logout() {
 
 		// Close all windows
 		BrowserWindow.getAllWindows()
