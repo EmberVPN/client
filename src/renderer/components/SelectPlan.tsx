@@ -1,7 +1,7 @@
-import Spinner from "@ui-elements/Spinner";
 import { useEffect, useRef } from "react";
 import { useConfigKey } from "../util/hooks/useConfigKey";
 import queryClient from "../util/queryClient";
+import { Spinner } from "@nextui/Spinner";
 
 export default function SelectPlan() {
 

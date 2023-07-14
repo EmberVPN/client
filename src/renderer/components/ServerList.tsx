@@ -1,5 +1,5 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import Spinner from "@ui-elements/Spinner";
+import { Spinner } from "@nextui/Spinner";
 import { useEffect, useState } from "react";
 import { calculateDistance } from "../../calculateDistance";
 import useConnection from "../util/hooks/useConnection";
@@ -55,7 +55,7 @@ export function ServerList({ servers: _servers }: { servers: Ember.Server[]; }):
 			{!servers.length ? (
 				<div className="flex flex-col items-center justify-center w-full h-full"
 					key={ -1 }>
-					<Spinner className="w-12" />
+					<Spinner />
 				</div>
 			) : (
 				<ul className="flex flex-col w-[380px] gap-4 p-4 py-20 m-auto"

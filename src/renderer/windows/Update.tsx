@@ -1,6 +1,6 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import Button from "@ui-elements/Button";
-import Spinner from "@ui-elements/Spinner";
+import { Button } from "@nextui/Button";
+import { Spinner } from "@nextui/Spinner";
 import { useState } from "react";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdArrowRight, MdBrowserUpdated, MdErrorOutline } from "react-icons/md";
@@ -159,12 +159,12 @@ function Content({ ovpnVersion, data, opensshVersion }: { ovpnVersion: SemVer | 
 			{/* Update button */}
 			<div className="flex justify-end w-full gap-4 p-2 mt-4">
 				<Button className={ cn((isUpToDate || isMissing) && "opacity-0 pointer-events-none", loading && "hidden") }
-					color="gray"
+					color="neutral"
 					disabled={ loading }
 					onClick={ () => [ electron.ipcRenderer.send("update", []), window.close() ] }
 					variant="outlined">maybe later</Button>
 				<Button className={ cn(isUpToDate && "opacity-0 pointer-events-none") }
-					color="warn"
+					color="warning"
 					loading={ loading }
 					onClick={ update }
 					variant="outlined">{isMissing ? "install" : "update"} all</Button>

@@ -1,6 +1,3 @@
-import Button from "@ui-elements/Button";
-import Card from "@ui-elements/Card";
-import Spinner from "@ui-elements/Spinner";
 import { useMemo } from "react";
 import { MdOutlineTimer } from "react-icons/md";
 import { calculateDistance } from "../../calculateDistance";
@@ -8,6 +5,9 @@ import { cn } from "../util/cn";
 import { useConfigKey } from "../util/hooks/useConfigKey";
 import useConnection from "../util/hooks/useConnection";
 import Timestamp from "./Timestamp";
+import { Card } from "@nextui/Card";
+import { Spinner } from "@nextui/Spinner";
+import { Button } from "@nextui/Button";
 
 export default function Server({ server: { ping = -1, ...server }}: { server: Ember.Server & { ping: number } }): JSX.Element | null {
 
@@ -99,7 +99,7 @@ export default function Server({ server: { ping = -1, ...server }}: { server: Em
 
 				{/* Connect/disconnect action */}
 				<Button
-					className={ cn("justify-center shrink-0", willConnect && "opacity-50 pointer-events-none !shadow-none", active && isLoading && "!opacity-0") }
+					className={ cn("justify-center shrink-0 !w-full", willConnect && "opacity-50 pointer-events-none !shadow-none", active && isLoading && "!opacity-0") }
 					color={ isActive && status === "connected" ? "error" : "success" }
 					onClick={ isActive && status === "connected" ? disconnect : connect }>
 					{(isActive && status === "connected") ? "Disconnect" : "Connect"}

@@ -1,5 +1,5 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import Spinner from "@ui-elements/Spinner";
+import { Spinner } from "@nextui/Spinner";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdErrorOutline } from "react-icons/md";
 import { cn } from "../util/cn";
@@ -9,7 +9,7 @@ import useData from "../util/hooks/useData";
 export default function ConnectionStatus(): JSX.Element | null {
 
 	// Get the connection status
-	const { status, ipLocation, active } = useConnection();
+	const { ipLocation, active, status } = useConnection();
 	const { data } = useData("/v2/ember/servers");
 
 	const [ animated ] = useAutoAnimate();
