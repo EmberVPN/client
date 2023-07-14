@@ -1,8 +1,7 @@
+import { ToastProvider } from "@nextui/Toast";
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClientProvider } from "react-query";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import "./styles/index.less";
 import { useConfigKey } from "./util/hooks/useConfigKey";
 import { ConnectionProvider } from "./util/hooks/useConnection";
@@ -18,21 +17,11 @@ const root = createRoot(document.getElementById("root") as HTMLElement);
 // Render the app providers
 root.render(
 	<QueryClientProvider client={ queryClient }>
-		<ToastContainer
-			autoClose={ 5000 }
-			closeOnClick
-			draggable
-			hideProgressBar={ false }
-			newestOnTop={ false }
-			pauseOnFocusLoss
-			pauseOnHover
-			position="top-right"
-			rtl={ false }
-			theme="colored"
-		/>
-		<ConnectionProvider>
-			<Application />
-		</ConnectionProvider>
+		<ToastProvider>
+			<ConnectionProvider>
+				<Application />
+			</ConnectionProvider>
+		</ToastProvider>
 	</QueryClientProvider>
 );
 
