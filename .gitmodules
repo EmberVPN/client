@@ -7,3 +7,6 @@
 [submodule "types"]
 	path = types
 	url = https://github.com/EmberVPN/types.git
+[submodule "src/renderer/nextui"]
+	path = src/renderer/nextui
+	url = https://github.com/JoshMerlino/nextui.git
