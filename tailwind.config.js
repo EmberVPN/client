@@ -7,7 +7,7 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
-				primary: { DEFAULT: colors.sky[500], ...colors.sky, "text": colors.white },
+				primary: { DEFAULT: colors.orange[500], ...colors.orange, "text": colors.white },
 				error: { DEFAULT: colors.red[500], ...colors.red, "text": colors.white },
 				success: { DEFAULT: colors.emerald[500], ...colors.emerald, "text": colors.white },
 				warning: { DEFAULT: colors.amber[500], ...colors.amber, "text": colors.amber[950] },

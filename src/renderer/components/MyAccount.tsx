@@ -8,6 +8,7 @@ import { MdExitToApp, MdManageAccounts, MdOutlineBrowserUpdated } from "react-ic
 import User from "../util/class/User";
 import { cn } from "../util/cn";
 import { useUser } from "../util/hooks/useUser";
+import { Ripple } from "@nextui/Ripple";
 
 export function MyAccount(): JSX.Element {
 
@@ -44,6 +45,7 @@ export function MyAccount(): JSX.Element {
 				<button className={ cn("flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip transition-[opacity,transform] duration-[300ms] ease-bounce", loading ? "opacity-0 scale-75" : "opacity-100 scale-100") }
 					onClick={ () => setOpen(true) }
 					ref={ ref }>
+					<Ripple className="bg-black/25 dark:bg-white/25" emitFromCenter />
 					{user && <img
 						alt="user photo"
 						className="rounded-full w-9 h-9"
