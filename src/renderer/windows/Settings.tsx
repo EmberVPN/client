@@ -86,7 +86,7 @@ export function SettingsWindow() {
 								options={ [
 									"SSH",
 									"TCP",
-									{ value: "UDP", disabled: true }
+									"UDP"
 								] }
 								type="select" />
 						</div>
