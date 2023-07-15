@@ -1,5 +1,5 @@
 import { is } from "@electron-toolkit/utils";
-import { BrowserWindow, app, globalShortcut, ipcRenderer } from "electron";
+import { BrowserWindow, app, globalShortcut } from "electron";
 import { Settings } from "../window/Settings";
 import { Update } from "../window/Update";
 import { Auth } from "./Auth";
@@ -77,10 +77,17 @@ export class KeybindManager {
 			return;
 		}
 
+		// F5
+		if (input.key === "F5") {
+			BrowserWindow.getAllWindows().map(win => win.webContents.send("drop-cache"));
+			event.preventDefault();
+			return;
+		}
+		
 		// Control Shift R
 		if (input.control && input.shift && input.key === "r") {
 			if (is.dev) return;
-			ipcRenderer.send("drop-cache");
+			BrowserWindow.getAllWindows().map(win => win.webContents.send("drop-cache"));
 			event.preventDefault();
 			return;
 		}

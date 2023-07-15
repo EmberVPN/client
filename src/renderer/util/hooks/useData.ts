@@ -7,8 +7,15 @@ interface Endpoints {
 	"/v3/ember/downloads": EmberAPI.ClientDownloads;
 }
 
-// Drop cache
-electron.ipcRenderer.on("drop-cache", () => queryClient.clear());
+// Drop cache and refetch data
+electron.ipcRenderer.on("drop-cache", () => {
+	console.log("Dropping cache");
+	queryClient.setQueryData("/v2/ember/servers", () => undefined);
+	queryClient.setQueryData("/v3/ember/downloads", () => undefined);
+
+	// Refetch data
+	queryClient.refetchQueries();
+});
 
 export default function useData<T extends keyof Endpoints>(route: T): { data: REST.APIResponse<Endpoints[T]> | undefined, isLoading: boolean } {
 
