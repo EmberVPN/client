@@ -263,7 +263,7 @@ export class OpenVPN {
 			body: JSON.stringify({
 				hash: server.hash,
 				ed25519,
-				proto: ed25519 ? "SSH" : "TCP",
+				proto: ed25519 ? "SSH" : Config.get("settings.openvpn.protocol"),
 				port
 			})
 		});

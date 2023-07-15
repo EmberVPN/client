@@ -3,11 +3,14 @@ import { ChangeEvent } from "react";
 import Titlebar from "../components/Titlebar";
 import { useConfigKey } from "../util/hooks/useConfigKey";
 import useConnection from "../util/hooks/useConnection";
+import useData from "../util/hooks/useData";
 
 export function SettingsWindow() {
 
 	// Get the current IP location
 	const { ipLocation, status } = useConnection();
+	const { data } = useData("/v2/ember/servers");
+	const servers = Object.values(data && data.success ? data.servers || {} : {});
 	
 	// Get config hooks
 	const [ units, setUnits ] = useConfigKey("settings.units.distance");
@@ -84,9 +87,9 @@ export function SettingsWindow() {
 								label="Protocol"
 								onChange={ (event: ChangeEvent<HTMLInputElement>) => setProtocol(event.target.value as typeof protocol) }
 								options={ [
-									"SSH",
-									"TCP",
-									"UDP"
+									{ value: "SSH", disabled: !servers.some(a => a.proto.toUpperCase().split(",").includes("SSH")) },
+									{ value: "TCP", disabled: !servers.some(a => a.proto.toUpperCase().split(",").includes("TCP")) },
+									{ value: "UDP", disabled: !servers.some(a => a.proto.toUpperCase().split(",").includes("UDP")) }
 								] }
 								type="select" />
 						</div>
