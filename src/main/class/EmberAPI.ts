@@ -37,13 +37,8 @@ export class EmberAPI {
 
 		// If were currently inflight, just wait for that to finish
 		if (EmberAPI.inflight[key] === true) {
-
-			// Wait for the request to finish
 			while (EmberAPI.inflight[key] === true) await new Promise(r => setTimeout(r, 10));
-
-			// Return the cached response
 			return EmberAPI.inflight[key].d;
-
 		}
 		
 		// Make sure the path is not outside of the API root domain
@@ -59,7 +54,6 @@ export class EmberAPI {
 
 		// Set the inflight state
 		EmberAPI.inflight[key] = true;
-
 		console.log(`[FETCH] ${ key }`);
 
 		// Fetch the data

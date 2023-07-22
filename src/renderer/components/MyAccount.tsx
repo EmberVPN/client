@@ -42,7 +42,7 @@ export function MyAccount(): JSX.Element {
 				
 			{/* Menu button */}
 			<Tooltip anchor="right" tooltip="More">
-				<button className={ cn("flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 group/tooltip transition-[opacity,transform] duration-[300ms] ease-bounce", loading ? "opacity-0 scale-75" : "opacity-100 scale-100") }
+				<button className={ cn("flex text-sm rounded-full select-none bg-gray-500/10 md:mr-0 overflow-hidden transition-[opacity,transform] duration-[300ms] ease-bounce", loading ? "opacity-0 scale-75" : "opacity-100 scale-100") }
 					onClick={ () => setOpen(true) }
 					ref={ ref }>
 					<Ripple className="bg-black/25 dark:bg-white/25" emitFromCenter />
