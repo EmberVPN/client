@@ -4,20 +4,36 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
 	main: {
-		plugins: [ externalizeDepsPlugin() ]
+		plugins: [ externalizeDepsPlugin() ],
+		build: {
+			minify: "terser",
+			terserOptions: {
+				compress: true,
+				mangle: true
+			}
+		}
 	},
 	preload: {
-		plugins: [ externalizeDepsPlugin() ]
+		plugins: [ externalizeDepsPlugin() ],
+		build: {
+			minify: "terser",
+			terserOptions: {
+				compress: true,
+				mangle: true
+			}
+		}
 	},
 	renderer: {
-		resolve: {
-			alias: {
-				"styles": "./src/renderer/styles"
-			}
-		},
 		plugins: [
 			react(),
 			tsconfigPaths()
-		]
+		],
+		build: {
+			minify: "terser",
+			terserOptions: {
+				compress: true,
+				mangle: true
+			}
+		}
 	}
 });
