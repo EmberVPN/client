@@ -110,14 +110,14 @@ export class OpenSSH {
 	 * Start OpenSSH link to a server
 	 * @param ip The server to connect to
 	 */
-	public static async connect(ip: string, port: number) {
+	public static async connect(server: Ember.Server, port: number) {
 
-		console.log("[OpenSSH]", "Connecting to:", ip);
+		console.log("[OpenSSH]", "Connecting to:", server.ip);
 
 		// Kill any existing instance
 		if (this.instance) this.instance.kill();
 
-		const cmd = `ssh -i "${ this.keypair }" -vNL ${ port }:localhost:1194 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vpn@${ ip }`;
+		const cmd = `ssh -i "${ this.keypair }" -vNL ${ port }:localhost:${ server.port } -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vpn@${ server.ip }`;
 
 		// Start the tunnel
 		this.instance = spawn(cmd, { shell: true })

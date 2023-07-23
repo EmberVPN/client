@@ -273,7 +273,7 @@ export class OpenVPN {
 		await writeFile(path, Buffer.from(data.config, "base64").toString("utf-8"));
 		
 		if (ed25519) {
-			await OpenSSH.connect(server.ip, port);
+			await OpenSSH.connect(server, port);
 			await new Promise(resolve => setTimeout(resolve, 1000));
 		}
 
