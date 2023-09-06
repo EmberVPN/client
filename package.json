@@ -38,7 +38,7 @@
 		"classnames": "^2.3.2",
 		"clsx": "^2.0.0",
 		"dayjs": "^1.11.7",
-		"electron": "^25.3.0",
+		"electron": "^25.5.0",
 		"electron-builder": "^24.4.0",
 		"electron-fetch": "^1.9.1",
 		"electron-store": "^8.1.0",
