@@ -58,7 +58,7 @@
 		"react-toastify": "^9.1.1",
 		"semver": "^7.5.2",
 		"sudo-prompt": "^9.2.1",
-		"systeminformation": "^5.18.7",
+		"systeminformation": "^5.21.7",
 		"tailwind-merge": "^1.13.2",
 		"tailwindcss": "^3.2.7",
 		"terser": "^5.19.2",
